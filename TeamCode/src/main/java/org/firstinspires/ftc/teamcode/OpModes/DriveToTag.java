@@ -79,11 +79,12 @@ import java.util.concurrent.TimeUnit;
  *
  */
 
-@TeleOp(name="Drive To AprilTag", group = "Concept")
+@TeleOp(name="Drive to Tag", group = "TeleOp")
+
 public class DriveToTag extends LinearOpMode
 {
     // Adjust these numbers to suit your robot.
-    final double DESIRED_DISTANCE = 6.0; //  this is how close the camera should get to the target (inches)
+    final double DESIRED_DISTANCE = 5.0; //  this is how close the camera should get to the target (inches)
 
     //  Set the GAIN constants to control the relationship between the measured position error, and how much power is
     //  applied to the drive motors to correct the error.
@@ -96,23 +97,26 @@ public class DriveToTag extends LinearOpMode
     final double MAX_AUTO_STRAFE= 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
     final double MAX_AUTO_TURN  = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
 
-    private DcMotor FL_Motor = null;  //  Used to control the left front drive wheel
-    private DcMotor FR_Motor = null;  //  Used to control the right front drive wheel
-    private DcMotor BL_Motor = null;  //  Used to control the left back drive wheel
-    private DcMotor BR_Motor = null;  //  Used to control the right back drive wheel
+    private DcMotor leftFrontDrive   = null;  //  Used to control the left front drive wheel
+    private DcMotor rightFrontDrive  = null;  //  Used to control the right front drive wheel
+    private DcMotor leftBackDrive    = null;  //  Used to control the left back drive wheel
+    private DcMotor rightBackDrive   = null;  //  Used to control the right back drive wheel
 
     private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
-    private static final int DESIRED_TAG_ID = 583;     // Choose the tag you want to approach or set to -1 for ANY tag.
+    private static final int DESIRED_TAG_ID = 0;     // Choose the tag you want to approach or set to -1 for ANY tag.
     private VisionPortal visionPortal;               // Used to manage the video source.
     private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
     private AprilTagDetection desiredTag = null;     // Used to hold the data for a detected AprilTag
 
+
+
     @Override public void runOpMode()
     {
         boolean targetFound     = false;    // Set to true when an AprilTag target is detected
-        double  drive           = 0.5;        // Desired forward power/speed (-1 to +1)
-        double  strafe          = 0.5;        // Desired strafe power/speed (-1 to +1)
-        double  turn            = 0.5;        // Desired turning power/speed (-1 to +1)
+        boolean t_reached       = false;
+        double  drive           = 0;        // Desired forward power/speed (-1 to +1)
+        double  strafe          = 0;        // Desired strafe power/speed (-1 to +1)
+        double  turn            = 0;        // Desired turning power/speed (-1 to +1)
 
         // Initialize the Apriltag Detection process
         initAprilTag();
@@ -120,21 +124,21 @@ public class DriveToTag extends LinearOpMode
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must match the names assigned during the robot configuration.
         // step (using the FTC Robot Controller app on the phone).
-        FL_Motor = hardwareMap.get(DcMotor.class, "FLMotor");
-        FR_Motor = hardwareMap.get(DcMotor.class, "FRMotor");
-        BL_Motor = hardwareMap.get(DcMotor.class, "BLMotor");
-        BR_Motor = hardwareMap.get(DcMotor.class, "BRMotor");
+        leftFrontDrive  = hardwareMap.get(DcMotor.class, "FLMotor");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "FRMotor");
+        leftBackDrive  = hardwareMap.get(DcMotor.class, "BLMotor");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "BRMotor");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-        FL_Motor.setDirection(DcMotor.Direction.REVERSE);
-        BL_Motor.setDirection(DcMotor.Direction.REVERSE);
-        FR_Motor.setDirection(DcMotor.Direction.FORWARD);
-        BR_Motor.setDirection(DcMotor.Direction.FORWARD);
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
         if (USE_WEBCAM)
-            setManualExposure(3, 250);  // Use low exposure time to reduce motion blur
+            setManualExposure(1, 250);  // Use low exposure time to reduce motion blur
 
         // Wait for driver to press start
         telemetry.addData("Camera preview on/off", "3 dots, Camera Stream");
@@ -169,22 +173,44 @@ public class DriveToTag extends LinearOpMode
                 telemetry.addData(">","Drive using joystick to find target\n");
             }
 
+            if (gamepad1.left_bumper && t_reached) {
+                telemetry.addLine("Reached");
+                strafe = 40;
+                drive = 0;
+            }
+            double rangeError;
+
             // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
             if (gamepad1.left_bumper && targetFound) {
+                double eps = 15;
 
-                // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
-                double  rangeError      = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
-                double  headingError    = desiredTag.ftcPose.bearing;
-                double  yawError        = desiredTag.ftcPose.yaw;
+                // Determine heading, range and Yaw  error so we can use them to control the robot automatically.
+                rangeError = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
+                double headingError = desiredTag.ftcPose.bearing;
+                double yawError = desiredTag.ftcPose.yaw;
 
-                // Use the speed and turn "gains" to calculate how we want the robot to move.
-                drive  = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
-                turn   = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN) ;
-                strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+                telemetry.addData("Range Error", rangeError);
+
+                if (rangeError <=  eps){
+                    t_reached = true;
+                    sleep(1000);
+                    // Use the speed and turn "gains" to calculate how we want the robot to move.
+
+                } else{
+                    telemetry.addLine("Not Reached");
+                    t_reached = false;
+                    // Use the speed and turn "gains" to calculate how we want the robot to move.
+                    drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
+                    turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
+                    strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+
+                }
+
+
 
                 telemetry.addData("Auto","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             } else {
-
+                t_reached = false;
                 // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
                 drive  = -gamepad1.left_stick_y  / 2.0;  // Reduce drive rate to 50%.
                 strafe = -gamepad1.left_stick_x  / 2.0;  // Reduce strafe rate to 50%.
@@ -195,6 +221,7 @@ public class DriveToTag extends LinearOpMode
 
             // Apply desired axes motions to the drivetrain.
             moveRobot(drive, strafe, turn);
+
             sleep(10);
         }
     }
@@ -225,10 +252,10 @@ public class DriveToTag extends LinearOpMode
         }
 
         // Send powers to the wheels.
-        FL_Motor.setPower(leftFrontPower);
-        FR_Motor.setPower(rightFrontPower);
-        BL_Motor.setPower(leftBackPower);
-        BR_Motor.setPower(rightBackPower);
+        leftFrontDrive.setPower(leftFrontPower);
+        rightFrontDrive.setPower(rightFrontPower);
+        leftBackDrive.setPower(leftBackPower);
+        rightBackDrive.setPower(rightBackPower);
     }
 
     /**
