@@ -21,6 +21,7 @@ public class Robot {
     public Arm arm = new Arm();
     public Chassis chassis = new Chassis();
     public VSlider vSlider = new VSlider();
+    public IntakeHelper intake = new IntakeHelper();
 
     public double armHoldingPower = 1;
 
@@ -41,6 +42,7 @@ public class Robot {
         chassis.init(hwMap);
         arm.init(hwMap);
         vSlider.init(hwMap);
+        intake.init(hwMap);
 
         if (robotInUse == 2021) {
             arm.motor.setDirection(DcMotorSimple.Direction.REVERSE);
