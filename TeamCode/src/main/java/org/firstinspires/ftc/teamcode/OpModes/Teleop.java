@@ -55,13 +55,8 @@ public class Teleop extends LinearOpMode {
 
 
         while (opModeIsActive()) {
-
-            if(robot.chassis.isRobotStable())
-            {
                 double move_y_axis = gamepad1.left_stick_y;
-                //double move_x_axis = -gamepad1.left_stick_x
-                // double(gamepad1.dpad_right)-double(gamepad1.dpad_left)
-                double move_x_axis = 0;
+                double move_x_axis = -gamepad1.left_stick_x;
                 double pivot_turn = -gamepad1.right_stick_x;
 
                 //Sets the target power
@@ -89,49 +84,23 @@ public class Teleop extends LinearOpMode {
                  * Joystick controls for slider, arm, and claw.
                  */
 
-                double vSliderPower = -gamepad2.left_stick_y;
-                if (vSliderPower < 0 && robot.vSlider.motor.getCurrentPosition() < 0) {
-                    vSliderPower = 0;
+
+                if(gamepad1.left_bumper) {
+                    robot.intake.MoveIntake(1, true);
+                }
+                if(gamepad1.right_bumper) {
+                    robot.intake.MoveIntake(1, false);
+                }
+                if(gamepad1.x){
+                    robot.intake.motor.setPower(0);
                 }
 
-                robot.vSlider.motor.setPower(vSliderPower);
-
-
-                // Claw
-                if (gamepad2.x) {
-                    robot.claw.close();
-                }
-                if (gamepad2.y) {
-                    robot.claw.open();
-                }
-
-                // Arm
-                if (gamepad2.right_bumper) {
-                    robot.claw.close();
-                    robot.arm.swingUp();
-                }
-                if (gamepad2.left_bumper) {
-                    robot.claw.close();
-                    robot.arm.swingDown();
-                }
-
-            }
-
-            else {
-                robot.chassis.stopDriveMotors();
-                robot.vSlider.motor.setPower(0);
-                robot.arm.motor.setPower(0);
-                robot.claw.open();
             }
 
             telemetry.addData("FL Motor Encoder", robot.chassis.FLMotor.getCurrentPosition());
             telemetry.addData("BL Motor Encoder", robot.chassis.BLMotor.getCurrentPosition());
             telemetry.addData("BR Motor Encoder", robot.chassis.BRMotor.getCurrentPosition());
             telemetry.addData("FR Motor Encoder", robot.chassis.FRMotor.getCurrentPosition());
-            telemetry.addData("vSliderPower", robot.vSlider.motor.getPower());
-            telemetry.addData("vSlider Encoder", robot.vSlider.motor.getCurrentPosition());
-            telemetry.addData("swingArm Encoder", robot.arm.motor.getCurrentPosition());
-            telemetry.addData("Claw Position", robot.claw.servo.getPosition());
             org.firstinspires.ftc.robotcore.external.navigation.Orientation angle;
             angle = robot.chassis.imu.getAngularOrientation();
             telemetry.addData("Angular Orientation", angle);
@@ -145,4 +114,3 @@ public class Teleop extends LinearOpMode {
         }
 
     }
-}
