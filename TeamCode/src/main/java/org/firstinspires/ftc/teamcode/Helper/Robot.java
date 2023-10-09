@@ -19,9 +19,10 @@ public class Robot {
 
     public Chassis chassis = new Chassis();
     public Intake intake = new Intake();
+    public Arm arm = new Arm();
+    public Wrist wrist = new Wrist();
+    public Claw claw = new Claw();
     public double armHoldingPower = 1;
-
-    private int robotInUse = 2022;
 
     /* local OpMode members. */
     //Init hardware map
@@ -36,6 +37,9 @@ public class Robot {
         hwMap = ahwMap;
         chassis.init(hwMap);
         intake.init(hwMap);
+        arm.init(hwMap);
+        wrist.init(hwMap);
+        claw.init(hwMap);
     }
 
 

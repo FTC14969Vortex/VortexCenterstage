@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Helper;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
@@ -81,23 +82,22 @@ public class Chassis {
         BRMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         //Setting the run mode
-        FLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        BLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        FRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        BRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+       // FLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+       // BLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+       // FRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+       // BRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
-        FLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        BLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        FRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        BRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+       //FLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+       // BLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+       // FRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+       // BRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
-
-        FLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        BLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        FRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        BRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //FLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+       // BLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+       // FRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+       // BRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
 
@@ -247,10 +247,10 @@ public class Chassis {
         BRMotor.setPower(0);
 
         // Turn off RUN_TO_POSITION
-        FLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        FRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        BLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        BRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+       // FLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+       // FRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+       // BLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+       // BRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void DriveToPosition(double Speed, int posX, int posY, boolean forwardFirst) {
