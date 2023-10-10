@@ -1,14 +1,10 @@
 package org.firstinspires.ftc.teamcode.Helper;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 //Related to IMU
 
-import java.util.*;
 
 public class Robot {
     /*
@@ -21,8 +17,7 @@ public class Robot {
     public Intake intake = new Intake();
     public Arm arm = new Arm();
     public Wrist wrist = new Wrist();
-    public Claw claw = new Claw();
-    public double armHoldingPower = 1;
+    public Slider slider = new Slider();
 
     /* local OpMode members. */
     //Init hardware map
@@ -39,7 +34,7 @@ public class Robot {
         intake.init(hwMap);
         arm.init(hwMap);
         wrist.init(hwMap);
-        claw.init(hwMap);
+        slider.init(hwMap);
     }
 
 

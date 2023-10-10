@@ -2,10 +2,7 @@ package org.firstinspires.ftc.teamcode.OpModes;
 //imports
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Helper.Chassis;
 import org.firstinspires.ftc.teamcode.Helper.Robot;
 
 @TeleOp(name = "23-24 TeleOp", group = "TeleOp")
@@ -21,6 +18,9 @@ public class Teleop extends LinearOpMode {
     //How fast your robot will accelerate.
     public double acceleration = 0.3;
 
+    double armHoldingPower = 0.1;
+    double WristHoldingPower = 0.7;
+
 
     //Motor powers
     public double fl_power = 0;
@@ -31,14 +31,20 @@ public class Teleop extends LinearOpMode {
     public double DRIVETRAIN_SPEED = 0.7;
 
     //ArmWrist
-    public void initDeliver() {
+    public void DeliverPosition() {
         robot.arm.swingUp();
+        //robot.arm.motor.setPower(armHoldingPower);
         robot.wrist.Deliver();
+        //robot.wrist.servo.setPosition(WristHoldingPower);
+
     }
-    public void initPick() {
+    public void DefaultPosition() {
+        robot.arm.motor.setPower(0);
         robot.arm.swingDown();
-        robot.wrist.Pick();
+        robot.wrist.Default();
+        robot.wrist.servo.setPosition(0);
     }
+
 
 
 
@@ -55,22 +61,14 @@ public class Teleop extends LinearOpMode {
          * i.e. When "INIT" Button is pressed on the Driver Station App
          */
 
-        telemetry.addData("FL Motor Encoder", robot.chassis.FLMotor.getCurrentPosition());
-        telemetry.addData("BL Motor Encoder", robot.chassis.BLMotor.getCurrentPosition());
-        telemetry.addData("BR Motor Encoder", robot.chassis.BRMotor.getCurrentPosition());
-        telemetry.addData("FR Motor Encoder", robot.chassis.FRMotor.getCurrentPosition());
-        telemetry.update();
 
         waitForStart();
-
-
 
         while (opModeIsActive()) {
             // Mapping from Xbox series S controller to motor powers.
             double move_y_axis = gamepad1.left_stick_y;
             double move_x_axis = -gamepad1.left_stick_x;
             double pivot_turn = -gamepad1.right_stick_x;
-
 
             //Sets the target power
             double target_fl_power = move_y_axis + move_x_axis + pivot_turn;
@@ -96,7 +94,6 @@ public class Teleop extends LinearOpMode {
             /**
              * Joystick controls for slider, arm, and claw.
              */
-
             //Intake
             if (gamepad1.left_bumper) {
                 robot.intake.MoveIntake(0.8, true);
@@ -108,24 +105,35 @@ public class Teleop extends LinearOpMode {
                 robot.intake.motor.setPower(0);
 
             }
-            //Claw
-//            if (gamepad2.x) {
-//                robot.claw.open();
-//            }
-//            if (gamepad2.y) {
-//                robot.claw.close();
-//            }
-//            //Arm delivery
-//            if (gamepad2.right_bumper) {
-//                initDeliver();
-//            }
-//            if (gamepad2.left_bumper) {
-//                initPick();
-//            }
-            //double wristPosition = -gamepad2.left_stick_x;
-            //double armPower = -gamepad2.right_stick_y;
-           // robot.wrist.servo.setPosition(wristPosition);
-           // robot.arm.motor.setPower(armPower);
+
+            //Arm delivery
+            if (gamepad2.right_bumper) {
+                robot.arm.swingUp();
+            }
+            if (gamepad2.left_bumper) {
+                robot.arm.swingDown();
+            }
+            if (gamepad2.x) {
+                robot.wrist.Deliver();
+            }
+            if (gamepad2.y) {
+                robot.wrist.Default();
+            }
+            if(gamepad2.dpad_up) {
+                robot.slider.extend();
+            }
+            if(gamepad2.dpad_down){
+                robot.slider.retract();
+            }
+
+            telemetry.addData("FL Motor Encoder", robot.chassis.FLMotor.getCurrentPosition());
+            telemetry.addData("BL Motor Encoder", robot.chassis.BLMotor.getCurrentPosition());
+            telemetry.addData("BR Motor Encoder", robot.chassis.BRMotor.getCurrentPosition());
+            telemetry.addData("FR Motor Encoder", robot.chassis.FRMotor.getCurrentPosition());
+            telemetry.addData("Arm Position", robot.arm.motor.getCurrentPosition());
+            telemetry.addData("Wrist Position", robot.wrist.servo.getPosition());
+            telemetry.addData("Slider Position", robot.slider.servo.getPosition());
+            telemetry.update();
 
         }
 

@@ -81,23 +81,23 @@ public class Chassis {
         FRMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         BRMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        //Setting the run mode
-       // FLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-       // BLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-       // FRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-       // BRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        //Setting the run mode
+//        FLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        BLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        FRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        BRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//////
 
-
-       //FLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-       // BLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-       // FRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-       // BRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-
-        //FLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-       // BLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-       // FRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-       // BRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        FLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        BLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        FRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        BRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//
+////
+//        FLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        BLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        FRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        BRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
 
