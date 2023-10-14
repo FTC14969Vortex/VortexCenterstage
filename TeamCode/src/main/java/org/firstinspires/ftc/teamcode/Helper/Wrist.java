@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Wrist {
     public Servo servo;
 
-    public double Deliver = 0;
-    public double Pick = 0.5;
+    public double Deliver = 0.575;
+    public double Default = 0.68;
 
     HardwareMap hwMap = null;
 
@@ -24,7 +24,7 @@ public class Wrist {
     }
 
     public void Default() {
-        servo.setPosition(Pick);
+        servo.setPosition(Default);
     }
 
 

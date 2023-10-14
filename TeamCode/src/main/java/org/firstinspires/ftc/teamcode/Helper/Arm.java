@@ -85,10 +85,10 @@ public class Arm {
 
     HardwareMap hwMap = null;
     public DcMotor motor;
-    int timeout_ms =  5000;
+    int timeout_ms = 5000;
     double speed;
     int Position;
-
+    int slowDown;
 
 
     public void init(HardwareMap ahwMap) throws InterruptedException {
@@ -96,19 +96,18 @@ public class Arm {
         //Init motors and servos
         motor = hwMap.get(DcMotor.class, "Arm");
         motor.setDirection(DcMotorSimple.Direction.FORWARD);
-        motor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void swingUp(){
+    public void swingUp() {
         ElapsedTime runtime = new ElapsedTime();
-        speed = 0.5;
-        Position = -300;
-        timeout_ms = 500;
+        speed = 0.3;
+        Position = 235;
+        timeout_ms = 3000;
 
         motor.setTargetPosition(Position);
         //set the mode to go to the target position
@@ -124,12 +123,11 @@ public class Arm {
 
     }
 
-
-    public void swingDown(){
+    public void swingDown() {
         ElapsedTime runtime = new ElapsedTime();
-        runtime.reset();
         speed = 0.3;
-        Position = 0;
+        Position = 235;
+        timeout_ms = 3000;
 
         motor.setTargetPosition(Position);
         //set the mode to go to the target position
@@ -137,9 +135,11 @@ public class Arm {
         //Set the power of the motor.
         motor.setPower(speed);
 
+        runtime.reset();
 
         while ((runtime.milliseconds() < timeout_ms) && (motor.isBusy())) {
         }
-
+        motor.setPower(0);
     }
 }
+

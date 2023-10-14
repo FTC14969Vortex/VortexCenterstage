@@ -3,6 +3,10 @@ package org.firstinspires.ftc.teamcode.Helper;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.tfod.TfodProcessor;
+
 //Related to IMU
 
 
@@ -12,6 +16,28 @@ public class Robot {
      */
     private ElapsedTime runtime = new ElapsedTime();
     double timeout_ms = 0;
+
+    //Vision
+
+
+    public static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
+
+    /**
+     * {@link #aprilTag} is the variable to store our instance of the AprilTag processor.
+     */
+    public AprilTagProcessor aprilTag;
+
+    /**
+     * {@link #tfod} is the variable to store our instance of the TensorFlow Object Detection processor.
+     */
+    public TfodProcessor tfod;
+
+    /**
+     * {@link #myVisionPortal} is the variable to store our instance of the vision portal.
+     */
+    public VisionPortal myVisionPortal;
+
+
 
     public Chassis chassis = new Chassis();
     public Intake intake = new Intake();

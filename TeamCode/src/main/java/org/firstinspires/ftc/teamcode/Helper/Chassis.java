@@ -3,14 +3,12 @@ package org.firstinspires.ftc.teamcode.Helper;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
-import java.util.*;
 
 public class Chassis {
 
@@ -45,11 +43,11 @@ public class Chassis {
     //Gear ratio of the motor to the wheel. 1:1 would mean that 1 turn of the motor is one turn of the wheel, 2:1 would mean two turns of the motor is one turn of the wheel, and so on.
     static final double DRIVE_GEAR_REDUCTION= 1; // This is < 1.0 if geared UP
 
-    //Diameter of the wheel in CM
-    static final double WHEEL_DIAMETER_CM= 10; // For figuring circumference
+    //Diameter of the wheel in inches
+    static final double WHEEL_DIAMETER_IN = 3.93701; // For figuring circumference
 
-    //How many times the encoder counts a tick per CM moved. (Ticks per rev * Gear ration) / perimeter
-    static final double COUNTS_PER_CM_Hex = (COUNTS_PER_MOTOR_REV_Hex * DRIVE_GEAR_REDUCTION)/(WHEEL_DIAMETER_CM * 3.1415);
+    //How many times the encoder counts a tick per inch moved. (Ticks per rev * Gear ration) / perimeter
+    static final double COUNTS_PER_IN = (COUNTS_PER_MOTOR_REV_Hex * DRIVE_GEAR_REDUCTION)/(WHEEL_DIAMETER_IN * 3.1415);
 
     HardwareMap hwMap = null;
 
@@ -161,10 +159,10 @@ public class Chassis {
         int BLPos = BLMotor.getCurrentPosition();
         int BRPos = BRMotor.getCurrentPosition();
 
-        targetFR = FRPos + (int) (distance * COUNTS_PER_CM_Hex);
-        targetBR = BRPos + (int) (distance * COUNTS_PER_CM_Hex);
-        targetFL = FLPos + (int) (distance * COUNTS_PER_CM_Hex);
-        targetBL = BLPos + (int) (distance * COUNTS_PER_CM_Hex);
+        targetFR = FRPos + (int) (distance * COUNTS_PER_IN);
+        targetBR = BRPos + (int) (distance * COUNTS_PER_IN);
+        targetFL = FLPos + (int) (distance * COUNTS_PER_IN);
+        targetBL = BLPos + (int) (distance * COUNTS_PER_IN);
 
         //Set motor targets
         FLMotor.setTargetPosition(targetFL);
@@ -210,10 +208,10 @@ public class Chassis {
         int BLPos = BLMotor.getCurrentPosition();
         int BRPos = BRMotor.getCurrentPosition();
 
-        targetFR = FRPos - (int) (distance * COUNTS_PER_CM_Hex);
-        targetBR = BRPos + (int) (distance * COUNTS_PER_CM_Hex);
-        targetFL = FLPos + (int) (distance * COUNTS_PER_CM_Hex);
-        targetBL = BLPos - (int) (distance * COUNTS_PER_CM_Hex);
+        targetFR = FRPos - (int) (distance * COUNTS_PER_IN);
+        targetBR = BRPos + (int) (distance * COUNTS_PER_IN);
+        targetFL = FLPos + (int) (distance * COUNTS_PER_IN);
+        targetBL = BLPos - (int) (distance * COUNTS_PER_IN);
 
         //Set motor targets
         FLMotor.setTargetPosition(targetFL);
