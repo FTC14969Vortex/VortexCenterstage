@@ -131,10 +131,10 @@ public class Teleop extends LinearOpMode {
             if (gamepad2.y) {
                 robot.wrist.Default();
             }
-            if(gamepad2.dpad_up) {
+            if(gamepad2.a) {
                 robot.slider.extend();
             }
-            if(gamepad2.dpad_down){
+            if(gamepad2.b){
                 robot.slider.retract();
             }
 
