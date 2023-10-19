@@ -44,6 +44,8 @@ public class AutoBlueFront extends LinearOpMode {
         robot.myVisionPortal.setProcessorEnabled(robot.aprilTag, true);
         robot.myVisionPortal.setProcessorEnabled(robot.tfod, true);
 
+        robot.tfod.setZoom(0.5);
+
         waitForStart();
 
         if (opModeIsActive()) {
