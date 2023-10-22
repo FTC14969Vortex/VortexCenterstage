@@ -66,46 +66,14 @@ public class Robot {
         gate.init(hwMap);
     }
 
-
-    public float modAngle(float angle) {
-        angle = angle % 360;
-        if (angle < 0) {
-            angle += 360;
-        }
-        return angle;
-    }
-
-    //Turns the robot
-    public void turnRobotToAngle(float endAngle) {
+    //Auto Functions
+    public void AutoFirstHalf(float endAngle) {
         org.firstinspires.ftc.robotcore.external.navigation.Orientation angle;
         angle = chassis.imu.getAngularOrientation();
-
-        float angleStart = modAngle(angle.firstAngle);
-        float angleEnd = modAngle(endAngle);
-        float angleCurrent = angleStart;
-        float direction = 0;
-
-        if (modAngle((angleEnd - angleCurrent)) >= 180) {
-            //Go Clockwise
-            direction = -1;
-        } else if (modAngle((angleEnd - angleCurrent)) <= 180) {
-            //Go Counter Clockwise
-            direction = 1;
-        }
-
-        double pwr = -0.6;
-
-
-        while (Math.abs(angleCurrent - angleEnd) > 2) {
-            chassis.FLMotor.setPower(-pwr * direction);
-            chassis.FRMotor.setPower(pwr * direction);
-            chassis.BLMotor.setPower(-pwr * direction);
-            chassis.BRMotor.setPower(pwr * direction);
-            angle = chassis.imu.getAngularOrientation();
-            angleCurrent = modAngle(angle.firstAngle);
-
-        }
-        chassis.stopDriveMotors();
+        chassis.Drive(0.7,-24);
+//      chassis.turnRobotToAngle(180);
+        chassis.Drive(0.7,12);
+        chassis.Drive(0.7,12);
     }
 
     public void goToBackboard() {

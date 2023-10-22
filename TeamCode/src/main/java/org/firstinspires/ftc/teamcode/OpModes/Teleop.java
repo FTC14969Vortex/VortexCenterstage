@@ -171,7 +171,7 @@ public class Teleop extends LinearOpMode {
             org.firstinspires.ftc.robotcore.external.navigation.Orientation angle;
             angle = robot.chassis.imu.getAngularOrientation();
             telemetry.addData("Angular Orientation", angle);
-            int angleFloat = (int) (robot.modAngle(angle.firstAngle));
+            int angleFloat = (int) (robot.chassis.modAngle(angle.firstAngle));
             telemetry.addData("Orientation in 0-360", angleFloat);
             telemetry.addData("Robot Location", "(" + robot.chassis.robotX + ", " + robot.chassis.robotY + ")");
             telemetry.addData("IsRobotStable", robot.chassis.isRobotStable());
