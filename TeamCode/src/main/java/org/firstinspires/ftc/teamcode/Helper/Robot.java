@@ -19,24 +19,24 @@ public class Robot {
 
     //Vision
 
-
-    public static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
-
-    /**
-     * {@link #aprilTag} is the variable to store our instance of the AprilTag processor.
-     */
-    public AprilTagProcessor aprilTag;
-
-    /**
-     * {@link #tfod} is the variable to store our instance of the TensorFlow Object Detection processor.
-     */
-    public TfodProcessor tfod;
-
-    /**
-     * {@link #myVisionPortal} is the variable to store our instance of the vision portal.
-     */
-    public VisionPortal myVisionPortal;
-
+//
+//    public static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
+//
+//    /**
+//     * {@link #aprilTag} is the variable to store our instance of the AprilTag processor.
+//     */
+//    public AprilTagProcessor aprilTag;
+//
+//    /**
+//     * {@link #tfod} is the variable to store our instance of the TensorFlow Object Detection processor.
+//     */
+//    public TfodProcessor tfod;
+//
+//    /**
+//     * {@link #myVisionPortal} is the variable to store our instance of the vision portal.
+//     */
+//    public VisionPortal myVisionPortal;
+//
 
 
     public Chassis chassis = new Chassis();
@@ -64,19 +64,5 @@ public class Robot {
         wrist.init(hwMap);
         slider.init(hwMap);
         gate.init(hwMap);
-    }
-
-    //Auto Functions
-    public void AutoFirstHalf(float endAngle) {
-        org.firstinspires.ftc.robotcore.external.navigation.Orientation angle;
-        angle = chassis.imu.getAngularOrientation();
-        chassis.Drive(0.7,-24);
-//      chassis.turnRobotToAngle(180);
-        chassis.Drive(0.7,12);
-        chassis.Drive(0.7,12);
-    }
-
-    public void goToBackboard() {
-        chassis.DriveToPosition(0.7, 80, 24, false);
     }
 }

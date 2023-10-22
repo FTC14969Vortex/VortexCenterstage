@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.teamcode.Helper.AutoCommon;
 import org.firstinspires.ftc.teamcode.Helper.Robot;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -21,7 +22,7 @@ public class AutoBlueFront extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
     double timeout_ms = 0;
-    Robot robot = new Robot();
+    AutoCommon auto = new AutoCommon();
 
     public enum TagValues {
         TagOne, TagTwo, TagThree
@@ -33,7 +34,7 @@ public class AutoBlueFront extends LinearOpMode {
     @Override
 
     public void runOpMode() throws InterruptedException {
-        robot.init(hardwareMap);
+        auto.robot.init(hardwareMap);
         initDoubleVision();
 
 
@@ -42,13 +43,13 @@ public class AutoBlueFront extends LinearOpMode {
         telemetry.update();
 
 
-        robot.myVisionPortal.setProcessorEnabled(robot.aprilTag, true);
+        auto.myVisionPortal.setProcessorEnabled(auto.aprilTag, true);
 //        robot.myVisionPortal.setProcessorEnabled(robot.tfod, true);
 
 
 //        robot.tfod.setZoom(1);
 
-        if (robot.myVisionPortal.getProcessorEnabled(robot.aprilTag)) {
+        if (auto.myVisionPortal.getProcessorEnabled(auto.aprilTag)) {
             telemetry.addLine("AprilTag Detection Working");
             telemetry.addLine();
             telemetryAprilTag();
@@ -63,17 +64,18 @@ public class AutoBlueFront extends LinearOpMode {
         //Set Detection value based off where the team element is
         //For testing it has been set to 2.
         int detection = 2;
-
+        String TagValue = "Inactive";
         if(detection == 1){
-            TagValue = TagValues.TagOne;
+            TagValue = "TagOne";
         }
 
         if(detection == 2){
-            TagValue = TagValues.TagTwo;
+            TagValue = "TagTwo";
+
         }
 
         if(detection == 3){
-            TagValue = TagValues.TagThree;
+            TagValue = "TagThree";
         }
 
         waitForStart();
@@ -85,27 +87,27 @@ public class AutoBlueFront extends LinearOpMode {
 //                    telemetry.addLine();
 //                    telemetryTfod();
 //                }
-
+                auto.runAuto(TagValue);
                 telemetry.update();
 
-                switch (TagValue) {
-
-                    case TagOne:
-                        telemetry.addLine("Delivered purple pixel on spike mark 1");
-                        telemetry.update();
-                        break;
-
-                    case TagTwo:
-                        robot.goToBackboard();
-                        telemetry.addLine("Delivered purple pixel on spike mark 2");
-                        telemetry.update();
-                        break;
-
-                    case TagThree:
-                        telemetry.addLine("Delivered purple pixel on spike mark 3");
-                        telemetry.update();
-                        break;
-                }
+//                switch (TagValue) {
+//
+//                    case TagOne:
+//                        telemetry.addLine("Delivered purple pixel on spike mark 1");
+//                        telemetry.update();
+//                        break;
+//
+//                    case TagTwo:
+//                        auto.goToBackboard();
+//                        telemetry.addLine("Delivered purple pixel on spike mark 2");
+//                        telemetry.update();
+//                        break;
+//
+//                    case TagThree:
+//                        telemetry.addLine("Delivered purple pixel on spike mark 3");
+//                        telemetry.update();
+//                        break;
+//                }
 
 
             }
@@ -122,7 +124,7 @@ public class AutoBlueFront extends LinearOpMode {
         // AprilTag Configuration
         // -----------------------------------------------------------------------------------------
 
-        robot.aprilTag = new AprilTagProcessor.Builder()
+        auto.aprilTag = new AprilTagProcessor.Builder()
                 .setDrawAxes(true)
                 .setDrawCubeProjection(true)
                 .setDrawTagID(true)
@@ -140,17 +142,17 @@ public class AutoBlueFront extends LinearOpMode {
         // Camera Configuration
         // -----------------------------------------------------------------------------------------
 
-        if (robot.USE_WEBCAM) {
-            robot.myVisionPortal = new VisionPortal.Builder()
+        if (auto.USE_WEBCAM) {
+            auto.myVisionPortal = new VisionPortal.Builder()
                     .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
 //                    .addProcessors(robot.tfod, robot.aprilTag)
-                    .addProcessors(robot.aprilTag)
+                    .addProcessors(auto.aprilTag)
                     .build();
         } else {
-            robot.myVisionPortal = new VisionPortal.Builder()
+            auto.myVisionPortal = new VisionPortal.Builder()
                     .setCamera(BuiltinCameraDirection.BACK)
 //                    .addProcessors(robot.tfod, robot.aprilTag)
-                    .addProcessors(robot.aprilTag)
+                    .addProcessors(auto.aprilTag)
                     .build();
         }
     }   // end initDoubleVision()
@@ -160,7 +162,7 @@ public class AutoBlueFront extends LinearOpMode {
      * Function to add telemetry about AprilTag detections.
      */
     private void telemetryAprilTag () {
-        List<AprilTagDetection> currentDetections = robot.aprilTag.getDetections();
+        List<AprilTagDetection> currentDetections = auto.aprilTag.getDetections();
         telemetry.addData("# AprilTags Detected", currentDetections.size());
 
         // Step through the list of detections and display info for each one.
@@ -183,7 +185,7 @@ public class AutoBlueFront extends LinearOpMode {
      * Function to add telemetry about TensorFlow Object Detection (TFOD) recognitions.
      */
     private void telemetryTfod () {
-        List<Recognition> currentRecognitions = robot.tfod.getRecognitions();
+        List<Recognition> currentRecognitions = auto.tfod.getRecognitions();
         telemetry.addData("# Objects Detected", currentRecognitions.size());
 
         // Step through the list of recognitions and display info for each one.
