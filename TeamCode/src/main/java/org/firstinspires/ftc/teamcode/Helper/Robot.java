@@ -45,6 +45,8 @@ public class Robot {
     public Wrist wrist = new Wrist();
     public Slider slider = new Slider();
 
+    public Gate gate = new Gate();
+
     /* local OpMode members. */
     //Init hardware map
     HardwareMap hwMap = null;
@@ -61,6 +63,7 @@ public class Robot {
         arm.init(hwMap);
         wrist.init(hwMap);
         slider.init(hwMap);
+        gate.init(hwMap);
     }
 
 

@@ -44,7 +44,8 @@ public class AutoBlueFront extends LinearOpMode {
         robot.myVisionPortal.setProcessorEnabled(robot.aprilTag, true);
 //        robot.myVisionPortal.setProcessorEnabled(robot.tfod, true);
 
-//        robot.tfod.setZoom(1);
+
+        robot.tfod.setZoom(1);
 
         if (robot.myVisionPortal.getProcessorEnabled(robot.aprilTag)) {
             telemetry.addLine("AprilTag Detection Working");

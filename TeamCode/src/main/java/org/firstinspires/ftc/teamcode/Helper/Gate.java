@@ -3,11 +3,14 @@ package org.firstinspires.ftc.teamcode.Helper;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-public class Wrist {
+
+public class Gate {
     public Servo servo;
 
-    public double Deliver = 1;
-    public double Default = 0;
+    public double Open = 1.0;
+    public double Close = 0;
+
+    public double Middle = 0.45;
 
     HardwareMap hwMap = null;
 
@@ -15,16 +18,19 @@ public class Wrist {
 
         hwMap = ahwMap;
         //Init motors and servos
-        servo = hwMap.get(Servo.class, "Wrist");
+        servo = hwMap.get(Servo.class, "Gate");
         servo.setDirection(Servo.Direction.FORWARD);
     }
 
-    public void Deliver() {
-        servo.setPosition(Deliver);
+    public void open() {
+        servo.setPosition(Open);
+    }
+    public void middle(){
+        servo.setPosition(Middle);
     }
 
-    public void Default() {
-        servo.setPosition(Default);
+    public void close() {
+        servo.setPosition(Close);
     }
 
 
