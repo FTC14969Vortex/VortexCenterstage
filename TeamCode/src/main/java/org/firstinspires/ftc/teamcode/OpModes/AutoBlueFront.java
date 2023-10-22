@@ -11,8 +11,8 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
-
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 
 import java.util.List;
 
@@ -42,26 +42,26 @@ public class AutoBlueFront extends LinearOpMode {
 
 
         robot.myVisionPortal.setProcessorEnabled(robot.aprilTag, true);
-        robot.myVisionPortal.setProcessorEnabled(robot.tfod, true);
+//        robot.myVisionPortal.setProcessorEnabled(robot.tfod, true);
 
-        robot.tfod.setZoom(0.5);
+//        robot.tfod.setZoom(1);
 
+        if (robot.myVisionPortal.getProcessorEnabled(robot.aprilTag)) {
+            telemetry.addLine("AprilTag Detection Working");
+            telemetry.addLine();
+            telemetryAprilTag();
+        }
+        telemetry.addLine();
         waitForStart();
 
         if (opModeIsActive()) {
             while (opModeIsActive()) {
-                if (robot.myVisionPortal.getProcessorEnabled(robot.aprilTag)) {
-                    telemetry.addLine("AprilTag Detection Working");
-                    telemetry.addLine();
-                    telemetryAprilTag();
-                }
-                telemetry.addLine();
-                telemetry.addLine("----------------------------------------");
-                if (robot.myVisionPortal.getProcessorEnabled(robot.tfod)) {
-                    telemetry.addLine("TFOD Detection Working");
-                    telemetry.addLine();
-                    telemetryTfod();
-                }
+//                telemetry.addLine("----------------------------------------");
+//                if (robot.myVisionPortal.getProcessorEnabled(robot.tfod)) {
+//                    telemetry.addLine("TFOD Detection Working");
+//                    telemetry.addLine();
+//                    telemetryTfod();
+//                }
 
                 telemetry.update();
 
@@ -69,7 +69,12 @@ public class AutoBlueFront extends LinearOpMode {
                     case detectSpikeMarks:
                         telemetry.addLine("Detected Team Element");
                         telemetry.update();
-                        Step = AutoSteps.deliverPurple;
+                        //Drive functions
+                        robot.chassis.Drive(0.,-24);
+                        sleep(3000);
+                        robot.chassis.DriveToPosition(0.7,-96, 24, true);
+
+                        Step = AutoSteps.endAuto;
                         break;
 
                     case deliverPurple:
@@ -105,14 +110,18 @@ public class AutoBlueFront extends LinearOpMode {
         // -----------------------------------------------------------------------------------------
 
         robot.aprilTag = new AprilTagProcessor.Builder()
+                .setDrawAxes(true)
+                .setDrawCubeProjection(true)
+                .setDrawTagID(true)
+                .setDrawTagOutline(true)
                 .build();
 
         // -----------------------------------------------------------------------------------------
         // TFOD Configuration
         // -----------------------------------------------------------------------------------------
-
-        robot.tfod = new TfodProcessor.Builder()
-                .build();
+//
+//        robot.tfod = new TfodProcessor.Builder()
+//                .build();
 
         // -----------------------------------------------------------------------------------------
         // Camera Configuration
@@ -121,12 +130,14 @@ public class AutoBlueFront extends LinearOpMode {
         if (robot.USE_WEBCAM) {
             robot.myVisionPortal = new VisionPortal.Builder()
                     .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-                    .addProcessors(robot.tfod, robot.aprilTag)
+//                    .addProcessors(robot.tfod, robot.aprilTag)
+                    .addProcessors(robot.aprilTag)
                     .build();
         } else {
             robot.myVisionPortal = new VisionPortal.Builder()
                     .setCamera(BuiltinCameraDirection.BACK)
-                    .addProcessors(robot.tfod, robot.aprilTag)
+//                    .addProcessors(robot.tfod, robot.aprilTag)
+                    .addProcessors(robot.aprilTag)
                     .build();
         }
     }   // end initDoubleVision()
