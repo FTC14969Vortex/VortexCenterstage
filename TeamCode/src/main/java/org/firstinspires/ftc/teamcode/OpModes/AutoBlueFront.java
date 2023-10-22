@@ -45,7 +45,7 @@ public class AutoBlueFront extends LinearOpMode {
 //        robot.myVisionPortal.setProcessorEnabled(robot.tfod, true);
 
 
-        robot.tfod.setZoom(1);
+//        robot.tfod.setZoom(1);
 
         if (robot.myVisionPortal.getProcessorEnabled(robot.aprilTag)) {
             telemetry.addLine("AprilTag Detection Working");
@@ -71,9 +71,8 @@ public class AutoBlueFront extends LinearOpMode {
                         telemetry.addLine("Detected Team Element");
                         telemetry.update();
                         //Drive functions
-                        robot.chassis.Drive(0.,-24);
-                        sleep(3000);
-                        robot.chassis.DriveToPosition(0.7,-96, 24, true);
+                        robot.autoFirstHalf();
+
 
                         Step = AutoSteps.endAuto;
                         break;
