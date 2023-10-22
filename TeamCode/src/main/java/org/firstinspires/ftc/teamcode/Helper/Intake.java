@@ -17,7 +17,7 @@ public class Intake {
     //Initializing hardware maps and motors for intake.
     public void init(HardwareMap ahwMap) {
         hwMap = ahwMap;
-        motor = hwMap.get(DcMotor.class, "intake");
+        motor = hwMap.get(DcMotor.class, "Intake");
 
         motor.setDirection(DcMotor.Direction.FORWARD);
         motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);

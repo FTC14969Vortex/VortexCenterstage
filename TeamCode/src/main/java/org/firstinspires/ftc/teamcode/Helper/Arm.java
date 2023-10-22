@@ -1,14 +1,5 @@
-//package org.firstinspires.ftc.teamcode.Helper;
-//
-//
-//import com.qualcomm.robotcore.hardware.DcMotor;
-//import com.qualcomm.robotcore.hardware.DcMotorSimple;
-//import com.qualcomm.robotcore.hardware.DcMotorEx;
-//import com.qualcomm.robotcore.hardware.HardwareMap;
-//import com.qualcomm.robotcore.util.ElapsedTime;
-//
-//
-//public class Arm {
+// ARM WITH BUTTONS V1:
+// public class Arm {
 //    HardwareMap hwMap = null;
 //    public DcMotor motor;
 //    int timeout_ms = 5000;
@@ -71,6 +62,8 @@
 //    }
 //}
 
+
+//CODE FOR JOYSTICK CONTROL V1:
 package org.firstinspires.ftc.teamcode.Helper;
 
 
@@ -102,6 +95,7 @@ public class Arm {
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
+// ARM WITH BUTTONS V2
 //    public void swingUpB() {
 //        ElapsedTime runtime = new ElapsedTime();
 //        speed = 0.3;
@@ -140,7 +134,7 @@ public class Arm {
 }
 
 
-        // ARM WITH JOYSTICK CODE:
+        // ARM WITH JOYSTICK CODE V2:
 //        motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 ////        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 ////        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

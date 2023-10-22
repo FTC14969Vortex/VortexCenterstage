@@ -69,11 +69,8 @@ public class Teleop extends LinearOpMode {
             double move_y_axis = gamepad1.left_stick_y;
             double move_x_axis = -gamepad1.left_stick_x;
             double pivot_turn = -gamepad1.right_stick_x;
+            double swing_arm_power = gamepad2.left_stick_y * 0.6;
 
-             double swing_arm_power = gamepad2.left_stick_y * 0.6;
-//            double wrist_position = gamepad2.right_stick_y + 0.6;
-            // Intake = 0.7
-            // Delivery = 0.6
 
             //Sets the target power
             double target_fl_power = move_y_axis + move_x_axis + pivot_turn;
@@ -96,16 +93,17 @@ public class Teleop extends LinearOpMode {
             robot.chassis.FRMotor.setPower(DRIVETRAIN_SPEED * fr_power);
             robot.chassis.BRMotor.setPower(DRIVETRAIN_SPEED * br_power);
 
+            //Joystick controls for Slider, Arm
+
             robot.arm.motor.setPower(swing_arm_power);
 
 
-             //robot.wrist.servo.setPosition(wrist_position);
-
 
             /**
-             * Joystick controls for slider, arm, and claw.
+             * Joystick controls for Slider, Arm
              */
             //GAMEPAD 1
+
             //Intake
             if (gamepad1.left_bumper) {
                 robot.intake.MoveIntake(0.8, true);
@@ -127,13 +125,15 @@ public class Teleop extends LinearOpMode {
                 robot.gate.middle();
             }
             //GAMEPAD 2
-            //Arm delivery
+
+            //Arm delivery with buttons
 //            if (gamepad2.a) {
 //                robot.arm.swingUpB();
 //            }
 //            if (gamepad2.b) {
 //                robot.arm.swingDownB();
 //            }
+
             //Wrist Movement
             if(gamepad2.x){
                 robot.wrist.Deliver();
