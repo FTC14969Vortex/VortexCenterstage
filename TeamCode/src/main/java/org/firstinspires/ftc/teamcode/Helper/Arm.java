@@ -15,7 +15,7 @@
 //        motor.setDirection(DcMotorSimple.Direction.FORWARD);
 //        //motor.setDirection(DcMotorSimple.Direction.REVERSE);
 //
-//        motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+//        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -132,7 +132,7 @@ public class Arm {
 
 
         // ARM WITH JOYSTICK CODE V2:
-//        motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+//        motor.setZeroPowerBehavior.DcMotor.ZeroPowerBehavior.BRAKE);
 ////        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 ////        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 ////        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
