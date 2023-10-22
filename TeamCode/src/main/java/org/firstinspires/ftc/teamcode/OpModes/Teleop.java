@@ -158,6 +158,7 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("Arm Power", robot.arm.motor.getPower());
             telemetry.addData("Wrist Position", robot.wrist.servo.getPosition());
             telemetry.addData("Slider Position", robot.slider.servo.getPosition());
+            telemetry.addData("Gate Position", robot.gate.servo.getPosition());
             telemetry.update();
 
         }
