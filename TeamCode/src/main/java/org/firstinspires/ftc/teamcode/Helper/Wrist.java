@@ -7,7 +7,7 @@ public class Wrist {
     public Servo servo;
 
     public double Deliver = 1;
-    public double Default = 0;
+    public double Default = 0.4;
 
     HardwareMap hwMap = null;
 
