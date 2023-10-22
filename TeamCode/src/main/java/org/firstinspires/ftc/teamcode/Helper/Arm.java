@@ -102,7 +102,7 @@ public class Arm {
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
-//    public void swingUpB(){
+//    public void swingUpB() {
 //        ElapsedTime runtime = new ElapsedTime();
 //        speed = 0.3;
 //        Position = 500;
@@ -116,11 +116,11 @@ public class Arm {
 //        while ((runtime.milliseconds() < timeout_ms) && (motor.isBusy())) {
 //        }
 //        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        //motor.setPower(0);
+//        motor.setPower(0);
 //
 //    }
 //
-//    public void swingDownB(){
+//    public void swingDownB() {
 //        ElapsedTime runtime = new ElapsedTime();
 //        speed = 0.3;
 //        Position = 1000;
@@ -135,8 +135,9 @@ public class Arm {
 //        while ((runtime.milliseconds() < timeout_ms) && (motor.isBusy())) {
 //        }
 //        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        //motor.setPower(0);
-    }
+//        motor.setPower(0);
+//    }
+}
 
 
         // ARM WITH JOYSTICK CODE:
