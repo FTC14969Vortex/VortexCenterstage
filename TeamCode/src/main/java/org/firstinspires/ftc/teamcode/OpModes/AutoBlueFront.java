@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.Helper.Robot;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import org.firstinspires.ftc.vision.tfod.TfodProcessor;
+
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -23,14 +23,15 @@ public class AutoBlueFront extends LinearOpMode {
     double timeout_ms = 0;
     Robot robot = new Robot();
 
-    public enum AutoSteps {
-        detectSpikeMarks, deliverPurple, deliverYellow, endAuto
+    public enum TagValues {
+        TagOne, TagTwo, TagThree
     }
 
-    public AutoSteps Step = AutoSteps.detectSpikeMarks;
+    public TagValues TagValue;
 
 
     @Override
+
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap);
         initDoubleVision();
@@ -44,19 +45,37 @@ public class AutoBlueFront extends LinearOpMode {
         robot.myVisionPortal.setProcessorEnabled(robot.aprilTag, true);
 //        robot.myVisionPortal.setProcessorEnabled(robot.tfod, true);
 
-
-        robot.tfod.setZoom(1);
-
         if (robot.myVisionPortal.getProcessorEnabled(robot.aprilTag)) {
             telemetry.addLine("AprilTag Detection Working");
             telemetry.addLine();
             telemetryAprilTag();
         }
         telemetry.addLine();
+
+        telemetry.addLine("Detected Team Element");
+        telemetry.update();
+
+        //Detection Code Here
+
+        //Set Detection value based off where the team element is
+        //For testing it has been set to 2.
+        int detection = 2;
+
+        if(detection == 1){
+            TagValue = TagValues.TagOne;
+        }
+
+        if(detection == 2){
+            TagValue = TagValues.TagTwo;
+        }
+
+        if(detection == 3){
+            TagValue = TagValues.TagThree;
+        }
+
         waitForStart();
 
         if (opModeIsActive()) {
-            while (opModeIsActive()) {
 //                telemetry.addLine("----------------------------------------");
 //                if (robot.myVisionPortal.getProcessorEnabled(robot.tfod)) {
 //                    telemetry.addLine("TFOD Detection Working");
@@ -66,35 +85,26 @@ public class AutoBlueFront extends LinearOpMode {
 
                 telemetry.update();
 
-                switch (Step) {
-                    case detectSpikeMarks:
-                        telemetry.addLine("Detected Team Element");
-                        telemetry.update();
-                        //Drive functions
-                        robot.chassis.Drive(0.,-24);
-                        sleep(3000);
-                        robot.chassis.DriveToPosition(0.7,-96, 24, true);
+                switch (TagValue) {
 
-                        Step = AutoSteps.endAuto;
+                    case TagOne:
+                        telemetry.addLine("Delivered purple pixel on spike mark 1");
+                        telemetry.update();
                         break;
 
-                    case deliverPurple:
-                        telemetry.addLine("Delivered purple pixel on spike marks!");
+                    case TagTwo:
+                        robot.goToBackboard();
+                        telemetry.addLine("Delivered purple pixel on spike mark 2");
                         telemetry.update();
-                        Step = AutoSteps.deliverYellow;
-
-                        // Deliver preload and park.
-                    case deliverYellow:
-                        telemetry.addLine("Delivered yellow pixel on backboard");
-                        telemetry.update();
-                        Step = AutoSteps.endAuto;
                         break;
 
-                    case endAuto:
-                        telemetry.addLine("Auto Finished!");
+                    case TagThree:
+                        telemetry.addLine("Delivered purple pixel on spike mark 3");
                         telemetry.update();
                         break;
                 }
+
+
             }
         }
     }

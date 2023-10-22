@@ -107,4 +107,8 @@ public class Robot {
         }
         chassis.stopDriveMotors();
     }
+
+    public void goToBackboard() {
+        chassis.DriveToPosition(0.7, 80, 24, false);
+    }
 }
