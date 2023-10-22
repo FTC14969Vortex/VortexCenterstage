@@ -51,7 +51,24 @@ public class AutoCommon {
     public VisionPortal myVisionPortal;
 
     //Auto Functions
-    public void AutoFirstHalf(float endAngle) {
+    public void outakeStraight(float endAngle) {
+        org.firstinspires.ftc.robotcore.external.navigation.Orientation angle;
+        angle = robot.chassis.imu.getAngularOrientation();
+        robot.chassis.Drive(0.7, -24);
+//      chassis.turnRobotToAngle(180);
+        robot.chassis.Drive(0.7, 12);
+        robot.chassis.Drive(0.7, 12);
+    }
+
+    public void outakeRight(float endAngle) {
+        org.firstinspires.ftc.robotcore.external.navigation.Orientation angle;
+        angle = robot.chassis.imu.getAngularOrientation();
+        robot.chassis.Drive(0.7, -24);
+//      chassis.turnRobotToAngle(180);
+        robot.chassis.Drive(0.7, 12);
+        robot.chassis.Drive(0.7, 12);
+    }
+    public void outakeLeft(float endAngle) {
         org.firstinspires.ftc.robotcore.external.navigation.Orientation angle;
         angle = robot.chassis.imu.getAngularOrientation();
         robot.chassis.Drive(0.7, -24);
@@ -61,7 +78,7 @@ public class AutoCommon {
     }
 
     public void goToBackboard() {
-        robot.chassis.DriveToPosition(0.7, 0, 6, false);
+        robot.chassis.DriveToPosition(0.7, 96, 24, false);
         robot.chassis.turnRobotToAngle(90);
     }
 

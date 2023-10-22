@@ -65,53 +65,57 @@ public class AutoBlueFront extends LinearOpMode {
         //For testing it has been set to 2.
         int detection = 2;
         String TagValue = "Inactive";
-        if(detection == 1){
+
+        waitForStart();
+
+        if(detection == 1 && opModeIsActive()){
             TagValue = "TagOne";
         }
 
-        if(detection == 2){
+        if(detection == 2 && opModeIsActive()){
             TagValue = "TagTwo";
 
         }
 
-        if(detection == 3){
+        if(detection == 3 && opModeIsActive()){
             TagValue = "TagThree";
         }
 
-        waitForStart();
-
         if (opModeIsActive()) {
-//                telemetry.addLine("----------------------------------------");
-//                if (robot.myVisionPortal.getProcessorEnabled(robot.tfod)) {
-//                    telemetry.addLine("TFOD Detection Working");
-//                    telemetry.addLine();
-//                    telemetryTfod();
-//                }
+            while (opModeIsActive()) {
+                //                telemetry.addLine("----------------------------------------");
+                //                if (robot.myVisionPortal.getProcessorEnabled(robot.tfod)) {
+                //                    telemetry.addLine("TFOD Detection Working");
+                //                    telemetry.addLine();
+                //                    telemetryTfod();
+                //                }
                 auto.runAuto(TagValue);
                 telemetry.update();
+                stop();
+                break;
 
-//                switch (TagValue) {
-//
-//                    case TagOne:
-//                        telemetry.addLine("Delivered purple pixel on spike mark 1");
-//                        telemetry.update();
-//                        break;
-//
-//                    case TagTwo:
-//                        auto.goToBackboard();
-//                        telemetry.addLine("Delivered purple pixel on spike mark 2");
-//                        telemetry.update();
-//                        break;
-//
-//                    case TagThree:
-//                        telemetry.addLine("Delivered purple pixel on spike mark 3");
-//                        telemetry.update();
-//                        break;
-//                }
-
+                //                switch (TagValue) {
+                //
+                //                    case TagOne:
+                //                        telemetry.addLine("Delivered purple pixel on spike mark 1");
+                //                        telemetry.update();
+                //                        break;
+                //
+                //                    case TagTwo:
+                //                        auto.goToBackboard();
+                //                        telemetry.addLine("Delivered purple pixel on spike mark 2");
+                //                        telemetry.update();
+                //                        break;
+                //
+                //                    case TagThree:
+                //                        telemetry.addLine("Delivered purple pixel on spike mark 3");
+                //                        telemetry.update();
+                //                        break;
+                //                }
 
             }
         }
+    }
 
 
 
