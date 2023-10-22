@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.Helper;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -20,7 +19,7 @@ public class Intake {
         motor = hwMap.get(DcMotor.class, "Intake");
 
         motor.setDirection(DcMotor.Direction.FORWARD);
-        motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     public void MoveIntake(double speed, boolean direction) {

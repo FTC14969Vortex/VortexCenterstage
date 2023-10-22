@@ -68,8 +68,6 @@ package org.firstinspires.ftc.teamcode.Helper;
 
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -77,7 +75,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class Arm {
 
     //Object creation
-    HardwareMap hwMap = null;
     public DcMotor motor;
     int timeout_ms = 5000;
     double speed;
@@ -86,13 +83,13 @@ public class Arm {
 
 
     public void init(HardwareMap ahwMap) throws InterruptedException {
-        hwMap = ahwMap;
+        HardwareMap hwMap = ahwMap;
         //Init motors and servos
         motor = hwMap.get(DcMotor.class, "Arm");
-        motor.setDirection(DcMotorSimple.Direction.FORWARD);
-        motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor.setDirection(DcMotor.Direction.FORWARD);
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
 // ARM WITH BUTTONS V2
