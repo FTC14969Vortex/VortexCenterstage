@@ -68,19 +68,6 @@ public class AutoBlueFront extends LinearOpMode {
 
         waitForStart();
 
-        if(detection == 1 && opModeIsActive()){
-            TagValue = "TagOne";
-        }
-
-        if(detection == 2 && opModeIsActive()){
-            TagValue = "TagTwo";
-
-        }
-
-        if(detection == 3 && opModeIsActive()){
-            TagValue = "TagThree";
-        }
-
         if (opModeIsActive()) {
             while (opModeIsActive()) {
                 //                telemetry.addLine("----------------------------------------");
@@ -89,6 +76,20 @@ public class AutoBlueFront extends LinearOpMode {
                 //                    telemetry.addLine();
                 //                    telemetryTfod();
                 //                }
+
+                if(detection == 1){
+                    TagValue = "TagOne";
+                }
+
+                if(detection == 2){
+                    TagValue = "TagTwo";
+
+                }
+
+                if(detection == 3){
+                    TagValue = "TagThree";
+                }
+
                 auto.runAuto(TagValue);
                 telemetry.update();
                 stop();

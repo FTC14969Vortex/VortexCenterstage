@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.Helper;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -22,6 +24,7 @@ public class AutoCommon {
 
     //Robot Object
     public Robot robot = new Robot();
+
 
     public enum TagValues {
         TagOne, TagTwo, TagThree
@@ -51,11 +54,11 @@ public class AutoCommon {
     public VisionPortal myVisionPortal;
 
     //Auto Functions
-    public void outakeStraight(float endAngle) {
+    public void outakeStraight() {
         org.firstinspires.ftc.robotcore.external.navigation.Orientation angle;
         angle = robot.chassis.imu.getAngularOrientation();
-        robot.chassis.Drive(0.7, -24);
-//      chassis.turnRobotToAngle(180);
+        robot.chassis.Drive(0.7,-24);
+        robot.chassis.turnRobotToAngle(180);
         robot.chassis.Drive(0.7, 12);
         robot.chassis.Drive(0.7, 12);
     }
@@ -72,7 +75,7 @@ public class AutoCommon {
         org.firstinspires.ftc.robotcore.external.navigation.Orientation angle;
         angle = robot.chassis.imu.getAngularOrientation();
         robot.chassis.Drive(0.7, -24);
-//      chassis.turnRobotToAngle(180);
+//        robot.chassis.turnRobotToAngle(180);
         robot.chassis.Drive(0.7, 12);
         robot.chassis.Drive(0.7, 12);
     }
@@ -85,7 +88,8 @@ public class AutoCommon {
     public void runAuto(String tagValue) {
         switch (tagValue) {
             case "TagTwo":
-                goToBackboard();
+//                goToBackboard();
+                outakeStraight();
                 break;
 
         }

@@ -154,6 +154,9 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("BL Motor Encoder", robot.chassis.BLMotor.getCurrentPosition());
             telemetry.addData("BR Motor Encoder", robot.chassis.BRMotor.getCurrentPosition());
             telemetry.addData("FR Motor Encoder", robot.chassis.FRMotor.getCurrentPosition());
+            telemetry.addData("First Angle", robot.chassis.imu.getAngularOrientation().firstAngle);
+            telemetry.addData("Second Angle", robot.chassis.imu.getAngularOrientation().secondAngle);
+            telemetry.addData("Third Angle", robot.chassis.imu.getAngularOrientation().thirdAngle);
             telemetry.addData("Arm Position", robot.arm.motor.getCurrentPosition());
             telemetry.addData("Arm Power", robot.arm.motor.getPower());
             telemetry.addData("Wrist Position", robot.wrist.servo.getPosition());
