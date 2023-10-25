@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.OpModes;
 //imports
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.Helper.Robot;
 
@@ -16,10 +17,14 @@ public class Teleop extends LinearOpMode {
     Robot robot = new Robot();
 
     //How fast your robot will accelerate.
-    public double acceleration = 0.3;
+    public double ACCELERATION = 0.3;
 
-    double armHoldingPower = 0.1;
-    double WristHoldingPower = 0.7;
+    double WRIST_HOLDING_POWER = 0.7;
+
+    int ARM_DELIVERY_POSITION = -600;
+    int ARM_PICKUP_POSITION = -50;
+    double ARM_HOLDING_POWER = 0.1;
+
 
 
     //Motor powers
@@ -79,10 +84,10 @@ public class Teleop extends LinearOpMode {
             double target_br_power = move_y_axis + move_x_axis - pivot_turn;
 
             //Adds how far you are from target power, times acceleration to the current power.
-            fl_power += acceleration * (target_fl_power - fl_power);
-            bl_power += acceleration * (target_bl_power - bl_power);
-            fr_power += acceleration * (target_fr_power - fr_power);
-            br_power += acceleration * (target_br_power - br_power);
+            fl_power += ACCELERATION * (target_fl_power - fl_power);
+            bl_power += ACCELERATION * (target_bl_power - bl_power);
+            fr_power += ACCELERATION * (target_fr_power - fr_power);
+            br_power += ACCELERATION * (target_br_power - br_power);
 
             /**
              Joystick controls for Drivetrain
@@ -94,7 +99,7 @@ public class Teleop extends LinearOpMode {
             robot.chassis.BRMotor.setPower(DRIVETRAIN_SPEED * br_power);
 
             //Joystick controls for Slider, Arm
-
+            robot.arm.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.arm.motor.setPower(swing_arm_power);
 
 
@@ -126,13 +131,14 @@ public class Teleop extends LinearOpMode {
             }
             //GAMEPAD 2
 
-            //Arm delivery with buttons
-//            if (gamepad2.a) {
-//                robot.arm.swingUpB();
-//            }
-//            if (gamepad2.b) {
-//                robot.arm.swingDownB();
-//            }
+//            Arm delivery with buttons
+            if (gamepad2.a) {
+                 robot.arm.gotoPosition(ARM_DELIVERY_POSITION);
+            }
+
+            if (gamepad2.b) {
+                robot.arm.gotoPosition(ARM_PICKUP_POSITION);
+            }
 
             //Wrist Movement
             if(gamepad2.x){
@@ -158,6 +164,7 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("Second Angle", robot.chassis.imu.getAngularOrientation().secondAngle);
             telemetry.addData("Third Angle", robot.chassis.imu.getAngularOrientation().thirdAngle);
             telemetry.addData("Arm Position", robot.arm.motor.getCurrentPosition());
+            telemetry.addData("Motor Status", robot.arm.motor.isBusy());
             telemetry.addData("Arm Power", robot.arm.motor.getPower());
             telemetry.addData("Wrist Position", robot.wrist.servo.getPosition());
             telemetry.addData("Slider Position", robot.slider.servo.getPosition());
