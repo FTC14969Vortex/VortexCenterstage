@@ -309,17 +309,23 @@ public class Chassis {
 
 
     }
-    public void autoTurn(float targetAngle){
+    public void autoTurn(float turnAngle){
         float desc_start = 10;
         double acc = 1;
         float startAngle = imu.getAngularOrientation().firstAngle;
         float currentAngle = startAngle;
 
-        while (Math.abs(currentAngle - startAngle)<targetAngle){
-            float diff = Math.abs(currentAngle - targetAngle);
-
-            if(diff<=desc_start ){
-                acc = diff/50;
+        float remaining = Math.abs(currentAngle - startAngle);
+        if (remaining>180){
+            remaining = 360 - remaining;
+        }
+        while (remaining<turnAngle){
+            float diff = Math.abs(currentAngle - turnAngle);
+            if (diff>180){
+                diff = 360 - diff;
+            }
+            if(diff<=desc_start){
+                acc = diff/10.0;
             }
             FLMotor.setPower(-0.3*acc);
             FRMotor.setPower(0.3*acc);
