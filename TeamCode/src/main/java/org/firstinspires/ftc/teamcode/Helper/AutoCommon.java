@@ -63,10 +63,8 @@ public class AutoCommon {
 
     //Auto Functions
     public void outakeStraight() {
-        org.firstinspires.ftc.robotcore.external.navigation.Orientation angle;
-        angle = robot.chassis.imu.getAngularOrientation();
         robot.chassis.Drive(0.7,-24);
-        robot.chassis.autoTurn(170);
+        robot.chassis.autoTurn(180);
         robot.chassis.Drive(0.7, 12);
         robot.intake.MoveIntake(0.7,true);
         robot.chassis.Drive(0.7, 12);
@@ -76,7 +74,7 @@ public class AutoCommon {
         org.firstinspires.ftc.robotcore.external.navigation.Orientation angle;
         angle = robot.chassis.imu.getAngularOrientation();
         robot.chassis.Drive(0.7, -24);
-        robot.chassis.autoTurn(260);
+        robot.chassis.autoTurn(270);
         robot.intake.MoveIntake(0.7,false);
         robot.chassis.Strafe(0.7, 24);
     }
@@ -84,14 +82,14 @@ public class AutoCommon {
         org.firstinspires.ftc.robotcore.external.navigation.Orientation angle;
         angle = robot.chassis.imu.getAngularOrientation();
         robot.chassis.Drive(0.7, -24);
-        robot.chassis.autoTurn(80);
+        robot.chassis.autoTurn(90);
         robot.intake.MoveIntake(0.7,false);
         robot.chassis.Strafe(0.7, -24);
     }
 
     public void goToBackboard() {
         robot.chassis.DriveToPosition(0.7, 96, 24, false);
-        robot.chassis.autoTurn(80);
+        robot.chassis.autoTurn(90);
         robot.arm.gotoPosition(ARM_DELIVERY_POSITION);
         robot.wrist.servoPosition(WRIST_DELIVERY_POSITION);
     }
@@ -99,7 +97,8 @@ public class AutoCommon {
     public void runAuto(String tagValue) {
         switch (tagValue) {
             case "TagTwo":
-                robot.chassis.autoTurn(90);
+                outakeStraight();
+                goToBackboard();
                 break;
 
         }

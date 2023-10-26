@@ -81,28 +81,10 @@ public class Chassis {
         FRMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         BRMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-//        FLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        BLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        FRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        BRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-//        //Setting the run mode
-//        FLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        BLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        FRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        BRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//////
-
-//        FLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        BLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        FRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        BRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//
-////
-//        FLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        BLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        FRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        BRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        FLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        BLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        FRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        BRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
 
@@ -312,6 +294,15 @@ public class Chassis {
     public void autoTurn(float turnAngle){
         float desc_start = 10;
         double acc = 1;
+        float turnOffest = 10;
+
+        this.FLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.BLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.FRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.BRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
+        turnAngle = turnAngle - turnOffest;
         float startAngle = imu.getAngularOrientation().firstAngle;
         float currentAngle = startAngle;
 
@@ -320,18 +311,16 @@ public class Chassis {
             remaining = 360 - remaining;
         }
         while (remaining<turnAngle){
-            float diff = Math.abs(currentAngle - turnAngle);
-            if (diff>180){
-                diff = 360 - diff;
-            }
-            if(diff<=desc_start){
-                acc = diff/10.0;
-            }
+
             FLMotor.setPower(-0.3*acc);
             FRMotor.setPower(0.3*acc);
             BLMotor.setPower(-0.3*acc);
             BRMotor.setPower(0.3*acc);
             currentAngle = imu.getAngularOrientation().firstAngle;
+            remaining = Math.abs(currentAngle - startAngle);
+            if (remaining>180){
+                remaining = 360 - remaining;
+            }
 
 
         }

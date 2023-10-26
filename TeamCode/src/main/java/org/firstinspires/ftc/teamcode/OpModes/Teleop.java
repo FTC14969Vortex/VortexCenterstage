@@ -75,6 +75,11 @@ public class Teleop extends LinearOpMode {
          */
 
 
+        robot.chassis.FLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.chassis.BLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.chassis.FRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.chassis.BRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         waitForStart();
 
         while (opModeIsActive()) {
