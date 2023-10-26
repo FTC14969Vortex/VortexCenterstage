@@ -66,8 +66,9 @@ public class AutoCommon {
         org.firstinspires.ftc.robotcore.external.navigation.Orientation angle;
         angle = robot.chassis.imu.getAngularOrientation();
         robot.chassis.Drive(0.7,-24);
-        robot.chassis.turnRobotToAngle(180);
+        robot.chassis.autoTurn(170);
         robot.chassis.Drive(0.7, 12);
+        robot.intake.MoveIntake(0.7,true);
         robot.chassis.Drive(0.7, 12);
     }
 
@@ -75,22 +76,22 @@ public class AutoCommon {
         org.firstinspires.ftc.robotcore.external.navigation.Orientation angle;
         angle = robot.chassis.imu.getAngularOrientation();
         robot.chassis.Drive(0.7, -24);
-//      chassis.turnRobotToAngle(180);
-        robot.chassis.Drive(0.7, 12);
-        robot.chassis.Drive(0.7, 12);
+        robot.chassis.autoTurn(260);
+        robot.intake.MoveIntake(0.7,false);
+        robot.chassis.Strafe(0.7, 24);
     }
     public void outakeLeft(float endAngle) {
         org.firstinspires.ftc.robotcore.external.navigation.Orientation angle;
         angle = robot.chassis.imu.getAngularOrientation();
         robot.chassis.Drive(0.7, -24);
-//        robot.chassis.turnRobotToAngle(180);
-        robot.chassis.Drive(0.7, 12);
-        robot.chassis.Drive(0.7, 12);
+        robot.chassis.autoTurn(80);
+        robot.intake.MoveIntake(0.7,false);
+        robot.chassis.Strafe(0.7, -24);
     }
 
     public void goToBackboard() {
         robot.chassis.DriveToPosition(0.7, 96, 24, false);
-        robot.chassis.turnRobotToAngle(90);
+        robot.chassis.autoTurn(80);
         robot.arm.gotoPosition(ARM_DELIVERY_POSITION);
         robot.wrist.servoPosition(WRIST_DELIVERY_POSITION);
     }
@@ -98,8 +99,6 @@ public class AutoCommon {
     public void runAuto(String tagValue) {
         switch (tagValue) {
             case "TagTwo":
-//                goToBackboard();
-//                outakeStraight();
                 robot.chassis.autoTurn(90);
                 break;
 
