@@ -22,8 +22,16 @@ public class Teleop extends LinearOpMode {
     double WRIST_HOLDING_POWER = 0.7;
 
     int ARM_DELIVERY_POSITION = -600;
-    int ARM_PICKUP_POSITION = -50;
+    int ARM_PICKUP_POSITION = 4;
     double ARM_HOLDING_POWER = 0.1;
+
+    double WRIST_DELIVERY_POSITION = 0.9;
+
+    double WRIST_PICKUP_POSITION = 0.25;
+
+    int timeout_ms = 5000;
+
+
 
 
 
@@ -131,28 +139,38 @@ public class Teleop extends LinearOpMode {
             }
             //GAMEPAD 2
 
-//            Arm delivery with buttons
-            if (gamepad2.a) {
-                 robot.arm.gotoPosition(ARM_DELIVERY_POSITION);
-            }
-
-            if (gamepad2.b) {
-                robot.arm.gotoPosition(ARM_PICKUP_POSITION);
-            }
-
-            //Wrist Movement
-            if(gamepad2.x){
-                robot.wrist.Deliver();
-            }
-            if (gamepad2.y) {
-                robot.wrist.Default();
-            }
+            //Arm delivery with buttons
+//            if (gamepad2.a) {
+//                 robot.arm.gotoPosition(ARM_DELIVERY_POSITION);
+//            }
+//
+//            if (gamepad2.b) {
+//                robot.arm.gotoPosition(ARM_PICKUP_POSITION);
+//            }
+//
+//            //Wrist Movement
+//            if(gamepad2.x){
+//                robot.wrist.servoPosition(WRIST_DELIVERY_POSITION);
+//            }
+//            if (gamepad2.y) {
+//                robot.wrist.servoPosition(WRIST_PICKUP_POSITION);
+//            }
             //Slider Movement
             if(gamepad2.dpad_up) {
                 robot.slider.extend();
             }
             if(gamepad2.dpad_down){
                 robot.slider.retract();
+            }
+            if(gamepad2.right_bumper){
+                robot.arm.gotoPosition(ARM_DELIVERY_POSITION);
+                //Thread.sleep(500);
+                robot.wrist.servoPosition(WRIST_DELIVERY_POSITION);
+            }
+            if(gamepad2.left_bumper){
+                robot.wrist.servoPosition(WRIST_PICKUP_POSITION);
+                Thread.sleep(850);
+                robot.arm.gotoPosition(ARM_PICKUP_POSITION);
             }
 
 //          T E L E M E T R Y
