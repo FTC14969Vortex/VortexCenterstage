@@ -305,6 +305,32 @@ public class Chassis {
 
         }
         stopDriveMotors();
+
+
+    }
+    public void autoTurn(float targetAngle){
+        float desc_start = 10;
+        double acc = 1;
+        float startAngle = imu.getAngularOrientation().firstAngle;
+        float currentAngle = startAngle;
+        int count = 0;
+        while (Math.abs(currentAngle - startAngle)<targetAngle){
+            float diff = Math.abs(currentAngle - startAngle);
+
+            if(diff<=desc_start && count>20){
+                acc = diff/10.0;
+            }
+            FLMotor.setPower(-0.7*acc);
+            FRMotor.setPower(0.7*acc);
+            BLMotor.setPower(-0.7*acc);
+            BRMotor.setPower(0.7*acc);
+            currentAngle = imu.getAngularOrientation().firstAngle;
+            count ++;
+
+        }
+        stopDriveMotors();
+
     }
 
 }
+

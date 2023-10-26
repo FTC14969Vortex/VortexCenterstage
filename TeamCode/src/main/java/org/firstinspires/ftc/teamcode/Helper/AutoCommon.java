@@ -89,7 +89,8 @@ public class AutoCommon {
         switch (tagValue) {
             case "TagTwo":
 //                goToBackboard();
-                outakeStraight();
+//                outakeStraight();
+                robot.chassis.autoTurn(90);
                 break;
 
         }
