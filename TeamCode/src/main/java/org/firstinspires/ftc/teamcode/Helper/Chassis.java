@@ -32,6 +32,7 @@ public class Chassis {
 
 
 
+
     //Drivetrain Motor
     public DcMotor FLMotor = null;
     public DcMotor FRMotor = null;
@@ -313,19 +314,19 @@ public class Chassis {
         double acc = 1;
         float startAngle = imu.getAngularOrientation().firstAngle;
         float currentAngle = startAngle;
-        int count = 0;
-        while (Math.abs(currentAngle - startAngle)<targetAngle){
-            float diff = Math.abs(currentAngle - startAngle);
 
-            if(diff<=desc_start && count>20){
-                acc = diff/10.0;
+        while (Math.abs(currentAngle - startAngle)<targetAngle){
+            float diff = Math.abs(currentAngle - targetAngle);
+
+            if(diff<=desc_start ){
+                acc = diff/50;
             }
-            FLMotor.setPower(-0.7*acc);
-            FRMotor.setPower(0.7*acc);
-            BLMotor.setPower(-0.7*acc);
-            BRMotor.setPower(0.7*acc);
+            FLMotor.setPower(-0.3*acc);
+            FRMotor.setPower(0.3*acc);
+            BLMotor.setPower(-0.3*acc);
+            BRMotor.setPower(0.3*acc);
             currentAngle = imu.getAngularOrientation().firstAngle;
-            count ++;
+
 
         }
         stopDriveMotors();

@@ -66,7 +66,21 @@ public class AutoBlueFront extends LinearOpMode {
         int detection = 2;
         String TagValue = "Inactive";
 
+        if(detection == 1){
+            TagValue = "TagOne";
+        }
+
+        if(detection == 2){
+            TagValue = "TagTwo";
+
+        }
+
+        if(detection == 3){
+            TagValue = "TagThree";
+        }
+
         waitForStart();
+
 
         if (opModeIsActive()) {
             while (opModeIsActive()) {
@@ -76,22 +90,12 @@ public class AutoBlueFront extends LinearOpMode {
                 //                    telemetry.addLine();
                 //                    telemetryTfod();
                 //                }
-
-                if(detection == 1){
-                    TagValue = "TagOne";
-                }
-
-                if(detection == 2){
-                    TagValue = "TagTwo";
-
-                }
-
-                if(detection == 3){
-                    TagValue = "TagThree";
-                }
-
-                auto.runAuto(TagValue);
+                telemetry.addData("First Angle", auto.robot.chassis.imu.getAngularOrientation().firstAngle);
                 telemetry.update();
+                auto.runAuto(TagValue);
+                telemetry.addData("First Angle", auto.robot.chassis.imu.getAngularOrientation().firstAngle);
+                telemetry.update();
+                Thread.sleep(3000);
                 stop();
                 break;
 

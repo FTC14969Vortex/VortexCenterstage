@@ -90,7 +90,7 @@ public class AutoCommon {
 
     public void goToBackboard() {
         robot.chassis.DriveToPosition(0.7, 96, 24, false);
-        robot.chassis.turnRobotToAngle(90);
+        robot.chassis.autoTurn(90);
         robot.arm.gotoPosition(ARM_DELIVERY_POSITION);
         robot.wrist.servoPosition(WRIST_DELIVERY_POSITION);
     }
@@ -98,9 +98,9 @@ public class AutoCommon {
     public void runAuto(String tagValue) {
         switch (tagValue) {
             case "TagTwo":
-//                goToBackboard();
+                goToBackboard();
 //                outakeStraight();
-                robot.chassis.autoTurn(90);
+//                robot.chassis.autoTurn(90);
                 break;
 
         }
