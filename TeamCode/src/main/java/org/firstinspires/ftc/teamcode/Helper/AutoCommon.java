@@ -33,6 +33,14 @@ public class AutoCommon {
     public TagValues TagValue;
 
 
+    //Arm and Wrist positions
+    int ARM_DELIVERY_POSITION = -600;
+    int ARM_PICKUP_POSITION = 4;
+
+    double WRIST_DELIVERY_POSITION = 0.9;
+    double WRIST_PICKUP_POSITION = 0.25;
+
+
     //Vision
 
 
@@ -83,6 +91,8 @@ public class AutoCommon {
     public void goToBackboard() {
         robot.chassis.DriveToPosition(0.7, 96, 24, false);
         robot.chassis.turnRobotToAngle(90);
+        robot.arm.gotoPosition(ARM_DELIVERY_POSITION);
+        robot.wrist.servoPosition(WRIST_DELIVERY_POSITION);
     }
 
     public void runAuto(String tagValue) {
