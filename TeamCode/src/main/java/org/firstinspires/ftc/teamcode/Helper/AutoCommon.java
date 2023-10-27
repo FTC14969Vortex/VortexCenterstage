@@ -1,21 +1,10 @@
 package org.firstinspires.ftc.teamcode.Helper;
 
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.teamcode.Helper.Robot;
-import org.firstinspires.ftc.teamcode.OpModes.AutoBlueFront;
 import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
-
-import java.util.List;
 
 public class AutoCommon {
 
@@ -40,6 +29,8 @@ public class AutoCommon {
     double WRIST_DELIVERY_POSITION = 0.9;
     double WRIST_PICKUP_POSITION = 0.25;
 
+    double DRIVE_SPEED = 0.5;
+
 
     //Vision
 
@@ -62,43 +53,50 @@ public class AutoCommon {
     public VisionPortal myVisionPortal;
 
     //Auto Functions
-    public void outakeStraight() {
-        robot.chassis.Drive(0.7,-24);
+    public void outakeStraight() throws InterruptedException {
+        robot.chassis.Drive(DRIVE_SPEED,-24);
         robot.chassis.autoTurn(180);
-        robot.chassis.Drive(0.7, 12);
-        robot.intake.MoveIntake(0.7,true);
-        robot.chassis.Drive(0.7, 12);
+        robot.chassis.Drive(DRIVE_SPEED, 28);
+        robot.intake.MoveIntake(0.6,true);
+        Thread.sleep(1000);
+        robot.intake.MoveIntake(0,true);
+
+//        robot.chassis.Drive(DRIVE_SPEED, 12);
     }
 
-    public void outakeRight(float endAngle) {
-        org.firstinspires.ftc.robotcore.external.navigation.Orientation angle;
-        angle = robot.chassis.imu.getAngularOrientation();
-        robot.chassis.Drive(0.7, -24);
+    public void outakeLeft() {
+        robot.chassis.Drive(DRIVE_SPEED, -24);
         robot.chassis.autoTurn(270);
-        robot.intake.MoveIntake(0.7,false);
-        robot.chassis.Strafe(0.7, 24);
+        robot.intake.MoveIntake(DRIVE_SPEED,false);
+        robot.chassis.Strafe(DRIVE_SPEED, 24);
     }
-    public void outakeLeft(float endAngle) {
-        org.firstinspires.ftc.robotcore.external.navigation.Orientation angle;
-        angle = robot.chassis.imu.getAngularOrientation();
-        robot.chassis.Drive(0.7, -24);
+    public void outakeRight() throws InterruptedException {
+        robot.chassis.Drive(DRIVE_SPEED, -24);
         robot.chassis.autoTurn(90);
-        robot.intake.MoveIntake(0.7,false);
-        robot.chassis.Strafe(0.7, -24);
+        robot.intake.MoveIntake(DRIVE_SPEED,true);
+        Thread.sleep(1000);
+        robot.chassis.Drive(DRIVE_SPEED, -2);
+        robot.chassis.Strafe(DRIVE_SPEED, -24);
+        robot.chassis.autoTurn(180);
+//        robot.chassis.Strafe(0.5, -24);
     }
 
-    public void goToBackboard() {
-        robot.chassis.DriveToPosition(0.7, 96, 24, false);
-        robot.chassis.autoTurn(90);
+    public void goToBackboardAndDeliver() throws InterruptedException {
+        robot.chassis.DriveToPosition(DRIVE_SPEED, 96, 26, false);
+        robot.chassis.autoTurn(-95);
         robot.arm.gotoPosition(ARM_DELIVERY_POSITION);
         robot.wrist.servoPosition(WRIST_DELIVERY_POSITION);
+        robot.chassis.Drive(0.3, 1);
+        Thread.sleep(1000);
+        robot.gate.open();
     }
 
-    public void runAuto(String tagValue) {
+    public void runAuto(String tagValue) throws InterruptedException {
         switch (tagValue) {
             case "TagTwo":
+//                outakeRight();
                 outakeStraight();
-                goToBackboard();
+                goToBackboardAndDeliver();
                 break;
 
         }

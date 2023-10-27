@@ -294,7 +294,15 @@ public class Chassis {
     public void autoTurn(float turnAngle){
         float desc_start = 10;
         double acc = 1;
-        float turnOffest = 10;
+        float turnDirection = java.lang.Math.signum(turnAngle);
+        float turnOffset = 10;
+        float startAngle;
+        float currentAngle;
+        float alreadyTurned = 0;
+        double turnSpeed = 0.3;
+
+        turnAngle = Math.abs(turnAngle) - turnOffset;
+
 
         this.FLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         this.BLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -302,28 +310,24 @@ public class Chassis {
         this.BRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
-        turnAngle = turnAngle - turnOffest;
-        float startAngle = imu.getAngularOrientation().firstAngle;
-        float currentAngle = startAngle;
+        startAngle = imu.getAngularOrientation().firstAngle;
 
-        float remaining = Math.abs(currentAngle - startAngle);
-        if (remaining>180){
-            remaining = 360 - remaining;
-        }
-        while (remaining<turnAngle){
+        while (alreadyTurned< turnAngle){
 
-            FLMotor.setPower(-0.3*acc);
-            FRMotor.setPower(0.3*acc);
-            BLMotor.setPower(-0.3*acc);
-            BRMotor.setPower(0.3*acc);
+            FLMotor.setPower(- turnSpeed * turnDirection * acc);
+            FRMotor.setPower(turnSpeed * turnDirection* acc);
+            BLMotor.setPower(-turnSpeed * turnDirection * acc);
+            BRMotor.setPower(turnSpeed * turnDirection * acc);
             currentAngle = imu.getAngularOrientation().firstAngle;
-            remaining = Math.abs(currentAngle - startAngle);
-            if (remaining>180){
-                remaining = 360 - remaining;
+            alreadyTurned = Math.abs(currentAngle - startAngle);
+
+            if (alreadyTurned>180){
+                alreadyTurned = 360 - alreadyTurned;
             }
-
-
         }
+
+
+
         stopDriveMotors();
 
     }
