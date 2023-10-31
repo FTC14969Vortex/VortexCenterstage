@@ -82,13 +82,16 @@ public class AutoCommon {
     }
 
     public void goToBackboardAndDeliver() throws InterruptedException {
-        robot.chassis.DriveToPosition(DRIVE_SPEED, 96, 26, false);
+        robot.chassis.DriveToPosition(DRIVE_SPEED, 95, 26, false);
         robot.chassis.autoTurn(-95);
         robot.arm.gotoPosition(ARM_DELIVERY_POSITION);
         robot.wrist.servoPosition(WRIST_DELIVERY_POSITION);
-        robot.chassis.Drive(0.3, 1);
+        robot.chassis.Drive(0.3, 2);
         Thread.sleep(1000);
         robot.gate.open();
+        Thread.sleep(600);
+        robot.gate.close();
+        robot.arm.gotoPosition(ARM_PICKUP_POSITION);
     }
 
     public void runAuto(String tagValue) throws InterruptedException {

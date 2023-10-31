@@ -124,10 +124,10 @@ public class Teleop extends LinearOpMode {
 
             //Intake
             if (gamepad1.left_bumper) {
-                robot.intake.MoveIntake(0.8, true);
+                robot.intake.MoveIntake(1, true);
             }
             if (gamepad1.right_bumper) {
-                robot.intake.MoveIntake(0.8, false);
+                robot.intake.MoveIntake(1, false);
             }
             if (gamepad1.x) {
                 robot.intake.motor.setPower(0);
