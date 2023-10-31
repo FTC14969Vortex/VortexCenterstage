@@ -55,7 +55,7 @@ public class AutoCommon {
     //Auto Functions
     public void outakeStraight() throws InterruptedException {
         robot.chassis.Drive(DRIVE_SPEED,-24);
-        robot.chassis.autoTurn(180);
+//        robot.chassis.autoTurn(180);
         robot.chassis.Drive(DRIVE_SPEED, 28);
         robot.intake.MoveIntake(0.6,true);
         Thread.sleep(1000);
@@ -94,7 +94,6 @@ public class AutoCommon {
     public void runAuto(String tagValue) throws InterruptedException {
         switch (tagValue) {
             case "TagTwo":
-//                outakeRight();
                 outakeStraight();
                 goToBackboardAndDeliver();
                 break;
