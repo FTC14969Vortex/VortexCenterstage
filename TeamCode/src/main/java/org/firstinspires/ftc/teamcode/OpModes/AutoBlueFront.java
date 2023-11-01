@@ -7,10 +7,10 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDir
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.Helper.AutoCommon;
-import org.firstinspires.ftc.teamcode.Helper.Robot;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -24,18 +24,13 @@ public class AutoBlueFront extends LinearOpMode {
     double timeout_ms = 0;
     AutoCommon auto = new AutoCommon();
 
-    public enum TagValues {
-        TagOne, TagTwo, TagThree
-    }
-
-    public TagValues TagValue;
-
-
     @Override
 
     public void runOpMode() throws InterruptedException {
         auto.robot.init(hardwareMap);
-        initDoubleVision();
+
+        initAprilTag();
+        initTfod();
 
 
         /** Wait for the game to begin */
@@ -43,128 +38,129 @@ public class AutoBlueFront extends LinearOpMode {
         telemetry.update();
 
 
-        auto.myVisionPortal.setProcessorEnabled(auto.aprilTag, true);
-//        robot.myVisionPortal.setProcessorEnabled(robot.tfod, true);
-
-
-//        robot.tfod.setZoom(1);
-
-        if (auto.myVisionPortal.getProcessorEnabled(auto.aprilTag)) {
-            telemetry.addLine("AprilTag Detection Working");
-            telemetry.addLine();
-            telemetryAprilTag();
-        }
-        telemetry.addLine();
-
-        telemetry.addLine("Detected Team Element");
-        telemetry.update();
-
-        //Detection Code Here
-
-        //Set Detection value based off where the team element is
-        //For testing it has been set to 2.
         int detection = 2;
         String TagValue = "Inactive";
-
-        if(detection == 1){
-            TagValue = "TagOne";
-        }
-
-        if(detection == 2){
-            TagValue = "TagTwo";
-
-        }
-
-        if(detection == 3){
-            TagValue = "TagThree";
-        }
 
         waitForStart();
 
 
         if (opModeIsActive()) {
             while (opModeIsActive()) {
-                //                telemetry.addLine("----------------------------------------");
-                //                if (robot.myVisionPortal.getProcessorEnabled(robot.tfod)) {
-                //                    telemetry.addLine("TFOD Detection Working");
-                //                    telemetry.addLine();
-                //                    telemetryTfod();
-                //                }
-                telemetry.addData("First Angle", auto.robot.chassis.imu.getAngularOrientation().firstAngle);
-                telemetry.update();
+
+                if (auto.visionPortal.getProcessorEnabled(auto.aprilTag)) {
+                    telemetry.addLine("AprilTag Detection Working");
+                    telemetry.addLine();
+                    telemetryAprilTag();
+                }
+
+                if (auto.visionPortal.getProcessorEnabled(auto.tfod)) {
+                    telemetry.addLine("Tfod Detection Working");
+                    telemetry.addLine();
+                    telemetryTfod();
+                }
+
+
+                if(detection == 1){
+                    TagValue = "One";
+                    auto.TagToDetect = 1;
+                }
+
+                if(detection == 2){
+                    TagValue = "Two";
+                    auto.TagToDetect = 2;
+                }
+
+                if(detection == 3){
+                    TagValue = "Three";
+                    auto.TagToDetect = 3;
+                }
+
+
                 auto.runAuto(TagValue);
-                telemetry.addData("First Angle", auto.robot.chassis.imu.getAngularOrientation().firstAngle);
-                telemetry.update();
-                Thread.sleep(3000);
-                stop();
-                break;
-
-                //                switch (TagValue) {
-                //
-                //                    case TagOne:
-                //                        telemetry.addLine("Delivered purple pixel on spike mark 1");
-                //                        telemetry.update();
-                //                        break;
-                //
-                //                    case TagTwo:
-                //                        auto.goToBackboard();
-                //                        telemetry.addLine("Delivered purple pixel on spike mark 2");
-                //                        telemetry.update();
-                //                        break;
-                //
-                //                    case TagThree:
-                //                        telemetry.addLine("Delivered purple pixel on spike mark 3");
-                //                        telemetry.update();
-                //                        break;
-                //                }
-
             }
         }
     }
 
 
+    private void initTfod() {
 
+        // Create the TensorFlow processor by using a builder.
+        auto.tfod = new TfodProcessor.Builder()
 
-    /**
-     * Function to initialize AprilTag and TFOD.
-     */
-    private void initDoubleVision() {
-        // -----------------------------------------------------------------------------------------
-        // AprilTag Configuration
-        // -----------------------------------------------------------------------------------------
+                // With the following lines commented out, the default TfodProcessor Builder
+                // will load the default model for the season. To define a custom model to load,
+                // choose one of the following:
+                //   Use setModelAssetName() if the custom TF Model is built in as an asset (AS only).
+                //   Use setModelFileName() if you have downloaded a custom team model to the Robot Controller.
+                //.setModelAssetName(TFOD_MODEL_ASSET)
+                //.setModelFileName(TFOD_MODEL_FILE)
 
-        auto.aprilTag = new AprilTagProcessor.Builder()
-                .setDrawAxes(true)
-                .setDrawCubeProjection(true)
-                .setDrawTagID(true)
-                .setDrawTagOutline(true)
+                // The following default settings are available to un-comment and edit as needed to
+                // set parameters for custom models.
+                //.setModelLabels(LABELS)
+                //.setIsModelTensorFlow2(true)
+                //.setIsModelQuantized(true)
+                //.setModelInputSize(300)
+                //.setModelAspectRatio(16.0 / 9.0)
+
                 .build();
 
-        // -----------------------------------------------------------------------------------------
-        // TFOD Configuration
-        // -----------------------------------------------------------------------------------------
-//
-//        robot.tfod = new TfodProcessor.Builder()
-//                .build();
+        // Create the vision portal by using a builder.
+        VisionPortal.Builder builder = new VisionPortal.Builder();
 
-        // -----------------------------------------------------------------------------------------
-        // Camera Configuration
-        // -----------------------------------------------------------------------------------------
-
+        // Set the camera (webcam vs. built-in RC phone camera).
         if (auto.USE_WEBCAM) {
-            auto.myVisionPortal = new VisionPortal.Builder()
+            builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
+        } else {
+            builder.setCamera(BuiltinCameraDirection.BACK);
+        }
+
+        // Choose a camera resolution. Not all cameras support all resolutions.
+        //builder.setCameraResolution(new Size(640, 480));
+
+        // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
+        //builder.enableLiveView(true);
+
+        // Set the stream format; MJPEG uses less bandwidth than default YUY2.
+        //builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);
+
+        // Choose whether or not LiveView stops if no processors are enabled.
+        // If set "true", monitor shows solid orange screen if no processors enabled.
+        // If set "false", monitor shows camera view without annotations.
+        //builder.setAutoStopLiveView(false);
+
+        // Set and enable the processor.
+        builder.addProcessor(auto.tfod);
+
+        // Build the Vision Portal, using the above settings.
+        auto.visionPortal = builder.build();
+
+        // Set confidence threshold for TFOD recognitions, at any time.
+        //tfod.setMinResultConfidence(0.75f);
+
+        // Disable or re-enable the TFOD processor at any time.
+        //visionPortal.setProcessorEnabled(tfod, true);
+
+    }   // end method initTfod()
+
+
+    private void initAprilTag() {
+        // Create the AprilTag processor by using a builder.
+        auto.aprilTag = new AprilTagProcessor.Builder().build();
+
+        // Create the vision portal by using a builder.
+        if (auto.USE_WEBCAM) {
+            auto.visionPortal = new VisionPortal.Builder()
                     .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-//                    .addProcessors(robot.tfod, robot.aprilTag)
-                    .addProcessors(auto.aprilTag)
+                    .addProcessor(auto.aprilTag)
                     .build();
         } else {
-            auto.myVisionPortal = new VisionPortal.Builder()
+            auto.visionPortal = new VisionPortal.Builder()
                     .setCamera(BuiltinCameraDirection.BACK)
-//                    .addProcessors(robot.tfod, robot.aprilTag)
-                    .addProcessors(auto.aprilTag)
+                    .addProcessor(auto.aprilTag)
                     .build();
         }
-    }   // end initDoubleVision()
+    }
 
 
     /**
@@ -188,6 +184,8 @@ public class AutoBlueFront extends LinearOpMode {
         }   // end for() loop
 
     }   // end method telemetryAprilTag()
+
+
 
 
     /**
