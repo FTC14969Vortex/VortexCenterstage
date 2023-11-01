@@ -22,12 +22,12 @@ public class Teleop extends LinearOpMode {
     double WRIST_HOLDING_POWER = 0.7;
 
     int ARM_DELIVERY_POSITION = -600;
-    int ARM_PICKUP_POSITION = 4;
+    int ARM_PICKUP_POSITION = 30;
     double ARM_HOLDING_POWER = 0.1;
 
-    double WRIST_DELIVERY_POSITION = 0.9;
+    double WRIST_DELIVERY_POSITION = 0.7;
 
-    double WRIST_PICKUP_POSITION = 0.25;
+    double WRIST_PICKUP_POSITION = 0.1;
 
     int timeout_ms = 5000;
 
@@ -124,10 +124,10 @@ public class Teleop extends LinearOpMode {
 
             //Intake
             if (gamepad1.left_bumper) {
-                robot.intake.MoveIntake(1, true);
+                robot.intake.MoveIntake(0.7, true);
             }
             if (gamepad1.right_bumper) {
-                robot.intake.MoveIntake(1, false);
+                robot.intake.MoveIntake(0.7, false);
             }
             if (gamepad1.x) {
                 robot.intake.motor.setPower(0);
