@@ -119,7 +119,7 @@ public class AutoCommon {
     public void outakeStraight() throws InterruptedException {
         robot.chassis.Drive(DRIVE_SPEED,24);
         robot.intake.MoveIntake(0.6,true);
-        robot.chassis.Drive(DRIVE_SPEED,28);
+        robot.chassis.Drive(DRIVE_SPEED,29);
         Thread.sleep(1000);
         robot.intake.MoveIntake(0,true);
 
