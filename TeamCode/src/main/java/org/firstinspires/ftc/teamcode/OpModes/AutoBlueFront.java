@@ -21,7 +21,7 @@ public class AutoBlueFront extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
     double timeout_ms = 0;
-    AutoCommon auto = new AutoCommon();
+    AutoCommonHelper auto = new AutoCommonHelper();
 
     @Override
 
