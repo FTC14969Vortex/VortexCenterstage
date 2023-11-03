@@ -33,18 +33,14 @@ public class Teleop extends LinearOpMode {
 
     int timeout_ms = 5000;
 
-
-
-
-
     //Motor powers
     public double fl_power = 0;
     public double bl_power = 0;
     public double fr_power = 0;
     public double br_power = 0;
 
-    public double DRIVETRAIN_SPEED = 0.7;
-    double slider_position = 0;
+    public double DRIVETRAIN_SPEED = 0.8;
+    public double slider_position = 0;
 
 //    //ArmWrist
 //    public void DeliverPosition() {
@@ -60,10 +56,6 @@ public class Teleop extends LinearOpMode {
 //        robot.wrist.Default();
 //        robot.wrist.servo.setPosition(0);
 //    }
-
-
-
-
 
     @Override
     public void runOpMode() throws InterruptedException{
@@ -86,18 +78,17 @@ public class Teleop extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            // Mapping from Xbox series S controller to motor powers.
+
+            /**
+             * Joystick controls for Drivetrain, Intake on GAMEPAD 1
+             */
+
+            //Drive train
+
+            // Xbox series S controller to motor powers.
             double move_y_axis = gamepad1.left_stick_y;
             double move_x_axis = -gamepad1.left_stick_x;
             double pivot_turn = -gamepad1.right_stick_x;
-            double swing_arm_power = gamepad2.left_stick_y * 0.6;
-            slider_position = slider_position + gamepad2.right_stick_y;
-            if(slider_position<0){
-                slider_position = 0;
-            }
-            if(slider_position>1){
-                slider_position = 1;
-            }
 
 
             //Sets the target power
@@ -112,26 +103,11 @@ public class Teleop extends LinearOpMode {
             fr_power += ACCELERATION * (target_fr_power - fr_power);
             br_power += ACCELERATION * (target_br_power - br_power);
 
-            /**
-             Joystick controls for Drivetrain
-             */
 
             robot.chassis.FLMotor.setPower(DRIVETRAIN_SPEED * fl_power);
             robot.chassis.BLMotor.setPower(DRIVETRAIN_SPEED * bl_power);
             robot.chassis.FRMotor.setPower(DRIVETRAIN_SPEED * fr_power);
             robot.chassis.BRMotor.setPower(DRIVETRAIN_SPEED * br_power);
-
-            //Joystick controls for Slider, Arm
-            robot.arm.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.arm.motor.setPower(swing_arm_power);
-            robot.slider.servo.setPosition(slider_position);
-
-
-
-            /**
-             * Joystick controls for Slider, Arm
-             */
-            //GAMEPAD 1
 
             //Intake
             if (gamepad1.left_bumper) {
@@ -143,6 +119,42 @@ public class Teleop extends LinearOpMode {
             if (gamepad1.x) {
                 robot.intake.motor.setPower(0);
             }
+
+            /**
+             * Joystick controls for Slider, Arm, Wrist, Gate on GAMEPAD 2
+             */
+
+
+            // Arm
+            double swing_arm_power = gamepad2.left_stick_y * 0.6;
+            // Running without encoder allows the arm to be swung from current position.
+            robot.arm.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.arm.motor.setPower(swing_arm_power);
+
+
+            // Slider
+
+            // Slider is driven by servo, which goes to absolute position.
+            // Therefore we should update the slider_position (range: 0 to 1) with joystick input (range: -1 to 1).
+            slider_position = slider_position + gamepad2.right_stick_y;
+            if(slider_position<0){
+                slider_position = 0;
+            }
+            if(slider_position>1){
+                slider_position = 1;
+            }
+            robot.slider.servo.setPosition(slider_position);
+
+
+            // Set slider to specific positions with dpad.
+            if(gamepad2.dpad_up) {
+                robot.slider.extend();
+            }
+            if(gamepad2.dpad_down){
+                robot.slider.retract();
+            }
+
+
             //Gate
             if(gamepad2.a){
                 robot.gate.close();
@@ -153,33 +165,8 @@ public class Teleop extends LinearOpMode {
             if(gamepad2.x){
                 robot.gate.middle();
             }
-            //GAMEPAD 2
 
-            //Arm delivery with buttons
-//            if (gamepad2.a) {
-//                 robot.arm.gotoPosition(ARM_DELIVERY_POSITION);
-//            }
-//
-//            if (gamepad2.b) {
-//                robot.arm.gotoPosition(ARM_PICKUP_POSITION);
-//            }
-//
-//            //Wrist Movement
-//            if(gamepad2.x){
-//                robot.wrist.servoPosition(WRIST_DELIVERY_POSITION);
-//            }
-//            if (gamepad2.y) {
-//                robot.wrist.servoPosition(WRIST_PICKUP_POSITION);
-//            }
-
-            //Slider Movement
-            if(gamepad2.dpad_up) {
-                robot.slider.extend();
-            }
-            if(gamepad2.dpad_down){
-                robot.slider.retract();
-            }
-
+            // Set arm, wrist, and gate to pickup or delivery position with bumper.
             if(gamepad2.right_bumper){
                 robot.arm.gotoPosition(ARM_DELIVERY_POSITION);
                 //Thread.sleep(500);
