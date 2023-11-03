@@ -27,7 +27,6 @@ public class AutoBlueFront extends LinearOpMode {
     @Override
 
     public void runOpMode() throws InterruptedException {
-        auto.robot.init(hardwareMap);
 
         initAprilTag();
         initTfod();
