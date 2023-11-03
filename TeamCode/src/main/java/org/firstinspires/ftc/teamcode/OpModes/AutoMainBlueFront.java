@@ -53,33 +53,48 @@ import java.util.List;
 @Autonomous(name = "AutoMain:BlueFront", group = "Auto")
 
 public class AutoMainBlueFront extends LinearOpMode {
+    /**
+     * Common variables for all Auto.
+     */
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 
-    /**
-     * The variable to store our instance of the AprilTag processor.
-     */
+   // The variable to store our instance of the AprilTag processor.
     private AprilTagProcessor aprilTag;
 
-    /**
-     * The variable to store our instance of the TensorFlow Object Detection processor.
-     */
+   // The variable to store our instance of the TensorFlow Object Detection processor.
     private TfodProcessor tfod;
 
-    /**
-     * The variable to store our instance of the vision portal.
-     */
+   //The variable to store our instance of the vision portal.
     private VisionPortal myVisionPortal;
 
+    // Custom model with blue and red team elements.
     private static final String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/DetectTeamElement.tflite";
     // Define the labels recognized in the model for TFOD (must be in training order!)
     private static final String[] LABELS = {
             "Blue",
             "Red"
-
     };
 
-    int detectedPosition = 0;
-    float teamElementX = 300;
+    // X-coordinate of team element at the start of auto.
+    float teamElementX = 320; // Frame size is 640, default in the middle.
+    int targetAprilTag = 0; // This needs to be assigned to 1, 2, or 3, based on the detected value.
+
+
+    /**
+     * Variables to change for different autos.
+     * The logic in all four OpModes is identical, we only change these variables.
+     */
+    // Target value of April tag for yellow pixel.
+    int targetAprilTagOffset = 0; // 0 for Blue side and 3 for Red side.
+    // Strafe left or right after delivering purple pixel.
+    String strafeDirAfterPurPix = "BlueRight"; // Blue autos require strafing right, and red require strafing left.
+    String turnDirNearBackstage = "CCW" ; // Blue side requires counter clockwise turn, red requires CW turn.
+    //Distance in inches from the middle of the spike mark 2 to the backstage.
+    int strafeDistAfterPurPix = 96; //24 inches when starting from the back and 24+72 inches when starting from front.
+
+
+
+
 
     @Override
     public void runOpMode() {
@@ -94,7 +109,6 @@ public class AutoMainBlueFront extends LinearOpMode {
 
         while (opModeIsActive())  {
             if (myVisionPortal.getProcessorEnabled(aprilTag)) {
-                // User instructions: Dpad left or Dpad right.
                 telemetry.addLine("AprilTag enabled");
                 telemetry.addLine();
                 telemetryAprilTag();
@@ -107,6 +121,11 @@ public class AutoMainBlueFront extends LinearOpMode {
 
             // Push telemetry to the Driver Station.
             telemetry.update();
+
+            /**
+             * Step 1: Detect object
+             * (common to all Auto)
+             */
             // Enable TFOD to detect object and store the value.
             myVisionPortal.setProcessorEnabled(tfod, true);
             myVisionPortal.setProcessorEnabled(aprilTag, false);
@@ -118,12 +137,31 @@ public class AutoMainBlueFront extends LinearOpMode {
             }
 
             if(teamElementX < 100) {
-                detectedPosition = 1;
+                targetAprilTag = 1;
             } else if(teamElementX > 440) {
-                detectedPosition = 3;
+                targetAprilTag = 3;
             } else {
-                detectedPosition = 2;
+                targetAprilTag = 2;
             }
+
+            // Add offset to account for blue or red side.
+            targetAprilTag += targetAprilTagOffset;
+
+            /**
+             * Step 2: Deliver purple pixel to the detected Position.
+             * (common to all auto)
+             */
+
+            /**
+             * Step 3: Drive to Backstage.
+             * (use flags based on auto).
+             * BLUE
+             */
+
+            /**
+             * Step 4: deliver yellow pixel in center of backdrop.
+             * (common to all auto).
+             */
 
 
 
@@ -136,7 +174,7 @@ public class AutoMainBlueFront extends LinearOpMode {
     /**
      * Initialize AprilTag and TFOD.
      */
-    private void initDoubleVision() {
+    public void initDoubleVision() {
         // -----------------------------------------------------------------------------------------
         // AprilTag Configuration
         // -----------------------------------------------------------------------------------------
@@ -189,7 +227,7 @@ public class AutoMainBlueFront extends LinearOpMode {
     /**
      * Add telemetry about AprilTag detections.
      */
-    private void telemetryAprilTag() {
+    public void telemetryAprilTag() {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         telemetry.addData("# AprilTags Detected", currentDetections.size());
 
@@ -211,7 +249,7 @@ public class AutoMainBlueFront extends LinearOpMode {
     /**
      * Add telemetry about TensorFlow Object Detection (TFOD) recognitions.
      */
-    private double telemetryTfod() {
+    public double telemetryTfod() {
         double x = 0;
         double y;
         List<Recognition> currentRecognitions = tfod.getRecognitions();
