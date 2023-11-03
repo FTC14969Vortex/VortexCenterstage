@@ -62,8 +62,8 @@ public class TensorflowTest extends LinearOpMode {
     private static final String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/DetectTeamElement.tflite";
     // Define the labels recognized in the model for TFOD (must be in training order!)
     private static final String[] LABELS = {
-            "Blue Team Element",
-            "Red Team Element"
+            "Blue",
+            "Red"
 
     };
 

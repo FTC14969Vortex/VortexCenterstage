@@ -50,9 +50,9 @@ import java.util.List;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  */
-@Autonomous(name = "Auto double vision", group = "Concept")
+@Autonomous(name = "AutoMain:BlueFront", group = "Auto")
 
-public class AutoBlueTensorFlowAprilTag extends LinearOpMode {
+public class AutoMainBlueFront extends LinearOpMode {
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 
     /**

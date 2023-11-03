@@ -17,7 +17,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.List;
 
-@Autonomous(name = "Blue Front", group = "Auto")
+@Autonomous(name = "BlueFront", group = "Auto")
 public class AutoBlueFront extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();

@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.Helper.Robot;
 
-@TeleOp(name = "23-24 TeleOp", group = "TeleOp")
+@TeleOp(name = "CenterStageTeleOp", group = "TeleOp")
 
 public class Teleop extends LinearOpMode {
 
