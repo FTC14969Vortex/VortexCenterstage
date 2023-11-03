@@ -133,13 +133,13 @@ public class Teleop extends LinearOpMode {
                 robot.intake.motor.setPower(0);
             }
             //Gate
-            if(gamepad1.a){
+            if(gamepad2.a){
                 robot.gate.open();
             }
-            if(gamepad1.b){
+            if(gamepad2.b){
                 robot.gate.close();
             }
-            if(gamepad1.y){
+            if(gamepad2.y){
                 robot.gate.middle();
             }
             //GAMEPAD 2
@@ -161,7 +161,7 @@ public class Teleop extends LinearOpMode {
 //                robot.wrist.servoPosition(WRIST_PICKUP_POSITION);
 //            }
             //Slider Movement
-            if(gamepad2.dpad_up) {
+            if(gamepad2.dpad_up {
                 robot.slider.extend();
             }
             if(gamepad2.dpad_down){

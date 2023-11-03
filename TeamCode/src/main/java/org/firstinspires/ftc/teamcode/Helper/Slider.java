@@ -8,7 +8,7 @@ public class Slider {
     HardwareMap hwMap = null;
 
     public double Retract = 0;
-    public double Extend = 1;
+    public double Extend = 0.6;
 
     public void init(HardwareMap ahwMap) throws InterruptedException {
 
