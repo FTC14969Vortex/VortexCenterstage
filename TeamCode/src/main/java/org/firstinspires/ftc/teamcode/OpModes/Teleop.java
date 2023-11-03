@@ -171,6 +171,7 @@ public class Teleop extends LinearOpMode {
 //            if (gamepad2.y) {
 //                robot.wrist.servoPosition(WRIST_PICKUP_POSITION);
 //            }
+
             //Slider Movement
             if(gamepad2.dpad_up) {
                 robot.slider.extend();
@@ -178,6 +179,7 @@ public class Teleop extends LinearOpMode {
             if(gamepad2.dpad_down){
                 robot.slider.retract();
             }
+
             if(gamepad2.right_bumper){
                 robot.arm.gotoPosition(ARM_DELIVERY_POSITION);
                 //Thread.sleep(500);

@@ -78,57 +78,59 @@ public class AutoBlueTensorFlowAprilTag extends LinearOpMode {
 
     };
 
+    int detectedPosition = 0;
+    float teamElementX = 300;
+
     @Override
     public void runOpMode() {
+        // Initialize
         initDoubleVision();
+        telemetry.addData("DS preview on/off","3 dots, Camera Stream");
+        telemetry.addLine();
+        telemetry.addLine("----------------------------------------");
 
-        // This OpMode loops continuously, allowing the user to switch between
-        // AprilTag and TensorFlow Object Detection (TFOD) image processors.
-        while (!isStopRequested())  {
+        waitForStart();
 
-            if (opModeInInit()) {
-                telemetry.addData("DS preview on/off","3 dots, Camera Stream");
-                telemetry.addLine();
-                telemetry.addLine("----------------------------------------");
-            }
 
+        while (opModeIsActive())  {
             if (myVisionPortal.getProcessorEnabled(aprilTag)) {
                 // User instructions: Dpad left or Dpad right.
-                telemetry.addLine("Dpad Left to disable AprilTag");
+                telemetry.addLine("AprilTag enabled");
                 telemetry.addLine();
                 telemetryAprilTag();
-            } else {
-                telemetry.addLine("Dpad Right to enable AprilTag");
             }
-            telemetry.addLine();
-            telemetry.addLine("----------------------------------------");
-            if (myVisionPortal.getProcessorEnabled(tfod)) {
-                telemetry.addLine("Dpad Down to disable TFOD");
+            else if(myVisionPortal.getProcessorEnabled(tfod)) {
+                telemetry.addLine("TFOD enabled");
                 telemetry.addLine();
                 telemetryTfod();
-            } else {
-                telemetry.addLine("Dpad Up to enable TFOD");
             }
 
             // Push telemetry to the Driver Station.
             telemetry.update();
+            // Enable TFOD to detect object and store the value.
+            myVisionPortal.setProcessorEnabled(tfod, true);
+            myVisionPortal.setProcessorEnabled(aprilTag, false);
 
-            if (gamepad1.dpad_left) {
-                myVisionPortal.setProcessorEnabled(aprilTag, false);
-            } else if (gamepad1.dpad_right) {
-                myVisionPortal.setProcessorEnabled(aprilTag, true);
-            }
-            if (gamepad1.dpad_down) {
-                myVisionPortal.setProcessorEnabled(tfod, false);
-            } else if (gamepad1.dpad_up) {
-                myVisionPortal.setProcessorEnabled(tfod, true);
+            //Get a recognition
+            List<Recognition> currentRecognitions = tfod.getRecognitions();
+            for (Recognition recognition : currentRecognitions) {
+                teamElementX = (recognition.getLeft() + recognition.getRight()) / 2;
             }
 
-            sleep(20);
+            if(teamElementX < 100) {
+                detectedPosition = 1;
+            } else if(teamElementX > 440) {
+                detectedPosition = 3;
+            } else {
+                detectedPosition = 2;
+            }
 
-        }   // end while loop
 
-    }   // end method runOpMode()
+
+        } // end while loop
+
+    }  //end opMode
+
 
 
     /**
@@ -209,14 +211,16 @@ public class AutoBlueTensorFlowAprilTag extends LinearOpMode {
     /**
      * Add telemetry about TensorFlow Object Detection (TFOD) recognitions.
      */
-    private void telemetryTfod() {
+    private double telemetryTfod() {
+        double x = 0;
+        double y;
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         telemetry.addData("# Objects Detected", currentRecognitions.size());
 
         // Step through the list of recognitions and display info for each one.
         for (Recognition recognition : currentRecognitions) {
-            double x = (recognition.getLeft() + recognition.getRight()) / 2 ;
-            double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
+            x = (recognition.getLeft() + recognition.getRight()) / 2 ;
+            y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
 
             telemetry.addData(""," ");
             telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
@@ -224,6 +228,9 @@ public class AutoBlueTensorFlowAprilTag extends LinearOpMode {
             telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
         }   // end for() loop
 
+        return x;
+
     }   // end method telemetryTfod()
+
 
 }   // end class
