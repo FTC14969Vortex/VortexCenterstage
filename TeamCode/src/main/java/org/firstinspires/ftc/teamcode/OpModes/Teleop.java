@@ -25,9 +25,11 @@ public class Teleop extends LinearOpMode {
     int ARM_PICKUP_POSITION = 30;
     double ARM_HOLDING_POWER = 0.1;
 
-    double WRIST_DELIVERY_POSITION = 0.7;
-
+    double WRIST_DELIVERY_POSITION = 0.75;
     double WRIST_PICKUP_POSITION = 0.1;
+
+    double INTAKE_SPEED = 0.6;
+
 
     int timeout_ms = 5000;
 
@@ -42,6 +44,7 @@ public class Teleop extends LinearOpMode {
     public double br_power = 0;
 
     public double DRIVETRAIN_SPEED = 0.7;
+    double slider_position = 0;
 
 //    //ArmWrist
 //    public void DeliverPosition() {
@@ -88,6 +91,13 @@ public class Teleop extends LinearOpMode {
             double move_x_axis = -gamepad1.left_stick_x;
             double pivot_turn = -gamepad1.right_stick_x;
             double swing_arm_power = gamepad2.left_stick_y * 0.6;
+            slider_position = slider_position + gamepad2.right_stick_y;
+            if(slider_position<0){
+                slider_position = 0;
+            }
+            if(slider_position>1){
+                slider_position = 1;
+            }
 
 
             //Sets the target power
@@ -114,6 +124,7 @@ public class Teleop extends LinearOpMode {
             //Joystick controls for Slider, Arm
             robot.arm.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.arm.motor.setPower(swing_arm_power);
+            robot.slider.servo.setPosition(slider_position);
 
 
 
@@ -124,22 +135,22 @@ public class Teleop extends LinearOpMode {
 
             //Intake
             if (gamepad1.left_bumper) {
-                robot.intake.MoveIntake(0.7, true);
+                robot.intake.MoveIntake(INTAKE_SPEED, true);
             }
             if (gamepad1.right_bumper) {
-                robot.intake.MoveIntake(0.7, false);
+                robot.intake.MoveIntake(INTAKE_SPEED, false);
             }
             if (gamepad1.x) {
                 robot.intake.motor.setPower(0);
             }
             //Gate
             if(gamepad2.a){
-                robot.gate.open();
-            }
-            if(gamepad2.b){
                 robot.gate.close();
             }
-            if(gamepad2.y){
+            if(gamepad2.b){
+                robot.gate.open();
+            }
+            if(gamepad2.x){
                 robot.gate.middle();
             }
             //GAMEPAD 2
@@ -174,9 +185,12 @@ public class Teleop extends LinearOpMode {
             }
             if(gamepad2.left_bumper){
                 robot.wrist.servoPosition(WRIST_PICKUP_POSITION);
+                robot.gate.open();
                 Thread.sleep(850);
                 robot.arm.gotoPosition(ARM_PICKUP_POSITION);
             }
+
+
 
 //          T E L E M E T R Y
             telemetry.addData("FL Motor Encoder", robot.chassis.FLMotor.getCurrentPosition());

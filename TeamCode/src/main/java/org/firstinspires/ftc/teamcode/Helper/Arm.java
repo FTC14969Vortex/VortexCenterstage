@@ -43,7 +43,7 @@ public class Arm {
 
         while ((runtime.milliseconds() < timeout_ms) && (motor.isBusy())) {
         }
-        motor.setPower(0);
+        motor.setPower(-speed*0.05); //Holding power.
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
