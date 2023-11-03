@@ -86,10 +86,11 @@ public class AutoCommon {
 //    private static final String TFOD_MODEL_ASSET = "MyModelStoredAsAsset.tflite";
     // TFOD_MODEL_FILE points to a model file stored onboard the Robot Controller's storage,
     // this is used when uploading models directly to the RC using the model upload interface.
-    private static final String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/blueElementCenterstage.tflite";
+    public static final String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/DetectTeamElement.tflite";
     // Define the labels recognized in the model for TFOD (must be in training order!)
-    private static final String[] LABELS = {
+    public static final String[] LABELS = {
             "Blue Team Element",
+            "Red Team Element",
     };
 
 
@@ -118,7 +119,7 @@ public class AutoCommon {
     public void outakeStraight() throws InterruptedException {
         robot.chassis.Drive(DRIVE_SPEED,24);
         robot.intake.MoveIntake(0.6,true);
-        robot.chassis.Drive(DRIVE_SPEED,28);
+        robot.chassis.Drive(DRIVE_SPEED,29);
         Thread.sleep(1000);
         robot.intake.MoveIntake(0,true);
 
@@ -141,8 +142,8 @@ public class AutoCommon {
 //        robot.chassis.Strafe(0.5, -24);
     }
     public void goToBackboardAndAdjust() throws InterruptedException {
-//        robot.chassis.DriveToPosition(DRIVE_SPEED, 80, 26, false);
-//        robot.chassis.autoTurn(-100);
+        robot.chassis.DriveToPosition(DRIVE_SPEED, 80, 26, false);
+        robot.chassis.autoTurn(-100);
         driveToAprilTag(TagToDetect);
     }
     public void deliver() throws InterruptedException {
