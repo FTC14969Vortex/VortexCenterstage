@@ -21,11 +21,11 @@ public class Teleop extends LinearOpMode {
 
     double WRIST_HOLDING_POWER = 0.7;
 
-    int ARM_DELIVERY_POSITION = -600;
+    int ARM_DELIVERY_POSITION = -550;
     int ARM_PICKUP_POSITION = 30;
     double ARM_HOLDING_POWER = 0.1;
 
-    double WRIST_DELIVERY_POSITION = 0.75;
+    double WRIST_DELIVERY_POSITION = 0.8;
     double WRIST_PICKUP_POSITION = 0.1;
 
     double INTAKE_SPEED = 0.6;
@@ -39,7 +39,7 @@ public class Teleop extends LinearOpMode {
     public double fr_power = 0;
     public double br_power = 0;
 
-    public double DRIVETRAIN_SPEED = 0.8;
+    public double DRIVETRAIN_SPEED = 0.7;
     public double slider_position = 0;
 
 //    //ArmWrist
@@ -126,7 +126,7 @@ public class Teleop extends LinearOpMode {
 
 
             // Arm
-            double swing_arm_power = gamepad2.left_stick_y * 0.6;
+            double swing_arm_power = gamepad2.left_stick_y * 0.6 + 0.05;
             // Running without encoder allows the arm to be swung from current position.
             robot.arm.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.arm.motor.setPower(swing_arm_power);
@@ -136,13 +136,13 @@ public class Teleop extends LinearOpMode {
 
             // Slider is driven by servo, which goes to absolute position.
             // Therefore we should update the slider_position (range: 0 to 1) with joystick input (range: -1 to 1).
-            slider_position = slider_position + gamepad2.right_stick_y;
-            if(slider_position<0){
-                slider_position = 0;
-            }
-            if(slider_position>1){
-                slider_position = 1;
-            }
+            slider_position  -= gamepad2.right_stick_y;
+//            if(slider_position<0){
+//                slider_position = 0;
+//            }
+//            if(slider_position>1){
+//                slider_position = 1;
+//            }
             robot.slider.servo.setPosition(slider_position);
 
 
@@ -168,6 +168,7 @@ public class Teleop extends LinearOpMode {
 
             // Set arm, wrist, and gate to pickup or delivery position with bumper.
             if(gamepad2.right_bumper){
+                robot.gate.close();
                 robot.arm.gotoPosition(ARM_DELIVERY_POSITION);
                 //Thread.sleep(500);
                 robot.wrist.servoPosition(WRIST_DELIVERY_POSITION);

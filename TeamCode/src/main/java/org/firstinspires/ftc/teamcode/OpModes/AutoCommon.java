@@ -118,8 +118,8 @@ public class AutoCommon extends LinearOpMode {
     // Target value of April tag for yellow pixel.
     public int targetAprilTagOffset; // 0 for Blue side and 3 for Red side.
     // Strafe left or right after delivering purple pixel.
-    public String strafeDirAfterPurPix; // Blue autos require strafing right, and red require strafing left.
-    public String turnDirNearBackstage; // Blue side requires counter clockwise turn, red requires CW turn.
+    public int strafeDirAfterPurPix; // Blue autos require strafing right, and red require strafing left.
+    public int turnAngleNearBackstage; // Blue side requires counter clockwise turn, red requires CW turn.
     //Distance in inches from the middle of the spike mark 2 to the backstage.
     public int strafeDistAfterPurPix; //24 inches when starting from the back and 24+72 inches when starting from front.
 
@@ -129,8 +129,8 @@ public class AutoCommon extends LinearOpMode {
          * Set parameters specific to starting position in Auto here.
          */
         targetAprilTagOffset = 0;
-        strafeDirAfterPurPix = "BlueRight";
-        turnDirNearBackstage = "CCW";
+        strafeDirAfterPurPix = -1; // +1 is right for Blue, -1 is left for Red.
+        turnAngleNearBackstage = 95;
         strafeDistAfterPurPix = 96;
     }
 
@@ -151,7 +151,7 @@ public class AutoCommon extends LinearOpMode {
         telemetry.addLine("Parameters unique to each auto:");
         telemetry.addData("targetAprilTagOffset", targetAprilTagOffset);
         telemetry.addData("strafeDirAfterPurPix",strafeDirAfterPurPix);
-        telemetry.addData("turnDirNearBackstage",turnDirNearBackstage);
+        telemetry.addData("turnDirNearBackstage", turnAngleNearBackstage);
         telemetry.addData("strafeDistAfterPurPix", strafeDistAfterPurPix);
 
         telemetry.update();
@@ -159,9 +159,8 @@ public class AutoCommon extends LinearOpMode {
 
 
         waitForStart();
-
-
-        while (opModeIsActive())  {
+        boolean doneAuto = false;
+        while (opModeIsActive() && !doneAuto)  {
             if (myVisionPortal.getProcessorEnabled(aprilTag)) {
                 telemetry.addLine("AprilTag enabled");
                 telemetry.addLine();
@@ -198,6 +197,9 @@ public class AutoCommon extends LinearOpMode {
                 targetSpikeMark = 2; //Center
             }
 
+            telemetry.addData("Target Spike Mark", targetSpikeMark);
+            telemetry.update();
+
             // Add offset to account for blue or red side.
             targetAprilTag = targetSpikeMark + targetAprilTagOffset;
 
@@ -218,18 +220,13 @@ public class AutoCommon extends LinearOpMode {
                     break;
             }
 
-
             /**
-             * Step 3: Drive to Backstage.
-             * (use flags based on auto).
-             * BLUE
+             * Step 3: Drive to Backstage and deliver.
+             *
              */
+            //backboardAndDeliver(strafeDirAfterPurPix,strafeDistAfterPurPix,turnAngleNearBackstage);
 
-            /**
-             * Step 4: deliver yellow pixel in center of backdrop.
-             * (common to all auto).
-             */
-
+            doneAuto = true;
 
 
         } // end while loop
@@ -341,30 +338,38 @@ public class AutoCommon extends LinearOpMode {
      * Methods for driving the robot.
      */
     public void outTakeStraight() throws InterruptedException {
-        robot.chassis.Drive(DRIVE_SPEED,-24);
-        robot.intake.MoveIntake(DRIVE_SPEED,false);
-        Thread.sleep(1000);
+        robot.chassis.Drive(DRIVE_SPEED,50);
+        robot.intake.MoveIntake(0.5,true);
+        Thread.sleep(2000);
         robot.intake.MoveIntake(0,true);
-        robot.chassis.Drive(DRIVE_SPEED,-24);
-
     }
 
     public void outTakeLeft() throws InterruptedException {
         robot.chassis.Drive(DRIVE_SPEED, -24);
-        robot.chassis.Strafe(DRIVE_SPEED, 24);
-        robot.intake.MoveIntake(DRIVE_SPEED,false);
-        Thread.sleep(1000);
+        robot.chassis.autoTurn(270);
+        robot.intake.MoveIntake(0.5,true);
+        Thread.sleep(2000);
         robot.intake.MoveIntake(0,true);
 
     }
     public void outTakeRight() throws InterruptedException {
         robot.chassis.Drive(DRIVE_SPEED, -24);
         robot.chassis.autoTurn(90);
-        robot.intake.MoveIntake(DRIVE_SPEED,true);
-        Thread.sleep(1000);
+        robot.intake.MoveIntake(0.5,true);
+        Thread.sleep(2000);
         robot.chassis.Drive(DRIVE_SPEED, -2);
         robot.chassis.Strafe(DRIVE_SPEED, -24);
         robot.chassis.autoTurn(180);
 //        robot.chassis.Strafe(0.5, -24);
+    }
+
+    public void backboardAndDeliver(int strafeDirAfterPurPix, int strafeDistAfterPurPix, int turnAngleNearBackstage) throws InterruptedException {
+        robot.chassis.Strafe(DRIVE_SPEED, strafeDirAfterPurPix*strafeDistAfterPurPix);
+        robot.chassis.autoTurn(turnAngleNearBackstage);
+        robot.chassis.Strafe(DRIVE_SPEED, strafeDirAfterPurPix*26);
+        robot.arm.gotoPosition(ARM_DELIVERY_POSITION);
+        robot.wrist.servoPosition(WRIST_DELIVERY_POSITION);
+        Thread.sleep(1000);
+        robot.gate.open();
     }
 }   // end class

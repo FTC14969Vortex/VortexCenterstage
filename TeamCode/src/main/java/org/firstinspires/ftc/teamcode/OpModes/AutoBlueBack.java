@@ -10,8 +10,8 @@ public class AutoBlueBack extends AutoCommon {
     public void setUniqueParameters() {
         // Specific values for AutoBlueFront
         targetAprilTagOffset = 0;
-        strafeDirAfterPurPix = "Right";
-        turnDirNearBackstage = "CCW";
+        strafeDirAfterPurPix = 1;
+        turnAngleNearBackstage = -95;
         strafeDistAfterPurPix = 24;
     }
     
