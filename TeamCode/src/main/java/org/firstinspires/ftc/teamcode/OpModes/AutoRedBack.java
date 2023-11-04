@@ -3,16 +3,16 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "AutoBlueFront", group = "Auto")
-public class AutoBlueFront extends AutoCommon {
+@Autonomous(name = "AutoRedBack", group = "Auto")
+public class AutoRedBack extends AutoCommon {
 
     @Override
     public void setUniqueParameters() {
         // Specific values for AutoBlueFront
-        targetAprilTagOffset = 0;
-        strafeDirAfterPurPix = "Right";
-        turnDirNearBackstage = "CCW";
-        strafeDistAfterPurPix = 96;
+        targetAprilTagOffset = 3;
+        strafeDirAfterPurPix = "Left";
+        turnDirNearBackstage = "CW";
+        strafeDistAfterPurPix = 24;
     }
 
     @Override

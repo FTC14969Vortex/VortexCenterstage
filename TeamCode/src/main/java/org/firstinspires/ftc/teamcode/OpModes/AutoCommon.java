@@ -31,7 +31,6 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -84,12 +83,20 @@ public class AutoCommon extends LinearOpMode {
      * The logic in all four OpModes is identical, we only change these variables.
      */
     // Target value of April tag for yellow pixel.
-    int targetAprilTagOffset = 0; // 0 for Blue side and 3 for Red side.
+    public int targetAprilTagOffset; // 0 for Blue side and 3 for Red side.
     // Strafe left or right after delivering purple pixel.
-    String strafeDirAfterPurPix = "BlueRight"; // Blue autos require strafing right, and red require strafing left.
-    String turnDirNearBackstage = "CCW" ; // Blue side requires counter clockwise turn, red requires CW turn.
+    public String strafeDirAfterPurPix; // Blue autos require strafing right, and red require strafing left.
+    public String turnDirNearBackstage; // Blue side requires counter clockwise turn, red requires CW turn.
     //Distance in inches from the middle of the spike mark 2 to the backstage.
-    int strafeDistAfterPurPix = 96; //24 inches when starting from the back and 24+72 inches when starting from front.
+    public int strafeDistAfterPurPix; //24 inches when starting from the back and 24+72 inches when starting from front.
+
+
+    public void setUniqueParameters(){
+        targetAprilTagOffset = 0;
+        strafeDirAfterPurPix = "BlueRight";
+        turnDirNearBackstage = "CCW";
+        strafeDistAfterPurPix = 96;
+    }
 
     /**
      * All methods for the AutoOpMode, we keep them public so that other opmodes can use them.
@@ -99,6 +106,8 @@ public class AutoCommon extends LinearOpMode {
     public void runOpMode() {
         // Initialize
         initDoubleVision();
+        setUniqueParameters();
+
         telemetry.addData("DS preview on/off","3 dots, Camera Stream");
         telemetry.addLine();
         telemetry.addLine("----------------------------------------");
