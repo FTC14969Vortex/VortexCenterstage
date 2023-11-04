@@ -16,7 +16,7 @@ public class AutoRedBack extends AutoCommon {
     }
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
         // Call the initialization method
         setUniqueParameters();
         // Now call the parent class's runOpMode method

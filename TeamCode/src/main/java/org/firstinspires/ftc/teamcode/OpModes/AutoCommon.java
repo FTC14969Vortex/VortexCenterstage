@@ -40,6 +40,9 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
+import org.firstinspires.ftc.teamcode.Helper.Robot;
+
+
 import java.util.List;
 
 /*
@@ -59,7 +62,23 @@ public class AutoCommon extends LinearOpMode {
    // The variable to store our instance of the AprilTag processor.
     private AprilTagProcessor aprilTag;
 
-   // The variable to store our instance of the TensorFlow Object Detection processor.
+    //Variables for AprilTag delivery
+
+    double DESIRED_DISTANCE = 12; //  this is how close the camera should get to the target (inches)
+
+    //  Set the GAIN constants to control the relationship between the measured position error, and how much power is
+    //  applied to the drive motors to correct the error.
+    //  Drive = Error * Gain    Make these values smaller for smoother control, or larger for a more aggressive response.
+    final double SPEED_GAIN  =  0.02  ;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
+    final double STRAFE_GAIN =  0.015 ;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
+    final double TURN_GAIN   =  0.01  ;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
+
+    final double MAX_AUTO_SPEED = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
+    final double MAX_AUTO_STRAFE= 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
+    final double MAX_AUTO_TURN  = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
+
+
+    // The variable to store our instance of the TensorFlow Object Detection processor.
     private TfodProcessor tfod;
 
    //The variable to store our instance of the vision portal.
@@ -75,8 +94,22 @@ public class AutoCommon extends LinearOpMode {
 
     // X-coordinate of team element at the start of auto.
     float teamElementX = 320; // Frame size is 640, default in the middle.
+    int targetSpikeMark = 2;
     int targetAprilTag = 0; // This needs to be assigned to 1, 2, or 3, based on the detected value.
 
+
+    //Robot Object
+    public Robot robot = new Robot();
+
+    // Robot control parameters
+    //Arm and Wrist positions
+    int ARM_DELIVERY_POSITION = -600;
+    int ARM_PICKUP_POSITION = 4;
+
+    double WRIST_DELIVERY_POSITION = 0.9;
+    double WRIST_PICKUP_POSITION = 0.25;
+
+    double DRIVE_SPEED = 0.5;
 
     /**
      * Variables to change for different autos.
@@ -92,6 +125,9 @@ public class AutoCommon extends LinearOpMode {
 
 
     public void setUniqueParameters(){
+        /**
+         * Set parameters specific to starting position in Auto here.
+         */
         targetAprilTagOffset = 0;
         strafeDirAfterPurPix = "BlueRight";
         turnDirNearBackstage = "CCW";
@@ -103,7 +139,7 @@ public class AutoCommon extends LinearOpMode {
      */
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
         // Initialize
         initDoubleVision();
         setUniqueParameters();
@@ -145,20 +181,33 @@ public class AutoCommon extends LinearOpMode {
             }
 
             if(teamElementX < 100) {
-                targetAprilTag = 1;
+                targetSpikeMark = 1; //Left
             } else if(teamElementX > 440) {
-                targetAprilTag = 3;
+                targetSpikeMark = 3; //Right
             } else {
-                targetAprilTag = 2;
+                targetSpikeMark = 2; //Center
             }
 
             // Add offset to account for blue or red side.
-            targetAprilTag += targetAprilTagOffset;
+            targetAprilTag = targetSpikeMark + targetAprilTagOffset;
 
             /**
              * Step 2: Deliver purple pixel to the detected Position.
              * (common to all auto)
              */
+
+            switch(targetSpikeMark){
+                case 1:
+                    outTakeLeft();
+                    break;
+                case 2:
+                    outTakeStraight();
+                    break;
+                case 3:
+                    outTakeRight();
+                    break;
+            }
+
 
             /**
              * Step 3: Drive to Backstage.
@@ -277,6 +326,37 @@ public class AutoCommon extends LinearOpMode {
         return x;
 
     }   // end method telemetryTfod()
+
+    /**
+     * Methods for driving the robot.
+     */
+    public void outTakeStraight() throws InterruptedException {
+        robot.chassis.Drive(DRIVE_SPEED,-24);
+        robot.intake.MoveIntake(DRIVE_SPEED,false);
+        Thread.sleep(1000);
+        robot.intake.MoveIntake(0,true);
+        robot.chassis.Drive(DRIVE_SPEED,-24);
+
+    }
+
+    public void outTakeLeft() throws InterruptedException {
+        robot.chassis.Drive(DRIVE_SPEED, -24);
+        robot.chassis.Strafe(DRIVE_SPEED, 24);
+        robot.intake.MoveIntake(DRIVE_SPEED,false);
+        Thread.sleep(1000);
+        robot.intake.MoveIntake(0,true);
+
+    }
+    public void outTakeRight() throws InterruptedException {
+        robot.chassis.Drive(DRIVE_SPEED, -24);
+        robot.chassis.autoTurn(90);
+        robot.intake.MoveIntake(DRIVE_SPEED,true);
+        Thread.sleep(1000);
+        robot.chassis.Drive(DRIVE_SPEED, -2);
+        robot.chassis.Strafe(DRIVE_SPEED, -24);
+        robot.chassis.autoTurn(180);
+//        robot.chassis.Strafe(0.5, -24);
+    }
 
 
 }   // end class
