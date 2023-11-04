@@ -15,11 +15,4 @@ public class AutoRedBack extends AutoCommon {
         strafeDistAfterPurPix = 24;
     }
 
-    @Override
-    public void runOpMode() throws InterruptedException {
-        // Call the initialization method
-        setUniqueParameters();
-        // Now call the parent class's runOpMode method
-        super.runOpMode();
-    }
 }

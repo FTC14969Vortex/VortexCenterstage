@@ -138,15 +138,25 @@ public class AutoCommon extends LinearOpMode {
      * All methods for the AutoOpMode, we keep them public so that other opmodes can use them.
      */
 
+
+
     @Override
     public void runOpMode() throws InterruptedException {
         // Initialize
         initDoubleVision();
         setUniqueParameters();
+        robot.init(hardwareMap);
 
         telemetry.addData("DS preview on/off","3 dots, Camera Stream");
-        telemetry.addLine();
-        telemetry.addLine("----------------------------------------");
+        telemetry.addLine("Parameters unique to each auto:");
+        telemetry.addData("targetAprilTagOffset", targetAprilTagOffset);
+        telemetry.addData("strafeDirAfterPurPix",strafeDirAfterPurPix);
+        telemetry.addData("turnDirNearBackstage",turnDirNearBackstage);
+        telemetry.addData("strafeDistAfterPurPix", strafeDistAfterPurPix);
+
+        telemetry.update();
+
+
 
         waitForStart();
 
@@ -357,6 +367,4 @@ public class AutoCommon extends LinearOpMode {
         robot.chassis.autoTurn(180);
 //        robot.chassis.Strafe(0.5, -24);
     }
-
-
 }   // end class

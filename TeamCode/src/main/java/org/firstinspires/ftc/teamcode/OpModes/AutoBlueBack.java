@@ -14,12 +14,5 @@ public class AutoBlueBack extends AutoCommon {
         turnDirNearBackstage = "CCW";
         strafeDistAfterPurPix = 24;
     }
-
-    @Override
-    public void runOpMode() throws InterruptedException  {
-        // Call the initialization method
-        setUniqueParameters();
-        // Now call the parent class's runOpMode method
-        super.runOpMode();
-    }
+    
 }
