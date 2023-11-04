@@ -11,7 +11,7 @@ import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
 import java.util.*;
 
-public class AutoCommonHelper {
+public class AutoCommonOld {
 
     private ElapsedTime runtime = new ElapsedTime();
     double timeout_ms = 0;
