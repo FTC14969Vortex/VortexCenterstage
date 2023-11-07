@@ -28,7 +28,7 @@ public class Teleop extends LinearOpMode {
     double WRIST_DELIVERY_POSITION = 0.8;
     double WRIST_PICKUP_POSITION = 0.1;
 
-    double INTAKE_SPEED = 0.6;
+    double INTAKE_SPEED = 0.7;
 
 
     int timeout_ms = 5000;

@@ -97,6 +97,8 @@ public class AutoCommon extends LinearOpMode {
     int targetSpikeMark = 2;
     int targetAprilTag = 0; // This needs to be assigned to 1, 2, or 3, based on the detected value.
 
+    float recognition_size;
+
 
     //Robot Object
     public Robot robot = new Robot();
@@ -147,61 +149,25 @@ public class AutoCommon extends LinearOpMode {
         setUniqueParameters();
         robot.init(hardwareMap);
 
-        telemetry.addData("DS preview on/off","3 dots, Camera Stream");
-        telemetry.addLine("Parameters unique to each auto:");
-        telemetry.addData("targetAprilTagOffset", targetAprilTagOffset);
-        telemetry.addData("strafeDirAfterPurPix",strafeDirAfterPurPix);
-        telemetry.addData("turnDirNearBackstage", turnAngleNearBackstage);
-        telemetry.addData("strafeDistAfterPurPix", strafeDistAfterPurPix);
-
-        telemetry.update();
+//        telemetry.addData("DS preview on/off","3 dots, Camera Stream");
+//        telemetry.addLine("Parameters unique to each auto:");
+//        telemetry.addData("targetAprilTagOffset", targetAprilTagOffset);
+//        telemetry.addData("strafeDirAfterPurPix",strafeDirAfterPurPix);
+//        telemetry.addData("turnDirNearBackstage", turnAngleNearBackstage);
+//        telemetry.addData("strafeDistAfterPurPix", strafeDistAfterPurPix);
+//
+        detectTeamElement();
 
 
 
         waitForStart();
         boolean doneAuto = false;
         while (opModeIsActive() && !doneAuto)  {
-            if (myVisionPortal.getProcessorEnabled(aprilTag)) {
-                telemetry.addLine("AprilTag enabled");
-                telemetry.addLine();
-                telemetryAprilTag();
-            }
-            else if(myVisionPortal.getProcessorEnabled(tfod)) {
-                telemetry.addLine("TFOD enabled");
-                telemetry.addLine();
-                telemetryTfod();
-            }
 
-            // Push telemetry to the Driver Station.
-            telemetry.update();
+            detectTeamElement();
 
-            /**
-             * Step 1: Detect object
-             * (common to all Auto)
-             */
-            // Enable TFOD to detect object and store the value.
-            myVisionPortal.setProcessorEnabled(tfod, true);
-            myVisionPortal.setProcessorEnabled(aprilTag, false);
 
-            //Get a recognition
-            List<Recognition> currentRecognitions = tfod.getRecognitions();
-            for (Recognition recognition : currentRecognitions) {
-                teamElementX = (recognition.getLeft() + recognition.getRight()) / 2;
-            }
 
-            if(teamElementX < 100) {
-                targetSpikeMark = 1; //Left
-            } else if(teamElementX > 440) {
-                targetSpikeMark = 3; //Right
-            } else {
-                targetSpikeMark = 2; //Center
-            }
-
-            telemetry.addData("Target Spike Mark", targetSpikeMark);
-            telemetry.update();
-
-            // Add offset to account for blue or red side.
-            targetAprilTag = targetSpikeMark + targetAprilTagOffset;
 
             /**
              * Step 2: Deliver purple pixel to the detected Position.
@@ -224,7 +190,7 @@ public class AutoCommon extends LinearOpMode {
              * Step 3: Drive to Backstage and deliver.
              *
              */
-            //backboardAndDeliver(strafeDirAfterPurPix,strafeDistAfterPurPix,turnAngleNearBackstage);
+            backboardAndDeliver(strafeDirAfterPurPix,strafeDistAfterPurPix,turnAngleNearBackstage);
 
             doneAuto = true;
 
@@ -334,42 +300,98 @@ public class AutoCommon extends LinearOpMode {
 
     }   // end method telemetryTfod()
 
+    public void detectTeamElement(){ // detect position of team element.
+        /**
+         * Step 1: Detect object
+         * (common to all Auto)
+         */
+        // Enable TFOD to detect object and store the value.
+        myVisionPortal.setProcessorEnabled(tfod, true);
+        myVisionPortal.setProcessorEnabled(aprilTag, false);
+
+
+        //Get a recognition
+        List<Recognition> currentRecognitions = tfod.getRecognitions();
+        float teamElemThresholdMax = 200;
+        float teamElemThresholdMin = 25;
+        for (Recognition recognition : currentRecognitions) {
+            if (recognition.getWidth() > teamElemThresholdMax ||
+                    recognition.getWidth() < teamElemThresholdMin) {
+                continue;
+            }
+            teamElementX = (recognition.getLeft() + recognition.getRight()) / 2;
+            recognition_size = recognition.getWidth();
+
+            break;
+        }
+
+
+        if(teamElementX < 120) {
+            targetSpikeMark = 3; //Left
+        } else if(teamElementX > 440) {
+            targetSpikeMark = 1; //Right
+        } else {
+            targetSpikeMark = 2; //Center
+        }
+
+        telemetry.addData("Tele_X", teamElementX);
+        telemetry.addData("Recognition Size", recognition_size);
+        telemetry.addData("Target Spike Mark", targetSpikeMark);
+
+        // Add offset to account for blue or red side.
+        targetAprilTag = targetSpikeMark + targetAprilTagOffset;
+
+        if (myVisionPortal.getProcessorEnabled(aprilTag)) {
+            telemetry.addLine("AprilTag enabled");
+            telemetry.addLine();
+            telemetryAprilTag();
+        }
+        else if(myVisionPortal.getProcessorEnabled(tfod)) {
+            telemetry.addLine("TFOD enabled");
+            telemetry.addLine();
+            telemetryTfod();
+        }
+        // Push telemetry to the Driver Station.
+        telemetry.update();
+
+
+    }
+
     /**
      * Methods for driving the robot.
      */
     public void outTakeStraight() throws InterruptedException {
-        robot.chassis.Drive(DRIVE_SPEED,50);
-        robot.intake.MoveIntake(0.5,true);
+        robot.chassis.Drive(DRIVE_SPEED,51);
+        robot.intake.MoveIntake(0.3,true);
         Thread.sleep(2000);
         robot.intake.MoveIntake(0,true);
     }
 
     public void outTakeLeft() throws InterruptedException {
-        robot.chassis.Drive(DRIVE_SPEED, -24);
-        robot.chassis.autoTurn(270);
-        robot.intake.MoveIntake(0.5,true);
+        robot.chassis.Drive(DRIVE_SPEED, 27);
+        robot.chassis.autoTurn(-100);
+        robot.intake.MoveIntake(0.3,true);
         Thread.sleep(2000);
         robot.intake.MoveIntake(0,true);
+        robot.chassis.Drive(DRIVE_SPEED, 2);
+        robot.chassis.Strafe(DRIVE_SPEED,35);
+        robot.chassis.autoTurn(95);
 
     }
     public void outTakeRight() throws InterruptedException {
-        robot.chassis.Drive(DRIVE_SPEED, -24);
+        robot.chassis.Drive(DRIVE_SPEED, 27);
         robot.chassis.autoTurn(90);
-        robot.intake.MoveIntake(0.5,true);
+        robot.intake.MoveIntake(0.3,true);
         Thread.sleep(2000);
-        robot.chassis.Drive(DRIVE_SPEED, -2);
-        robot.chassis.Strafe(DRIVE_SPEED, -24);
-        robot.chassis.autoTurn(180);
-//        robot.chassis.Strafe(0.5, -24);
+        robot.intake.MoveIntake(0, true);
+        robot.chassis.Drive(DRIVE_SPEED, 2);
+        robot.chassis.Strafe(DRIVE_SPEED, -35);
+        robot.chassis.autoTurn(-95);
     }
 
     public void backboardAndDeliver(int strafeDirAfterPurPix, int strafeDistAfterPurPix, int turnAngleNearBackstage) throws InterruptedException {
         robot.chassis.Strafe(DRIVE_SPEED, strafeDirAfterPurPix*strafeDistAfterPurPix);
         robot.chassis.autoTurn(turnAngleNearBackstage);
-        robot.chassis.Strafe(DRIVE_SPEED, strafeDirAfterPurPix*26);
-        robot.arm.gotoPosition(ARM_DELIVERY_POSITION);
-        robot.wrist.servoPosition(WRIST_DELIVERY_POSITION);
-        Thread.sleep(1000);
-        robot.gate.open();
+        robot.chassis.Strafe(DRIVE_SPEED, strafeDirAfterPurPix*44);
     }
 }   // end class

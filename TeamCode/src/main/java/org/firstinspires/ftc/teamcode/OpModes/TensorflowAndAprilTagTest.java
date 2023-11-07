@@ -69,7 +69,7 @@ public class TensorflowAndAprilTagTest extends LinearOpMode {
      */
     private VisionPortal myVisionPortal;
 
-    private static final String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/DetectTeamElement.tflite";
+    private static final String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/ssd_mobilenet_v2_320x320_coco17_tpu_8.tflite";
     // Define the labels recognized in the model for TFOD (must be in training order!)
     private static final String[] LABELS = {
             "Blue",
@@ -157,7 +157,7 @@ public class TensorflowAndAprilTagTest extends LinearOpMode {
 
                 // The following default settings are available to un-comment and edit as needed to
                 // set parameters for custom models.
-                .setModelLabels(LABELS)
+//                .setModelLabels(LABELS)
                 //.setIsModelTensorFlow2(true)
                 //.setIsModelQuantized(true)
                 //.setModelInputSize(300)
@@ -218,8 +218,9 @@ public class TensorflowAndAprilTagTest extends LinearOpMode {
             double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
 
             telemetry.addData(""," ");
-            telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
             telemetry.addData("- Position", "%.0f / %.0f", x, y);
+            telemetry.addData("Image Class", recognition.getClass());
+            telemetry.addData("Image Confidence", recognition.getConfidence() * 100);
             telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
         }   // end for() loop
 
