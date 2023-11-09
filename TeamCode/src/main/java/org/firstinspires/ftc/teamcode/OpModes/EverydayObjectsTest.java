@@ -85,13 +85,16 @@ public class EverydayObjectsTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        readLabels();
-        initTfod();
-
-        // Wait for the DS start button to be touched.
-        telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
-        telemetry.addData(">", "Touch Play to start OpMode");
+        labels = readLabels(TFOD_MODEL_LABELS);
+        // Testing readLabels
+        telemetry.addData("readLabels() length:", labels.length);
+        for (String label : labels) {
+            telemetry.addData("readLabels()", " " + label);
+        }
         telemetry.update();
+
+        initTfod(TFOD_MODEL_FILE, labels);
+
         waitForStart();
 
 //        visionPortal.resumeLiveView();
@@ -100,7 +103,7 @@ public class EverydayObjectsTest extends LinearOpMode {
                 if (tfod != null) {
                     // getUpdatedRecognitions() will return null if no new information is available since
                     // the last time that call was made.
-                    List<Recognition> updatedRecognitions = tfod.getFreshRecognitions();
+                    List<Recognition> updatedRecognitions = tfod.getRecognitions();
                     if (updatedRecognitions != null) {
                         telemetry.addData("# Objects Detected", updatedRecognitions.size());
 
@@ -131,7 +134,7 @@ public class EverydayObjectsTest extends LinearOpMode {
     /**
      * Initialize the TensorFlow Object Detection processor.
      */
-    private void initTfod() {
+    private void initTfod(String TFOD_MODEL_FILE, String[] labels) {
 
         // Create the TensorFlow processor by using a builder.
         tfod = new TfodProcessor.Builder()
@@ -216,7 +219,7 @@ public class EverydayObjectsTest extends LinearOpMode {
     /**
      * Read the labels for the object detection model from a file.
      */
-    private void readLabels() {
+    private String[] readLabels(String TFOD_MODEL_LABELS) {
         ArrayList<String> labelList = new ArrayList<>();
 
         // try to read in the the labels.
@@ -253,6 +256,7 @@ public class EverydayObjectsTest extends LinearOpMode {
         } else {
             telemetry.addData("readLabels()", "No labels read!");
         }
+        return labels;
     }
 
     // Function to convert ArrayList<String> to String[]
