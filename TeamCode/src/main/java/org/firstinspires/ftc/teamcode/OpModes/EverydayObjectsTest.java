@@ -67,10 +67,11 @@ public class EverydayObjectsTest extends LinearOpMode {
     // TFOD_MODEL_FILE points to a model file stored onboard the Robot Controller's storage,
     // this is used when uploading models directly to the RC using the model upload interface.
 
-    private String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/detect.tflite";
+    private String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/" +
+            "ssd_mobilenet_v2_320x320_coco17_tpu_8.tflite";
     private String TFOD_MODEL_LABELS = "/sdcard/FIRST/tflitemodels/labelmap.txt";
     // Define the labels recognized in the model for TFOD (must be in training order!)
-    private String[] labels;
+    private static  String[] LABELS;
 
 
     /**
@@ -81,19 +82,20 @@ public class EverydayObjectsTest extends LinearOpMode {
     /**
      * The variable to store our instance of the vision portal.
      */
-    private VisionPortal visionPortal;
+    private VisionPortal myVisionPortal;
+
 
     @Override
     public void runOpMode() {
-        labels = readLabels(TFOD_MODEL_LABELS);
+        readLabels(TFOD_MODEL_LABELS);
         // Testing readLabels
-        telemetry.addData("readLabels() length:", labels.length);
-        for (String label : labels) {
+        telemetry.addData("readLabels() length:", LABELS.length);
+        for (String label : LABELS) {
             telemetry.addData("readLabels()", " " + label);
         }
         telemetry.update();
 
-        initTfod(TFOD_MODEL_FILE, labels);
+        initTfod();
 
         waitForStart();
 
@@ -127,14 +129,13 @@ public class EverydayObjectsTest extends LinearOpMode {
 
 
         // Save more CPU resources when camera is no longer needed.
-        visionPortal.close();
 
     }   // end runOpMode()
 
     /**
      * Initialize the TensorFlow Object Detection processor.
      */
-    private void initTfod(String TFOD_MODEL_FILE, String[] labels) {
+    private void initTfod() {
 
         // Create the TensorFlow processor by using a builder.
         tfod = new TfodProcessor.Builder()
@@ -149,49 +150,24 @@ public class EverydayObjectsTest extends LinearOpMode {
 
                 // The following default settings are available to un-comment and edit as needed to
                 // set parameters for custom models.
-                .setModelLabels(labels)
-                .setIsModelTensorFlow2(false)
-                //.setIsModelQuantized(true)
-                .setModelInputSize(300)
-                //.setModelAspectRatio(16.0 / 9.0)
+                .setModelLabels(LABELS)
 
                 .build();
 
-        // Create the vision portal by using a builder.
-        VisionPortal.Builder builder = new VisionPortal.Builder();
 
         // Set the camera (webcam vs. built-in RC phone camera).
         if (USE_WEBCAM) {
-            builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
+            myVisionPortal = new VisionPortal.Builder()
+                    .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                    .addProcessors(tfod)
+                    .build();
         } else {
-            builder.setCamera(BuiltinCameraDirection.BACK);
+            myVisionPortal = new VisionPortal.Builder()
+                    .setCamera(BuiltinCameraDirection.BACK)
+                    .addProcessors(tfod)
+                    .build();
         }
 
-        // Choose a camera resolution. Not all cameras support all resolutions.
-        //builder.setCameraResolution(new Size(640, 480));
-
-        // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
-        builder.enableLiveView(true);
-
-        // Set the stream format; MJPEG uses less bandwidth than default YUY2.
-        //builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);
-
-        // Choose whether or not LiveView stops if no processors are enabled.
-        // If set "true", monitor shows solid orange screen if no processors enabled.
-        // If set "false", monitor shows camera view without annotations.
-        //builder.setAutoStopLiveView(false);
-
-        // Set and enable the processor.
-        builder.addProcessor(tfod);
-
-        // Build the Vision Portal, using the above settings.
-        visionPortal = builder.build();
-
-        // Set confidence threshold for TFOD recognitions, at any time.
-//        tfod.setMinResultConfidence(0.6f);
-
-        // Disable or re-enable the TFOD processor at any time.
-        //visionPortal.setProcessorEnabled(tfod, true);
 
     }   // end method initTfod()
 
@@ -219,7 +195,7 @@ public class EverydayObjectsTest extends LinearOpMode {
     /**
      * Read the labels for the object detection model from a file.
      */
-    private String[] readLabels(String TFOD_MODEL_LABELS) {
+    private void readLabels(String TFOD_MODEL_LABELS) {
         ArrayList<String> labelList = new ArrayList<>();
 
         // try to read in the the labels.
@@ -248,7 +224,7 @@ public class EverydayObjectsTest extends LinearOpMode {
         }
 
         if (labelList.size() > 0) {
-            labels = getStringArray(labelList);
+            LABELS = getStringArray(labelList);
 //            telemetry.addData("readLabels()", labels.length);
 //            for (String label : labels) {
 //                telemetry.addData("readLabels()", " " + label);
@@ -256,7 +232,6 @@ public class EverydayObjectsTest extends LinearOpMode {
         } else {
             telemetry.addData("readLabels()", "No labels read!");
         }
-        return labels;
     }
 
     // Function to convert ArrayList<String> to String[]
