@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.Helper;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-public class Claw {
+public class Gate {
     public Servo servo;
 
     public double OPEN = 0.8;
@@ -15,7 +15,7 @@ public class Claw {
 
         hwMap = ahwMap;
         //Init motors and servos
-        servo = hwMap.get(Servo.class, "claw");
+        servo = hwMap.get(Servo.class, "Gate");
         servo.setDirection(Servo.Direction.FORWARD);
     }
 
