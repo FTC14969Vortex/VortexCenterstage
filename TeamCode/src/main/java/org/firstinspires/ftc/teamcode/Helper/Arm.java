@@ -11,7 +11,7 @@ public class Arm {
     //Object creation
     public DcMotor motor;
     int timeout_ms = 5000;
-    double speed = 0.6;
+    double speed = 1;
     int targetPosition;
     int currentPosition;
 //    int slowDown;
