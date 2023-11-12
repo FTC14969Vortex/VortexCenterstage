@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class Gate {
     public Servo servo;
 
-    public double OPEN = 0.8;
-    public double CLOSE = 0;
+    public double OPEN = 1;
+    public double CLOSE = 0.35;
 
     HardwareMap hwMap = null;
 

@@ -57,9 +57,7 @@ public class Teleop extends LinearOpMode {
         while (opModeIsActive()) {
 
             double move_y_axis = gamepad1.left_stick_y;
-            //double move_x_axis = -gamepad1.left_stick_x
-            // double(gamepad1.dpad_right)-double(gamepad1.dpad_left)
-            double move_x_axis = 0;
+            double move_x_axis = -gamepad1.left_stick_x;
             double pivot_turn = -gamepad1.right_stick_x;
 
             //Sets the target power
@@ -84,10 +82,10 @@ public class Teleop extends LinearOpMode {
             robot.chassis.BRMotor.setPower(DRIVETRAIN_SPEED * br_power);
 
             // Claw
-            if (gamepad2.x) {
+            if (gamepad1.cross) {
                 robot.gate.close();
             }
-            if (gamepad2.y) {
+            if (gamepad1.circle) {
                 robot.gate.open();
             }
 
