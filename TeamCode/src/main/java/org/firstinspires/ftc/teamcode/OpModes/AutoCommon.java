@@ -210,6 +210,11 @@ public class AutoCommon extends LinearOpMode {
         // -----------------------------------------------------------------------------------------
 
         aprilTag = new AprilTagProcessor.Builder()
+                .setDrawAxes(true)
+                .setDrawCubeProjection(true)
+                .setDrawTagID(true)
+                .setDrawTagOutline(true)
+                .setLensIntrinsics(1612.13,1612.13, 265.34, -257.457)
                 .build();
 
         // -----------------------------------------------------------------------------------------
