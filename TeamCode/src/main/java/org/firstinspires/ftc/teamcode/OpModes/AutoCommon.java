@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -62,6 +63,7 @@ public class AutoCommon extends LinearOpMode {
    // The variable to store our instance of the AprilTag processor.
     private AprilTagProcessor aprilTag;
 
+    AprilTagDetection tag;
     //Variables for AprilTag delivery
 
     double DESIRED_DISTANCE = 12; //  this is how close the camera should get to the target (inches)
@@ -85,7 +87,7 @@ public class AutoCommon extends LinearOpMode {
     private VisionPortal myVisionPortal;
 
     // Custom model with blue and red team elements.
-    private static final String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/DetectTeamElement.tflite";
+    private static final String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/FixedLightingCenterstage.tflite";
     // Define the labels recognized in the model for TFOD (must be in training order!)
     private static final String[] LABELS = {
             "Blue",
@@ -136,37 +138,49 @@ public class AutoCommon extends LinearOpMode {
         strafeDistAfterPurPix = 96;
     }
 
+    int strafeDistAtBackboard;
+
     /**
      * All methods for the AutoOpMode, we keep them public so that other opmodes can use them.
      */
 
 
+    //For centering on the AprilTag
+    boolean targetFound     = false;    // Set to true when an AprilTag target is detected
+    double  drive           = 0;        // Desired forward power/speed (-1 to +1)
+    double  strafe          = 0;        // Desired strafe power/speed (-1 to +1)
+    double  turn            = 0;        // Desired turning power/speed (-1 to +1)
 
     @Override
     public void runOpMode() throws InterruptedException {
+
+
         // Initialize
         initDoubleVision();
         setUniqueParameters();
         robot.init(hardwareMap);
-
-//        telemetry.addData("DS preview on/off","3 dots, Camera Stream");
-//        telemetry.addLine("Parameters unique to each auto:");
-//        telemetry.addData("targetAprilTagOffset", targetAprilTagOffset);
-//        telemetry.addData("strafeDirAfterPurPix",strafeDirAfterPurPix);
-//        telemetry.addData("turnDirNearBackstage", turnAngleNearBackstage);
-//        telemetry.addData("strafeDistAfterPurPix", strafeDistAfterPurPix);
 //
         detectTeamElement();
 
+        while (!isStarted()) {
+            if(opModeInInit()) {
+                telemetryAprilTag();
+                telemetryTfod();
+                telemetry.update();
+            }
+        }
 
 
         waitForStart();
+
+
         boolean doneAuto = false;
         while (opModeIsActive() && !doneAuto)  {
 
+            telemetryAprilTag();
+            telemetryTfod();
             detectTeamElement();
-
-
+            detectTeamElement();
 
 
             /**
@@ -177,12 +191,16 @@ public class AutoCommon extends LinearOpMode {
             switch(targetSpikeMark){
                 case 1:
                     outTakeLeft();
+                    strafeDistAtBackboard = 38;
+
                     break;
                 case 2:
                     outTakeStraight();
+                    strafeDistAtBackboard = 36;
                     break;
                 case 3:
                     outTakeRight();
+                    strafeDistAtBackboard = 44;
                     break;
             }
 
@@ -190,7 +208,8 @@ public class AutoCommon extends LinearOpMode {
              * Step 3: Drive to Backstage and deliver.
              *
              */
-            backboardAndDeliver(strafeDirAfterPurPix,strafeDistAfterPurPix,turnAngleNearBackstage);
+            backboardAndDeliver(strafeDirAfterPurPix,strafeDistAfterPurPix,turnAngleNearBackstage, strafeDistAtBackboard);
+            centerOnAprilTag(tag);
 
             doneAuto = true;
 
@@ -266,13 +285,14 @@ public class AutoCommon extends LinearOpMode {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         telemetry.addData("# AprilTags Detected", currentDetections.size());
 
+        if(myVisionPortal.getProcessorEnabled(aprilTag)) {
+            telemetry.addLine("April Tags working");
+        }
+
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {
                 telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
-                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
-                telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
-                telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
             } else {
                 telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
                 telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
@@ -285,8 +305,14 @@ public class AutoCommon extends LinearOpMode {
      * Add telemetry about TensorFlow Object Detection (TFOD) recognitions.
      */
     public double telemetryTfod() {
+
         double x = 0;
         double y;
+
+        if(myVisionPortal.getProcessorEnabled(tfod)) {
+            telemetry.addLine("TFOD Tags working");
+        }
+
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         telemetry.addData("# Objects Detected", currentRecognitions.size());
 
@@ -312,7 +338,7 @@ public class AutoCommon extends LinearOpMode {
          */
         // Enable TFOD to detect object and store the value.
         myVisionPortal.setProcessorEnabled(tfod, true);
-        myVisionPortal.setProcessorEnabled(aprilTag, false);
+        myVisionPortal.setProcessorEnabled(aprilTag, true);
 
 
         //Get a recognition
@@ -339,23 +365,11 @@ public class AutoCommon extends LinearOpMode {
             targetSpikeMark = 2; //Center
         }
 
-        telemetry.addData("Tele_X", teamElementX);
-        telemetry.addData("Recognition Size", recognition_size);
-        telemetry.addData("Target Spike Mark", targetSpikeMark);
+
 
         // Add offset to account for blue or red side.
         targetAprilTag = targetSpikeMark + targetAprilTagOffset;
 
-        if (myVisionPortal.getProcessorEnabled(aprilTag)) {
-            telemetry.addLine("AprilTag enabled");
-            telemetry.addLine();
-            telemetryAprilTag();
-        }
-        else if(myVisionPortal.getProcessorEnabled(tfod)) {
-            telemetry.addLine("TFOD enabled");
-            telemetry.addLine();
-            telemetryTfod();
-        }
         // Push telemetry to the Driver Station.
         telemetry.update();
 
@@ -394,9 +408,71 @@ public class AutoCommon extends LinearOpMode {
         robot.chassis.autoTurn(-95);
     }
 
-    public void backboardAndDeliver(int strafeDirAfterPurPix, int strafeDistAfterPurPix, int turnAngleNearBackstage) throws InterruptedException {
+    public void backboardAndDeliver(int strafeDirAfterPurPix, int strafeDistAfterPurPix, int turnAngleNearBackstage, int strafeDistAtBackboard) throws InterruptedException {
         robot.chassis.Strafe(DRIVE_SPEED, strafeDirAfterPurPix*strafeDistAfterPurPix);
         robot.chassis.autoTurn(turnAngleNearBackstage);
-        robot.chassis.Strafe(DRIVE_SPEED, strafeDirAfterPurPix*44);
+        robot.chassis.Strafe(DRIVE_SPEED, strafeDirAfterPurPix*strafeDistAtBackboard);
+    }
+
+    public void centerOnAprilTag(AprilTagDetection desiredTag) {
+
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            // Look to see if we have size info on this tag.
+            if (detection.metadata != null) {
+                //  Check to see if we want to track towards this tag.
+                if ((targetAprilTag < 0) || (detection.id == targetAprilTag)) {
+                    // Yes, we want to use this tag.
+                    targetFound = true;
+                    tag = detection;
+                    break;  // don't look any further.
+                } else {
+                    // This tag is in the library, but we do not want to track it right now.
+                    telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
+                }
+            } else {
+                // This tag is NOT in the library, so we don't have enough information to track to it.
+                telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
+            }
+        }
+
+        if(targetFound) {
+            double  rangeError      = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
+            double  headingError    = desiredTag.ftcPose.bearing;
+            double  yawError        = desiredTag.ftcPose.yaw;
+
+            // Use the speed and turn "gains" to calculate how we want the robot to move.
+            drive  = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
+            turn   = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN) ;
+            strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+
+        }
+        moveRobotAprilTags(drive, strafe, turn);
+    }
+
+    public void moveRobotAprilTags(double x, double y, double yaw) {
+        // Calculate wheel powers.
+        double leftFrontPower    =  x -y -yaw;
+        double rightFrontPower   =  x +y +yaw;
+        double leftBackPower     =  x +y -yaw;
+        double rightBackPower    =  x -y +yaw;
+
+        // Normalize wheel powers to be less than 1.0
+        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+        max = Math.max(max, Math.abs(leftBackPower));
+        max = Math.max(max, Math.abs(rightBackPower));
+
+        if (max > 1.0) {
+            leftFrontPower /= max;
+            rightFrontPower /= max;
+            leftBackPower /= max;
+            rightBackPower /= max;
+        }
+
+        // Send powers to the wheels.
+        robot.chassis.FLMotor.setPower(leftFrontPower);
+        robot.chassis.FRMotor.setPower(rightFrontPower);
+        robot.chassis.BLMotor.setPower(leftBackPower);
+        robot.chassis.BRMotor.setPower(rightBackPower);
     }
 }   // end class
