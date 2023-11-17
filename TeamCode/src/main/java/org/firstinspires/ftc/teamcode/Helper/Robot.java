@@ -46,6 +46,7 @@ public class Robot {
     public Slider slider = new Slider();
 
     public Gate gate = new Gate();
+    public Intake_Servo New_Intake = new Intake_Servo();
 
     /* local OpMode members. */
     //Init hardware map
