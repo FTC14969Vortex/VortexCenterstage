@@ -110,25 +110,16 @@ public class Teleop extends LinearOpMode {
             robot.chassis.BRMotor.setPower(DRIVETRAIN_SPEED * br_power);
 
             //Intake
-//            if (gamepad1.left_bumper) {
-//                robot.intake.MoveIntake(INTAKE_SPEED, true);
-//            }
-//            if (gamepad1.right_bumper) {
-//                robot.intake.MoveIntake(INTAKE_SPEED, false);
-//            }
-//            if (gamepad1.x) {
-//                robot.intake.motor.setPower(0);
-//            }
-            //New Intake
             if (gamepad1.left_bumper) {
-                robot.New_Intake.Intake();
+                robot.intake.MoveIntake(INTAKE_SPEED, true);
             }
             if (gamepad1.right_bumper) {
-                robot.New_Intake.Outake();
-           }
-            if (gamepad1.x) {
-               robot.New_Intake.Stop();
+                robot.intake.MoveIntake(INTAKE_SPEED, false);
             }
+            if (gamepad1.x) {
+                robot.intake.motor.setPower(0);
+            }
+
 
 
 
