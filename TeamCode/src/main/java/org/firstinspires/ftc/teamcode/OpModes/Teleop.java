@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Helper.Chassis;
 import org.firstinspires.ftc.teamcode.Helper.Robot;
 
-@TeleOp(name = "23-24 TeleOp", group = "TeleOp")
+@TeleOp(name = "Old Robot TeleOp", group = "TeleOp")
 
 public class Teleop extends LinearOpMode {
 
