@@ -139,14 +139,14 @@ public class Teleop extends LinearOpMode {
 
             // Slider is driven by servo, which goes to absolute position.
             // Therefore we should update the slider_position (range: 0 to 1) with joystick input (range: -1 to 1).
-            slider_position  -= gamepad2.right_stick_y;
+            //slider_position  -= gamepad2.right_stick_y;
 //            if(slider_position<0){
 //                slider_position = 0;
 //            }
 //            if(slider_position>1){
 //                slider_position = 1;
 //            }
-            robot.slider.servo.setPosition(slider_position);
+           // robot.slider.servo.setPosition(slider_position);
 
 
             // Set slider to specific positions with dpad.
@@ -197,7 +197,7 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("Motor Status", robot.arm.motor.isBusy());
             telemetry.addData("Arm Power", robot.arm.motor.getPower());
             telemetry.addData("Wrist Position", robot.wrist.servo.getPosition());
-            telemetry.addData("Slider Position", robot.slider.servo.getPosition());
+            //telemetry.addData("Slider Position", robot.slider.servo.getPosition());
             telemetry.addData("Gate Position", robot.gate.servo.getPosition());
             telemetry.update();
 

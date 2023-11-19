@@ -63,7 +63,7 @@ public class Robot {
         intake.init(hwMap);
         arm.init(hwMap);
         wrist.init(hwMap);
-        slider.init(hwMap);
+        //slider.init(hwMap);
         gate.init(hwMap);
     }
 }
