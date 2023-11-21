@@ -154,7 +154,6 @@ public class AutoCommon extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-
         // Initialize
         initDoubleVision();
         setUniqueParameters();
@@ -209,7 +208,9 @@ public class AutoCommon extends LinearOpMode {
              *
              */
             backboardAndDeliver(strafeDirAfterPurPix,strafeDistAfterPurPix,turnAngleNearBackstage, strafeDistAtBackboard);
-            centerOnAprilTag(tag);
+            telemetry.addLine("reached");
+            sleep(300);
+            centerOnAprilTag();
 
             doneAuto = true;
 
@@ -293,6 +294,8 @@ public class AutoCommon extends LinearOpMode {
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {
                 telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
+                telemetry.addData("yaw",detection.ftcPose.yaw);
+                telemetry.addData("range",detection.ftcPose.range);
             } else {
                 telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
                 telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
@@ -414,41 +417,7 @@ public class AutoCommon extends LinearOpMode {
         robot.chassis.Strafe(DRIVE_SPEED, strafeDirAfterPurPix*strafeDistAtBackboard);
     }
 
-    public void centerOnAprilTag(AprilTagDetection desiredTag) {
 
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-        for (AprilTagDetection detection : currentDetections) {
-            // Look to see if we have size info on this tag.
-            if (detection.metadata != null) {
-                //  Check to see if we want to track towards this tag.
-                if ((targetAprilTag < 0) || (detection.id == targetAprilTag)) {
-                    // Yes, we want to use this tag.
-                    targetFound = true;
-                    tag = detection;
-                    break;  // don't look any further.
-                } else {
-                    // This tag is in the library, but we do not want to track it right now.
-                    telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
-                }
-            } else {
-                // This tag is NOT in the library, so we don't have enough information to track to it.
-                telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
-            }
-        }
-
-        if(targetFound) {
-            double  rangeError      = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
-            double  headingError    = desiredTag.ftcPose.bearing;
-            double  yawError        = desiredTag.ftcPose.yaw;
-
-            // Use the speed and turn "gains" to calculate how we want the robot to move.
-            drive  = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
-            turn   = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN) ;
-            strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
-
-        }
-        moveRobotAprilTags(drive, strafe, turn);
-    }
 
     public void moveRobotAprilTags(double x, double y, double yaw) {
         // Calculate wheel powers.
@@ -474,5 +443,40 @@ public class AutoCommon extends LinearOpMode {
         robot.chassis.FRMotor.setPower(rightFrontPower);
         robot.chassis.BLMotor.setPower(leftBackPower);
         robot.chassis.BRMotor.setPower(rightBackPower);
+    }
+    public void centerOnAprilTag() {
+
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            // Look to see if we have size info on this tag.
+            if (detection.metadata != null) {
+                //  Check to see if we want to track towards this tag.
+                if (detection.id == targetAprilTag) {
+                    // Yes, we want to use this tag.
+                    targetFound = true;
+                    tag = detection;
+                    break;  // don't look any further.
+                } else {
+                    // This tag is in the library, but we do not want to track it right now.
+                    telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
+                }
+            } else {
+                // This tag is NOT in the library, so we don't have enough information to track to it.
+                telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
+            }
+        }
+
+        if(targetFound) {
+            double  rangeError      = (tag.ftcPose.range - DESIRED_DISTANCE);
+            double  headingError    = tag.ftcPose.bearing;
+            double  yawError        = tag.ftcPose.yaw;
+
+            // Use the speed and turn "gains" to calculate how we want the robot to move.
+            drive  = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
+            turn   = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN) ;
+            strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+
+        }
+        moveRobotAprilTags(drive, strafe, turn);
     }
 }   // end class
