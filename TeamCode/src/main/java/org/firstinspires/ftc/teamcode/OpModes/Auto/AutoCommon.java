@@ -223,8 +223,11 @@ public class AutoCommon extends LinearOpMode {
                     detect_apriltag();
                     telemetryAprilTag();
                     telemetry.update();
+                    currentStage = AutoStages.CENTER_AprilTag;
                     break;
                 case CENTER_AprilTag:
+                    strafetoMiddleTag();
+                    currentStage = AutoStages.END_AUTO;
                     break;
                 case END_AUTO:
 
@@ -548,6 +551,17 @@ public class AutoCommon extends LinearOpMode {
                 // This tag is NOT in the library, so we don't have enough information to track to it.
                 telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
             }
+        }
+        if(centerTagFound) {
+            double  yawError        = tag.ftcPose.yaw;
+            // Use the speed and turn "gains" to calculate how we want the robot to move.
+            turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+        }
+        moveYaw(turn);
+    }
+    public void strafetoMiddleTag(){
+        if(tag!=null){
+            robot.chassis.Strafe(0.5, (int)tag.ftcPose.x);
         }
         if(centerTagFound) {
             double  yawError        = tag.ftcPose.yaw;

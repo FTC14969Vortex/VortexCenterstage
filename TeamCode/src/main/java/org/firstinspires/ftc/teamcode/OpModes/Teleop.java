@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.Helper.Intake;
 import org.firstinspires.ftc.teamcode.Helper.Robot;
 
 @TeleOp(name = "CenterStageTeleOp", group = "TeleOp")
@@ -21,12 +22,13 @@ public class Teleop extends LinearOpMode {
 
     double WRIST_HOLDING_POWER = 0.7;
 
-    int ARM_DELIVERY_POSITION_LOW = -1800;
+    int ARM_DELIVERY_POSITION_LOW = -1750;
     int ARM_DELIVERY_POSITION_HIGH = -1300;
     int ARM_PICKUP_POSITION = 30;
     double ARM_HOLDING_POWER = 0.1;
 
-    double WRIST_DELIVERY_POSITION = 0.3;
+    double WRIST_DELIVERY_POSITION_HIGH = 0.25;
+    double WRIST_DELIVERY_POSITION_LOW = 0.4;
     double WRIST_PICKUP_POSITION = 0.9;
 
     double INTAKE_SPEED = 0.7;
@@ -86,7 +88,7 @@ public class Teleop extends LinearOpMode {
 
             //Drive train
 
-            // Xbox series S controller to motor powers.
+            // Controller to motor powers.
             double move_y_axis = gamepad1.left_stick_y;
             double move_x_axis = -gamepad1.left_stick_x;
             double pivot_turn = -gamepad1.right_stick_x;
@@ -168,14 +170,14 @@ public class Teleop extends LinearOpMode {
                 robot.gate.close();
                 robot.arm.gotoPosition(ARM_DELIVERY_POSITION_HIGH);
                 //Thread.sleep(500);
-                robot.wrist.servoPosition(WRIST_DELIVERY_POSITION);
+                robot.wrist.servoPosition(WRIST_DELIVERY_POSITION_HIGH);
             }
             //Lower delivery
             if(gamepad2.dpad_left){
                 robot.gate.close();
                 robot.arm.gotoPosition(ARM_DELIVERY_POSITION_LOW);
                 //Thread.sleep(500);
-                robot.wrist.servoPosition(WRIST_DELIVERY_POSITION);
+                robot.wrist.servoPosition(WRIST_DELIVERY_POSITION_LOW);
             }
             //Pickup position
             if(gamepad2.dpad_down){
