@@ -21,12 +21,13 @@ public class Teleop extends LinearOpMode {
 
     double WRIST_HOLDING_POWER = 0.7;
 
-    int ARM_DELIVERY_POSITION = -550;
+    int ARM_DELIVERY_POSITION_LOW = -1800;
+    int ARM_DELIVERY_POSITION_HIGH = -1300;
     int ARM_PICKUP_POSITION = 30;
     double ARM_HOLDING_POWER = 0.1;
 
-    double WRIST_DELIVERY_POSITION = 0.8;
-    double WRIST_PICKUP_POSITION = 0.1;
+    double WRIST_DELIVERY_POSITION = 0.3;
+    double WRIST_PICKUP_POSITION = 0.9;
 
     double INTAKE_SPEED = 0.7;
 
@@ -149,14 +150,6 @@ public class Teleop extends LinearOpMode {
            // robot.slider.servo.setPosition(slider_position);
 
 
-            // Set slider to specific positions with dpad.
-            if(gamepad2.dpad_up) {
-                robot.slider.extend();
-            }
-            if(gamepad2.dpad_down){
-                robot.slider.retract();
-            }
-
 
             //Gate
             if(gamepad2.a){
@@ -170,13 +163,22 @@ public class Teleop extends LinearOpMode {
             }
 
             // Set arm, wrist, and gate to pickup or delivery position with bumper.
-            if(gamepad2.right_bumper){
+            //Higher Delivery
+            if(gamepad2.dpad_up){
                 robot.gate.close();
-                robot.arm.gotoPosition(ARM_DELIVERY_POSITION);
+                robot.arm.gotoPosition(ARM_DELIVERY_POSITION_HIGH);
                 //Thread.sleep(500);
                 robot.wrist.servoPosition(WRIST_DELIVERY_POSITION);
             }
-            if(gamepad2.left_bumper){
+            //Lower delivery
+            if(gamepad2.dpad_left){
+                robot.gate.close();
+                robot.arm.gotoPosition(ARM_DELIVERY_POSITION_LOW);
+                //Thread.sleep(500);
+                robot.wrist.servoPosition(WRIST_DELIVERY_POSITION);
+            }
+            //Pickup position
+            if(gamepad2.dpad_down){
                 robot.wrist.servoPosition(WRIST_PICKUP_POSITION);
                 robot.gate.open();
                 Thread.sleep(850);

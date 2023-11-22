@@ -43,7 +43,7 @@ public class Robot {
     public Intake intake = new Intake();
     public Arm arm = new Arm();
     public Wrist wrist = new Wrist();
-    public Slider slider = new Slider();
+//    public Slider slider = new Slider();
 
     public Gate gate = new Gate();
 
