@@ -64,6 +64,7 @@ public class AutoCommon extends LinearOpMode {
     private AprilTagProcessor aprilTag;
 
     AprilTagDetection tag;
+    int tagID;
     //Variables for AprilTag delivery
 
     double DESIRED_DISTANCE = 12; //  this is how close the camera should get to the target (inches)
@@ -115,6 +116,9 @@ public class AutoCommon extends LinearOpMode {
 
     double DRIVE_SPEED = 0.5;
 
+    enum AutoStages {DETECT_TE, OUTTAKE, GOTO_BACKBOARD, DETECT_AprilTag, CENTER_AprilTag, END_AUTO}
+    AutoStages currentStage = AutoStages.DETECT_AprilTag;
+
     /**
      * Variables to change for different autos.
      * The logic in all four OpModes is identical, we only change these variables.
@@ -147,6 +151,7 @@ public class AutoCommon extends LinearOpMode {
 
     //For centering on the AprilTag
     boolean targetFound     = false;    // Set to true when an AprilTag target is detected
+    boolean centerTagFound = false;     //Set to true when the camera detects the middle april tag
     double  drive           = 0;        // Desired forward power/speed (-1 to +1)
     double  strafe          = 0;        // Desired strafe power/speed (-1 to +1)
     double  turn            = 0;        // Desired turning power/speed (-1 to +1)
@@ -174,43 +179,61 @@ public class AutoCommon extends LinearOpMode {
 
 
         boolean doneAuto = false;
-        while (opModeIsActive() && !doneAuto)  {
+        while (opModeIsActive() && currentStage != AutoStages.END_AUTO)  {
 
-            telemetryAprilTag();
-            telemetryTfod();
-            detectTeamElement();
-            detectTeamElement();
-
-
-            /**
-             * Step 2: Deliver purple pixel to the detected Position.
-             * (common to all auto)
-             */
-
-            switch(targetSpikeMark){
-                case 1:
-                    outTakeLeft();
-                    strafeDistAtBackboard = 38;
-
+            switch(currentStage){
+                case DETECT_TE:
+                    detectTeamElement();
+                    telemetryTfod();
+                    telemetry.update();
+                    currentStage = AutoStages.OUTTAKE;
                     break;
-                case 2:
-                    outTakeStraight();
-                    strafeDistAtBackboard = 36;
+                case OUTTAKE:
+                    /**
+                     * Step 2: Deliver purple pixel to the detected Position.
+                     * (common to all auto)
+                     */
+
+                    switch(targetSpikeMark){
+                        case 1:
+                            outTakeLeft();
+                            strafeDistAtBackboard = 38;
+
+                            break;
+                        case 2:
+                            outTakeStraight();
+                            strafeDistAtBackboard = 36;
+                            break;
+                        case 3:
+                            outTakeRight();
+                            strafeDistAtBackboard = 44;
+                            break;
+                    }
+                    currentStage = AutoStages.GOTO_BACKBOARD;
                     break;
-                case 3:
-                    outTakeRight();
-                    strafeDistAtBackboard = 44;
+                case GOTO_BACKBOARD:
+                    /**
+                     * Step 3: Drive to Backstage.
+                     *
+                     */
+                    gotoBackBoard(strafeDirAfterPurPix,strafeDistAfterPurPix,turnAngleNearBackstage, strafeDistAtBackboard);
+                    currentStage = AutoStages.DETECT_AprilTag;
                     break;
+                case DETECT_AprilTag:
+                    detect_apriltag();
+                    telemetryAprilTag();
+                    telemetry.update();
+                    break;
+                case CENTER_AprilTag:
+                    break;
+                case END_AUTO:
+
             }
 
-            /**
-             * Step 3: Drive to Backstage and deliver.
-             *
-             */
-            backboardAndDeliver(strafeDirAfterPurPix,strafeDistAfterPurPix,turnAngleNearBackstage, strafeDistAtBackboard);
-            telemetry.addLine("reached");
-            sleep(300);
-            centerOnAprilTag();
+
+
+
+
 
             doneAuto = true;
 
@@ -296,6 +319,8 @@ public class AutoCommon extends LinearOpMode {
                 telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
                 telemetry.addData("yaw",detection.ftcPose.yaw);
                 telemetry.addData("range",detection.ftcPose.range);
+                telemetry.addData("current detection", tagID);
+                telemetry.update();
             } else {
                 telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
                 telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
@@ -411,7 +436,7 @@ public class AutoCommon extends LinearOpMode {
         robot.chassis.autoTurn(-95);
     }
 
-    public void backboardAndDeliver(int strafeDirAfterPurPix, int strafeDistAfterPurPix, int turnAngleNearBackstage, int strafeDistAtBackboard) throws InterruptedException {
+    public void gotoBackBoard(int strafeDirAfterPurPix, int strafeDistAfterPurPix, int turnAngleNearBackstage, int strafeDistAtBackboard) throws InterruptedException {
         robot.chassis.Strafe(DRIVE_SPEED, strafeDirAfterPurPix*strafeDistAfterPurPix);
         robot.chassis.autoTurn(turnAngleNearBackstage);
         robot.chassis.Strafe(DRIVE_SPEED, strafeDirAfterPurPix*strafeDistAtBackboard);
@@ -478,5 +503,69 @@ public class AutoCommon extends LinearOpMode {
 
         }
         moveRobotAprilTags(drive, strafe, turn);
+    }
+    public void moveYaw(double yaw) {
+        // Calculate wheel powers.
+        double leftFrontPower    =  -yaw;
+        double rightFrontPower   =  +yaw;
+        double leftBackPower     =  -yaw;
+        double rightBackPower    =  +yaw;
+
+        // Normalize wheel powers to be less than 1.0
+        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+        max = Math.max(max, Math.abs(leftBackPower));
+        max = Math.max(max, Math.abs(rightBackPower));
+
+        if (max > 1.0) {
+            leftFrontPower /= max;
+            rightFrontPower /= max;
+            leftBackPower /= max;
+            rightBackPower /= max;
+        }
+
+        // Send powers to the wheels.
+        robot.chassis.FLMotor.setPower(leftFrontPower);
+        robot.chassis.FRMotor.setPower(rightFrontPower);
+        robot.chassis.BLMotor.setPower(leftBackPower);
+        robot.chassis.BRMotor.setPower(rightBackPower);
+    }
+    public void correctYaw(){
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            // Look to see if we have size info on this tag.
+            if (detection.metadata != null) {
+                //  Check to see if the middle tag is detected
+                if (detection.id == 2) {
+                    // Yes, we want to use this middle tag to adjust the yaw
+                    centerTagFound = true;
+                    tag = detection;
+                    break;  // don't look any further.
+                } else {
+                    // This tag is in the library, but we do not want to track it right now.
+                    telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
+                }
+            } else {
+                // This tag is NOT in the library, so we don't have enough information to track to it.
+                telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
+            }
+        }
+        if(centerTagFound) {
+            double  yawError        = tag.ftcPose.yaw;
+            // Use the speed and turn "gains" to calculate how we want the robot to move.
+            turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+        }
+        moveYaw(turn);
+    }
+    public void detect_apriltag() {
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            // Look to see if we have size info on this tag.
+            if (detection.id == 2) {
+                // Yes, we want to use this middle tag to adjust the yaw
+                tag = detection;
+                tagID = detection.id;
+                break;  // don't look any further.}
+            }
+        }
     }
 }   // end class
