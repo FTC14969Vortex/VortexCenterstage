@@ -63,7 +63,8 @@ public class AutoCommon extends LinearOpMode {
    // The variable to store our instance of the AprilTag processor.
     private AprilTagProcessor aprilTag;
 
-    AprilTagDetection tag;
+    AprilTagDetection centerTag;
+    AprilTagDetection targetTag;
     int tagID;
     //Variables for AprilTag delivery
 
@@ -117,7 +118,7 @@ public class AutoCommon extends LinearOpMode {
     double DRIVE_SPEED = 0.5;
 
     enum AutoStages {DETECT_TE, OUTTAKE, GOTO_BACKBOARD, DETECT_AprilTag, CENTER_AprilTag, END_AUTO}
-    AutoStages currentStage = AutoStages.DETECT_AprilTag;
+    AutoStages currentStage = AutoStages.DETECT_TE;
 
     /**
      * Variables to change for different autos.
@@ -151,7 +152,10 @@ public class AutoCommon extends LinearOpMode {
 
     //For centering on the AprilTag
     boolean targetFound     = false;    // Set to true when an AprilTag target is detected
-    boolean centerTagFound = false;     //Set to true when the camera detects the middle april tag
+    double centerTagID = 2;             // Middle AprilTag
+    double targetTagID = -1;            // Start ID as -1, will be updated in the function.
+    boolean centerTagFound = false;
+    boolean targetTagFound = false;
     double  drive           = 0;        // Desired forward power/speed (-1 to +1)
     double  strafe          = 0;        // Desired strafe power/speed (-1 to +1)
     double  turn            = 0;        // Desired turning power/speed (-1 to +1)
@@ -322,13 +326,14 @@ public class AutoCommon extends LinearOpMode {
                 telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
                 telemetry.addData("yaw",detection.ftcPose.yaw);
                 telemetry.addData("range",detection.ftcPose.range);
-                telemetry.addData("current detection", tagID);
+                telemetry.addData("current detection", targetTagID);
                 telemetry.update();
             } else {
                 telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
                 telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
             }
         }   // end for() loop
+        telemetry.addData("Target Tag ID", targetTagID);
 
     }   // end method telemetryAprilTag()
 
@@ -389,9 +394,9 @@ public class AutoCommon extends LinearOpMode {
 
 
         if(teamElementX < 120) {
-            targetSpikeMark = 3; //Left
+            targetSpikeMark = 1; //Left
         } else if(teamElementX > 440) {
-            targetSpikeMark = 1; //Right
+            targetSpikeMark = 3; //Right
         } else {
             targetSpikeMark = 2; //Center
         }
@@ -399,10 +404,8 @@ public class AutoCommon extends LinearOpMode {
 
 
         // Add offset to account for blue or red side.
-        targetAprilTag = targetSpikeMark + targetAprilTagOffset;
-
+        targetTagID = targetSpikeMark + targetAprilTagOffset;
         // Push telemetry to the Driver Station.
-        telemetry.update();
 
 
     }
@@ -412,7 +415,7 @@ public class AutoCommon extends LinearOpMode {
      */
     public void outTakeStraight() throws InterruptedException {
         robot.chassis.Drive(DRIVE_SPEED,51);
-        robot.intake.MoveIntake(0.3,true);
+        robot.intake.MoveIntake(0.6,true);
         Thread.sleep(2000);
         robot.intake.MoveIntake(0,true);
     }
@@ -420,10 +423,10 @@ public class AutoCommon extends LinearOpMode {
     public void outTakeLeft() throws InterruptedException {
         robot.chassis.Drive(DRIVE_SPEED, 27);
         robot.chassis.autoTurn(-100);
-        robot.intake.MoveIntake(0.3,true);
+        robot.intake.MoveIntake(0.6,true);
         Thread.sleep(2000);
         robot.intake.MoveIntake(0,true);
-        robot.chassis.Drive(DRIVE_SPEED, 2);
+        robot.chassis.Drive(DRIVE_SPEED, 1);
         robot.chassis.Strafe(DRIVE_SPEED,35);
         robot.chassis.autoTurn(95);
 
@@ -431,7 +434,7 @@ public class AutoCommon extends LinearOpMode {
     public void outTakeRight() throws InterruptedException {
         robot.chassis.Drive(DRIVE_SPEED, 27);
         robot.chassis.autoTurn(90);
-        robot.intake.MoveIntake(0.3,true);
+        robot.intake.MoveIntake(0.6,true);
         Thread.sleep(2000);
         robot.intake.MoveIntake(0, true);
         robot.chassis.Drive(DRIVE_SPEED, 2);
@@ -482,7 +485,7 @@ public class AutoCommon extends LinearOpMode {
                 if (detection.id == targetAprilTag) {
                     // Yes, we want to use this tag.
                     targetFound = true;
-                    tag = detection;
+                    centerTag = detection;
                     break;  // don't look any further.
                 } else {
                     // This tag is in the library, but we do not want to track it right now.
@@ -495,9 +498,9 @@ public class AutoCommon extends LinearOpMode {
         }
 
         if(targetFound) {
-            double  rangeError      = (tag.ftcPose.range - DESIRED_DISTANCE);
-            double  headingError    = tag.ftcPose.bearing;
-            double  yawError        = tag.ftcPose.yaw;
+            double  rangeError      = (centerTag.ftcPose.range - DESIRED_DISTANCE);
+            double  headingError    = centerTag.ftcPose.bearing;
+            double  yawError        = centerTag.ftcPose.yaw;
 
             // Use the speed and turn "gains" to calculate how we want the robot to move.
             drive  = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
@@ -541,7 +544,7 @@ public class AutoCommon extends LinearOpMode {
                 if (detection.id == 2) {
                     // Yes, we want to use this middle tag to adjust the yaw
                     centerTagFound = true;
-                    tag = detection;
+                    centerTag = detection;
                     break;  // don't look any further.
                 } else {
                     // This tag is in the library, but we do not want to track it right now.
@@ -553,32 +556,33 @@ public class AutoCommon extends LinearOpMode {
             }
         }
         if(centerTagFound) {
-            double  yawError        = tag.ftcPose.yaw;
+            double  yawError        = centerTag.ftcPose.yaw;
             // Use the speed and turn "gains" to calculate how we want the robot to move.
             turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
         }
         moveYaw(turn);
     }
     public void strafetoMiddleTag(){
-        if(tag!=null){
-            robot.chassis.Strafe(0.5, (int)tag.ftcPose.x);
-        }
         if(centerTagFound) {
-            double  yawError        = tag.ftcPose.yaw;
+            double  yawError        = centerTag.ftcPose.yaw;
             // Use the speed and turn "gains" to calculate how we want the robot to move.
             turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+            robot.chassis.autoTurn((float)-yawError);
+            detect_apriltag();
+            robot.chassis.Strafe(0.5, 2*(int)centerTag.ftcPose.x);
         }
-        moveYaw(turn);
     }
     public void detect_apriltag() {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         for (AprilTagDetection detection : currentDetections) {
-            // Look to see if we have size info on this tag.
-            if (detection.id == 2) {
-                // Yes, we want to use this middle tag to adjust the yaw
-                tag = detection;
-                tagID = detection.id;
-                break;  // don't look any further.}
+            // Look to see if we have size info on the tag.
+            if (detection.id == centerTagID) {
+                centerTag = detection;
+                centerTagFound = true;
+            if (detection.id == targetTagID);
+                targetTag = detection;
+                targetTagFound = true;
+
             }
         }
     }
