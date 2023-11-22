@@ -12,7 +12,7 @@ public class AutoBlueBack extends AutoCommon {
         targetAprilTagOffset = 0;
         strafeDirAfterPurPix = -1;
         turnAngleNearBackstage = -95;
-        strafeDistAfterPurPix = 36;
+        strafeDistAfterPurPix = 25;
     }
     
 }
