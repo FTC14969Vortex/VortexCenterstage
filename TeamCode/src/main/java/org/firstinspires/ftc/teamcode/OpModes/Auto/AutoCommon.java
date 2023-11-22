@@ -118,7 +118,7 @@ public class AutoCommon extends LinearOpMode {
     double DRIVE_SPEED = 0.5;
 
     enum AutoStages {DETECT_TE, OUTTAKE, GOTO_BACKBOARD, DETECT_AprilTag, CENTER_AprilTag, END_AUTO}
-    AutoStages currentStage = AutoStages.DETECT_TE;
+    AutoStages currentStage = AutoStages.DETECT_AprilTag;
 
     /**
      * Variables to change for different autos.
@@ -152,7 +152,7 @@ public class AutoCommon extends LinearOpMode {
 
     //For centering on the AprilTag
     boolean targetFound     = false;    // Set to true when an AprilTag target is detected
-    double centerTagID = 2;             // Middle AprilTag
+    double centerTagID = 4;             // Middle AprilTag
     double targetTagID = -1;            // Start ID as -1, will be updated in the function.
     boolean centerTagFound = false;
     boolean targetTagFound = false;

@@ -13,6 +13,7 @@ public class AutoBlueBack extends AutoCommon {
         strafeDirAfterPurPix = -1;
         turnAngleNearBackstage = -95;
         strafeDistAfterPurPix = 21;
+        super.centerTagID = 2;
     }
     
 }
