@@ -23,13 +23,13 @@ public class Teleop extends LinearOpMode {
     double WRIST_HOLDING_POWER = 0.7;
 
     int ARM_DELIVERY_POSITION_LOW = -1665;
-    int ARM_DELIVERY_POSITION_HIGH = -1300;
+    int ARM_DELIVERY_POSITION_HIGH = -1450;
     int ARM_PICKUP_POSITION = 30;
     double ARM_HOLDING_POWER = 0.1;
 
     double WRIST_DELIVERY_POSITION_HIGH = 0;
-    double WRIST_DELIVERY_POSITION_LOW = 0.4;
-    double WRIST_PICKUP_POSITION = 0.5;
+    double WRIST_DELIVERY_POSITION_LOW = 0.1;
+    double WRIST_PICKUP_POSITION = 0.65;
 
     double INTAKE_SPEED = 0.7;
 
