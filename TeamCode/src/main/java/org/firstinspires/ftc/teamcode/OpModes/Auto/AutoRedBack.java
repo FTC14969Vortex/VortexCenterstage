@@ -13,7 +13,7 @@ public class AutoRedBack extends AutoCommon {
         strafeDirAfterPurPix = 1;
         turnAngleNearBackstage = 95;
         strafeDistAfterPurPix = 40;
-        super.centerTagID = 4;
+        super.centerTagID = 5;
 
     }
 

@@ -118,7 +118,7 @@ public class AutoCommon extends LinearOpMode {
     double DRIVE_SPEED = 0.5;
 
     enum AutoStages {DETECT_TE, OUTTAKE, GOTO_BACKBOARD, DETECT_AprilTag, CENTER_AprilTag, END_AUTO}
-    AutoStages currentStage = AutoStages.DETECT_AprilTag;
+    AutoStages currentStage = AutoStages.DETECT_TE;
 
     /**
      * Variables to change for different autos.
@@ -200,7 +200,7 @@ public class AutoCommon extends LinearOpMode {
 
                     switch(targetSpikeMark){
                         case 1:
-                            outTakeLeft();
+                            outTakeRight();
                             strafeDistAtBackboard = 38;
 
                             break;
@@ -209,7 +209,7 @@ public class AutoCommon extends LinearOpMode {
                             strafeDistAtBackboard = 36;
                             break;
                         case 3:
-                            outTakeRight();
+                            outTakeLeft();
                             strafeDistAtBackboard = 44;
                             break;
                     }
@@ -225,7 +225,9 @@ public class AutoCommon extends LinearOpMode {
                     break;
                 case DETECT_AprilTag:
                     detect_apriltag();
-                    telemetryAprilTag();
+                    sleep(2000);
+                    telemetry.addData("Target Tag",targetTagID);
+                    telemetry.addData("Center Tag",centerTagID);
                     telemetry.update();
                     currentStage = AutoStages.CENTER_AprilTag;
                     break;
@@ -327,7 +329,6 @@ public class AutoCommon extends LinearOpMode {
                 telemetry.addData("yaw",detection.ftcPose.yaw);
                 telemetry.addData("range",detection.ftcPose.range);
                 telemetry.addData("current detection", targetTagID);
-                telemetry.update();
             } else {
                 telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
                 telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
@@ -568,6 +569,7 @@ public class AutoCommon extends LinearOpMode {
             // Use the speed and turn "gains" to calculate how we want the robot to move.
             turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
             robot.chassis.autoTurn((float)-yawError);
+            sleep(500);
             detect_apriltag();
             robot.chassis.Strafe(0.5, 2*(int)centerTag.ftcPose.x);
         }
