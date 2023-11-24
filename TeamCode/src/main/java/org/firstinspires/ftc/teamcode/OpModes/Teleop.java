@@ -22,14 +22,8 @@ public class Teleop extends LinearOpMode {
 
     double WRIST_HOLDING_POWER = 0.7;
 
-    int ARM_DELIVERY_POSITION_LOW = -1665;
-    int ARM_DELIVERY_POSITION_HIGH = -1450;
-    int ARM_PICKUP_POSITION = 30;
     double ARM_HOLDING_POWER = 0.1;
 
-    double WRIST_DELIVERY_POSITION_HIGH = 0;
-    double WRIST_DELIVERY_POSITION_LOW = 0.1;
-    double WRIST_PICKUP_POSITION = 0.65;
 
     double INTAKE_SPEED = 0.7;
 
@@ -168,23 +162,23 @@ public class Teleop extends LinearOpMode {
             //Higher Delivery
             if(gamepad2.dpad_up){
                 robot.gate.close();
-                robot.arm.gotoPosition(ARM_DELIVERY_POSITION_HIGH);
+                robot.arm.gotoHighPosition();
                 //Thread.sleep(500);
-                robot.wrist.servoPosition(WRIST_DELIVERY_POSITION_HIGH);
+                robot.wrist.gotoHighPosition();
             }
             //Lower delivery
             if(gamepad2.dpad_left){
                 robot.gate.close();
-                robot.arm.gotoPosition(ARM_DELIVERY_POSITION_LOW);
+                robot.arm.gotoLowPosition();
                 //Thread.sleep(500);
-                robot.wrist.servoPosition(WRIST_DELIVERY_POSITION_LOW);
+                robot.wrist.gotoLowPosition();
             }
             //Pickup position
             if(gamepad2.dpad_down){
-                robot.wrist.servoPosition(WRIST_PICKUP_POSITION);
+                robot.wrist.goToPickupPosition();
                 robot.gate.open();
                 Thread.sleep(850);
-                robot.arm.gotoPosition(ARM_PICKUP_POSITION);
+                robot.arm.gotoPickupPosoition();
             }
 
 

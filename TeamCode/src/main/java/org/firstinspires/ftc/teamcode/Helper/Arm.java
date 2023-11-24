@@ -14,6 +14,9 @@ public class Arm {
     double speed = 1;
     int targetPosition;
     int currentPosition;
+    public int ARM_DELIVERY_POSITION_LOW = -1665;
+    public int ARM_DELIVERY_POSITION_HIGH = -1450;
+    public int ARM_PICKUP_POSITION = 30;
 //    int slowDown;
 
 
@@ -47,6 +50,18 @@ public class Arm {
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
+    }
+
+    public void gotoPickupPosoition(){
+        this.gotoPosition(ARM_PICKUP_POSITION);
+    }
+
+    public void gotoLowPosition(){
+        this.gotoPosition(ARM_DELIVERY_POSITION_LOW);
+    }
+
+    public void gotoHighPosition(){
+        this.gotoPosition(ARM_DELIVERY_POSITION_HIGH);
     }
 
 }
