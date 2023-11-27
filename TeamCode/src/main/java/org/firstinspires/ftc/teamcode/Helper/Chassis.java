@@ -130,7 +130,7 @@ public class Chassis {
         }
     }
 
-    public void Drive(double speed, int distance) {
+    public void Drive(double speed, float distance) {
 
         runtime.reset();
         timeout_ms = 10000;

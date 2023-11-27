@@ -27,7 +27,7 @@ public class Wrist {
 
     }
 
-    public void goToPickupPosition(){
+    public void gotoPickupPosition(){
         servo.setPosition(WRIST_PICKUP_POSITION);
     }
     public void gotoLowPosition(){

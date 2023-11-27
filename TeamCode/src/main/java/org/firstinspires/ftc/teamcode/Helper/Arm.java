@@ -54,6 +54,7 @@ public class Arm {
 
     public void gotoPickupPosoition(){
         this.gotoPosition(ARM_PICKUP_POSITION);
+
     }
 
     public void gotoLowPosition(){

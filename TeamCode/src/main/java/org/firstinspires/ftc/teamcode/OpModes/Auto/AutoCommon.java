@@ -35,6 +35,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -68,7 +69,7 @@ public class AutoCommon extends LinearOpMode {
     int tagID;
     //Variables for AprilTag delivery
 
-    double DESIRED_DISTANCE = 14; //  this is how close the camera should get to the target (inches)
+    double DESIRED_DISTANCE = 21; //  this is how close the camera should get to the target (inches)
 
     //  Set the GAIN constants to control the relationship between the measured position error, and how much power is
     //  applied to the drive motors to correct the error.
@@ -115,7 +116,7 @@ public class AutoCommon extends LinearOpMode {
     double WRIST_DELIVERY_POSITION = 0.9;
     double WRIST_PICKUP_POSITION = 0.25;
 
-    double DRIVE_SPEED = 0.5;
+    double DRIVE_SPEED = 0.7;
 
     enum AutoStages {DETECT_TE, OUTTAKE, GOTO_BACKBOARD, DETECT_AprilTag, CENTER_AprilTag, DELVER_BACKBOARD, END_AUTO}
     AutoStages currentStage = AutoStages.DETECT_TE;
@@ -240,13 +241,15 @@ public class AutoCommon extends LinearOpMode {
                     break;
                 case CENTER_AprilTag:
                     aligntoMiddleTag();
-                    currentStage = AutoStages.END_AUTO;
+                    sleep(1000);
+                    currentStage = AutoStages.DELVER_BACKBOARD;
                     break;
                 case DELVER_BACKBOARD:
                     deliverToBackboard();
                     currentStage =AutoStages.END_AUTO;
+                    break;
                 case END_AUTO:
-                    finalPark();
+//                    finalPark();
                     telemetry.addData("auto sequence", debugAutoSequence);
                     telemetry.addData("Target Tag",targetTag.id);
                     telemetry.addData("Center Tag",centerTag.id);
@@ -345,6 +348,7 @@ public class AutoCommon extends LinearOpMode {
                 telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
                 telemetry.addData("yaw",detection.ftcPose.yaw);
                 telemetry.addData("range",detection.ftcPose.range);
+                telemetry.addData("Y", detection.ftcPose.y);
                 telemetry.addData("current detection", targetTagID);
             } else {
                 telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
@@ -586,11 +590,11 @@ public class AutoCommon extends LinearOpMode {
             // Use the speed and turn "gains" to calculate how we want the robot to move.
             turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
             robot.chassis.autoTurn((float)-yawError);
-            sleep(500);
+            sleep(1000);
             detect_apriltag();
-            robot.chassis.Strafe(0.5, 2*(int)centerTag.ftcPose.x);
+            robot.chassis.Strafe(DRIVE_SPEED, 2*(int)centerTag.ftcPose.x);
             detect_apriltag();
-            robot.chassis.Drive(0.5, (int)(targetTag.ftcPose.y -DESIRED_DISTANCE));
+            robot.chassis.Drive(DRIVE_SPEED * 0.5, (int)((targetTag.ftcPose.y/2.54) -DESIRED_DISTANCE));
         }
     }
     public List<AprilTagDetection> detect_apriltag() {
@@ -612,10 +616,15 @@ public class AutoCommon extends LinearOpMode {
     public void deliverToBackboard(){
         robot.arm.gotoLowPosition();
         robot.wrist.gotoLowPosition();
+        sleep(1000);
         robot.gate.open();
+        sleep(2000);
+        robot.wrist.gotoPickupPosition();
+        robot.arm.gotoPickupPosoition();
+        sleep(2000);
     }
     public void finalPark(){
-        robot.chassis.Strafe(0.5,8);
+        robot.chassis.Strafe(DRIVE_SPEED,-8);
     }
 
 }   // end class

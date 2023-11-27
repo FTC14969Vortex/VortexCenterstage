@@ -175,7 +175,7 @@ public class Teleop extends LinearOpMode {
             }
             //Pickup position
             if(gamepad2.dpad_down){
-                robot.wrist.goToPickupPosition();
+                robot.wrist.gotoPickupPosition();
                 robot.gate.open();
                 Thread.sleep(850);
                 robot.arm.gotoPickupPosoition();
