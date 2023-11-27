@@ -177,7 +177,7 @@ public class Chassis {
         this.stopDriveMotors();
     }
 
-    public void Strafe(double speed, int distance) {
+    public void Strafe(double speed, double distance) {
 
         robotX += distance;
 

@@ -163,14 +163,14 @@ public class Teleop extends LinearOpMode {
             if(gamepad2.dpad_up){
                 robot.gate.close();
                 robot.arm.gotoHighPosition();
-                //Thread.sleep(500);
+                Thread.sleep(500);
                 robot.wrist.gotoHighPosition();
             }
             //Lower delivery
             if(gamepad2.dpad_left){
                 robot.gate.close();
                 robot.arm.gotoLowPosition();
-                //Thread.sleep(500);
+                Thread.sleep(500);
                 robot.wrist.gotoLowPosition();
             }
             //Pickup position

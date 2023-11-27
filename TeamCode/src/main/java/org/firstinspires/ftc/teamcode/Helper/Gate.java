@@ -10,7 +10,7 @@ public class Gate {
     public double Open = 0.8;
     public double Close = 0;
 
-    public double Middle = 0.3;
+    public double Middle = 0.35;
 
     HardwareMap hwMap = null;
 

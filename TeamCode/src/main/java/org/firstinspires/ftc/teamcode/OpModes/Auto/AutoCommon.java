@@ -35,7 +35,6 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -186,7 +185,6 @@ public class AutoCommon extends LinearOpMode {
 
 
         boolean doneAuto = false;
-        int detect_count= 0;
         while (opModeIsActive())  {
             debugAutoSequence = debugAutoSequence + " " + currentStage.toString();
             switch(currentStage){
@@ -225,22 +223,10 @@ public class AutoCommon extends LinearOpMode {
                      *
                      */
                     gotoBackBoard(strafeDirAfterPurPix,strafeDistAfterPurPix,turnAngleNearBackstage, strafeDistAtBackboard);
-                    currentStage = AutoStages.DETECT_AprilTag;
-                    break;
-                case DETECT_AprilTag:
-                    for(int i=0; i<10 ; i++){
-                        List<AprilTagDetection> currentDetections = detect_apriltag();
-                        if(targetTag != null) {
-                            break;
-                        }
-                        detect_count += 1;
-                        sleep(500);
-                    }
-
                     currentStage = AutoStages.CENTER_AprilTag;
                     break;
                 case CENTER_AprilTag:
-                    aligntoMiddleTag();
+                    centerToTag();
                     sleep(1000);
                     currentStage = AutoStages.DELVER_BACKBOARD;
                     break;
@@ -249,11 +235,11 @@ public class AutoCommon extends LinearOpMode {
                     currentStage =AutoStages.END_AUTO;
                     break;
                 case END_AUTO:
-//                    finalPark();
+                    sleep(1000);
+                    finalPark();
                     telemetry.addData("auto sequence", debugAutoSequence);
                     telemetry.addData("Target Tag",targetTag.id);
                     telemetry.addData("Center Tag",centerTag.id);
-                    telemetry.addData("Detect Count",detect_count);
                     telemetry.update();
                     sleep(30000);
 
@@ -467,7 +453,7 @@ public class AutoCommon extends LinearOpMode {
     public void gotoBackBoard(int strafeDirAfterPurPix, int strafeDistAfterPurPix, int turnAngleNearBackstage, int strafeDistAtBackboard) throws InterruptedException {
         robot.chassis.Strafe(DRIVE_SPEED, strafeDirAfterPurPix*strafeDistAfterPurPix);
         robot.chassis.autoTurn(turnAngleNearBackstage);
-        robot.chassis.Strafe(DRIVE_SPEED, strafeDirAfterPurPix*strafeDistAtBackboard);
+        robot.chassis.Strafe(DRIVE_SPEED, strafeDistAtBackboard);
     }
 
 
@@ -584,33 +570,49 @@ public class AutoCommon extends LinearOpMode {
         }
         moveYaw(turn);
     }
-    public void aligntoMiddleTag(){
+    public void centerToTag(){
+        double yawError = 0;
+        detect_apriltag();
         if(centerTagFound) {
-            double  yawError        = centerTag.ftcPose.yaw;
-            // Use the speed and turn "gains" to calculate how we want the robot to move.
-            turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
-            robot.chassis.autoTurn((float)-yawError);
-            sleep(1000);
-            detect_apriltag();
-            robot.chassis.Strafe(DRIVE_SPEED, 2*(int)centerTag.ftcPose.x);
-            detect_apriltag();
-            robot.chassis.Drive(DRIVE_SPEED * 0.5, (int)((targetTag.ftcPose.y/2.54) -DESIRED_DISTANCE));
+            yawError = centerTag.ftcPose.yaw;
+        } else if(targetTagFound) {
+            yawError = targetTag.ftcPose.yaw;
         }
-    }
-    public List<AprilTagDetection> detect_apriltag() {
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-        for (AprilTagDetection detection : currentDetections) {
-            // Look to see if we have size info on the tag.
-            if (detection.id == centerTagID) {
-                centerTag = detection;
-                centerTagFound = true;
-            if (detection.id == targetTagID);
-                targetTag = detection;
-                targetTagFound = true;
+        // Use the speed and turn "gains" to calculate how we want the robot to move.
+        turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+        robot.chassis.autoTurn((float)-yawError);
+        sleep(1000);
+        detect_apriltag();
+        robot.chassis.Strafe(DRIVE_SPEED, targetTag.ftcPose.x/2.54);
+        detect_apriltag();
+        robot.chassis.Drive(DRIVE_SPEED * 0.5, (int)((targetTag.ftcPose.y/2.54) -DESIRED_DISTANCE));
+        }
 
+    public void detect_apriltag() {
+        int detect_count = 0;
+        List<AprilTagDetection> currentDetections = null;
+        for(int i=0; i<5 ; i++){
+            currentDetections = aprilTag.getDetections();
+            detect_count += 1; //Useful for debugging via telemetry.
+
+            for (AprilTagDetection detection : currentDetections) {
+                // Look to see if we have size info on the tag.
+                if (detection.id == centerTagID) {
+                    centerTag = detection;
+                    centerTagFound = true;
+                    if (detection.id == targetTagID);
+                    targetTag = detection;
+                    targetTagFound = true;
+
+                }
+                if(targetTag != null) {
+                    break;
+                }
+            sleep(500);
             }
+
         }
-        return currentDetections;
+
     }
 
     public void deliverToBackboard(){
@@ -624,7 +626,7 @@ public class AutoCommon extends LinearOpMode {
         sleep(2000);
     }
     public void finalPark(){
-        robot.chassis.Strafe(DRIVE_SPEED,-8);
+        robot.chassis.Strafe(DRIVE_SPEED,-24);
     }
 
 }   // end class
