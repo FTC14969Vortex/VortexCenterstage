@@ -65,21 +65,16 @@ public class AutoCommon extends LinearOpMode {
 
     AprilTagDetection centerTag = null;
     AprilTagDetection targetTag = null;
-    int tagID;
-    //Variables for AprilTag delivery
-
     double DELIVERY_DISTANCE = 18; //  this is how close the camera should get to the target (inches)
+    //For centering on the AprilTag
+    int centerTagID = 5;             // Middle AprilTag
+    int targetTagID = 4;            // Start ID as -1, will be updated in the function.
+    double  drive           = 0;        // Desired forward power/speed (-1 to +1)
+    double  strafe          = 0;        // Desired strafe power/speed (-1 to +1)
+    double  turn            = 0;        // Desired turning power/speed (-1 to +1)
 
-    //  Set the GAIN constants to control the relationship between the measured position error, and how much power is
-    //  applied to the drive motors to correct the error.
-    //  Drive = Error * Gain    Make these values smaller for smoother control, or larger for a more aggressive response.
-    final double SPEED_GAIN  =  0.02  ;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
-    final double STRAFE_GAIN =  0.015 ;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
-    final double TURN_GAIN   =  0.01  ;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
-
-    final double MAX_AUTO_SPEED = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
-    final double MAX_AUTO_STRAFE= 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
-    final double MAX_AUTO_TURN  = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
+    String debugAutoSequence;
+    String debugDetectedAprilTags;
 
 
     // The variable to store our instance of the TensorFlow Object Detection processor.
@@ -108,16 +103,10 @@ public class AutoCommon extends LinearOpMode {
     public Robot robot = new Robot();
 
     // Robot control parameters
-    //Arm and Wrist positions
-    int ARM_DELIVERY_POSITION = -600;
-    int ARM_PICKUP_POSITION = 4;
-
-    double WRIST_DELIVERY_POSITION = 0.9;
-    double WRIST_PICKUP_POSITION = 0.25;
 
     double DRIVE_SPEED = 0.7;
 
-    enum AutoStages {DETECT_TE, OUTTAKE, GOTO_BACKBOARD, DETECT_AprilTag, CENTER_AprilTag, DELVER_BACKBOARD, END_AUTO}
+    enum AutoStages {DETECT_TE, OUTTAKE, GOTO_BACKBOARD, DETECT_AprilTag, CENTER_AprilTag, DELVER_BACKBOARD_PARK, END_AUTO}
     AutoStages currentStage = AutoStages.CENTER_AprilTag;
 
     /**
@@ -153,17 +142,6 @@ public class AutoCommon extends LinearOpMode {
      */
 
 
-    //For centering on the AprilTag
-    boolean targetFound     = false;    // Set to true when an AprilTag target is detected
-    int centerTagID = 5;             // Middle AprilTag
-    int targetTagID = 4;            // Start ID as -1, will be updated in the function.
-    double  drive           = 0;        // Desired forward power/speed (-1 to +1)
-    double  strafe          = 0;        // Desired strafe power/speed (-1 to +1)
-    double  turn            = 0;        // Desired turning power/speed (-1 to +1)
-
-    String debugAutoSequence;
-    String debugDetectedAprilTags;
-
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -178,6 +156,7 @@ public class AutoCommon extends LinearOpMode {
             if(opModeInInit()) {
                 detectTeamElement(); // run detections continuously.
                 telemetry.addData("Target Tag ID", targetTagID);
+                telemetryAprilTag();
                 telemetry.update();
             }
         }
@@ -185,8 +164,6 @@ public class AutoCommon extends LinearOpMode {
 
         waitForStart();
 
-
-        boolean doneAuto = false;
         while (opModeIsActive())  {
             debugAutoSequence = debugAutoSequence + " " + currentStage.toString();
             switch(currentStage){
@@ -228,29 +205,25 @@ public class AutoCommon extends LinearOpMode {
                     currentStage = AutoStages.CENTER_AprilTag;
                     break;
                 case CENTER_AprilTag:
-                    targetTagID = 4;
+                    targetTagID = 1;
                     centerToTag();
                     sleep(1000);
-                    currentStage = AutoStages.DELVER_BACKBOARD;
+                    currentStage = AutoStages.DELVER_BACKBOARD_PARK;
                     break;
-                case DELVER_BACKBOARD:
-                    deliverToBackboard();
+                case DELVER_BACKBOARD_PARK:
+                    deliverToBackboardAndPark();
                     sleep(1000);
-                    finalPark();
                     currentStage =AutoStages.END_AUTO;
                     break;
                 case END_AUTO:
+                    // End Auto keeps printing debug information via telemetry.
                     telemetry.addData("auto sequence", debugAutoSequence);
                     telemetry.addData("Target Tag",targetTag.id);
                     telemetry.addData("Center Tag",centerTag.id);
                     telemetry.addData("Detection sequence of april tags", debugDetectedAprilTags);
                     telemetry.update();
-                    sleep(30000);
-
+                    sleep(5000); //5 sec delay between telemetry.
             }
-
-            doneAuto = true;
-
 
         } // end while loop
 
@@ -320,12 +293,14 @@ public class AutoCommon extends LinearOpMode {
      * Add telemetry about AprilTag detections.
      */
     public void telemetryAprilTag() {
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-        telemetry.addData("# AprilTags Detected", currentDetections.size());
-
+        myVisionPortal.setProcessorEnabled(tfod, false);
+        myVisionPortal.setProcessorEnabled(aprilTag, true);
         if(myVisionPortal.getProcessorEnabled(aprilTag)) {
             telemetry.addLine("April Tags working");
         }
+
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        telemetry.addData("# AprilTags Detected", currentDetections.size());
 
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
@@ -333,7 +308,9 @@ public class AutoCommon extends LinearOpMode {
                 telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
                 telemetry.addData("yaw",detection.ftcPose.yaw);
                 telemetry.addData("range",detection.ftcPose.range);
+                telemetry.addData("X", detection.ftcPose.x);
                 telemetry.addData("Y", detection.ftcPose.y);
+                telemetry.addData("Z", detection.ftcPose.z);
                 telemetry.addData("current detection", targetTagID);
             } else {
                 telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
@@ -347,6 +324,8 @@ public class AutoCommon extends LinearOpMode {
      * Add telemetry about TensorFlow Object Detection (TFOD) recognitions.
      */
     public double telemetryTfod() {
+        myVisionPortal.setProcessorEnabled(tfod, true);
+        myVisionPortal.setProcessorEnabled(aprilTag, false);
 
         double x = 0;
         double y;
@@ -380,8 +359,8 @@ public class AutoCommon extends LinearOpMode {
          * (common to all Auto)
          */
         // Enable TFOD to detect object and store the value.
-//        myVisionPortal.setProcessorEnabled(tfod, true);
-//        myVisionPortal.setProcessorEnabled(aprilTag, true);
+        myVisionPortal.setProcessorEnabled(tfod, true);
+        myVisionPortal.setProcessorEnabled(aprilTag, false);
 
 
         //Get a recognition
@@ -464,28 +443,31 @@ public class AutoCommon extends LinearOpMode {
         targetTag = detect_apriltag(targetTagID);
 
 
-        if(centerTag != null) {
-            yawError = centerTag.ftcPose.yaw;
-        } else if(targetTag != null) {
+        if(targetTag != null) {
             yawError = targetTag.ftcPose.yaw;
+        } else if(centerTag != null) {
+            yawError = centerTag.ftcPose.yaw;
         }
         // Use the speed and turn "gains" to calculate how we want the robot to move.
-        turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+        // turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
         robot.chassis.autoTurn((float)-yawError);
         sleep(1000);
-        debugDetectedAprilTags = debugDetectedAprilTags + ", after yaw correction:";
+        debugDetectedAprilTags = debugDetectedAprilTags + "\n yaw correction:" + -yawError + "tags after after correction:";
 
         targetTag = detect_apriltag(targetTagID);
-        robot.chassis.Strafe(DRIVE_SPEED, targetTag.ftcPose.x/2.54);
+        robot.chassis.Strafe(DRIVE_SPEED * 0.5, targetTag.ftcPose.x); //x is in inches.
         sleep(1000);
 
 
-        debugDetectedAprilTags = debugDetectedAprilTags + ", after strafe correction:";
+        debugDetectedAprilTags = debugDetectedAprilTags + "\n strafe correction:" + targetTag.ftcPose.x/2.54 + "after correction:";
         targetTag = detect_apriltag(targetTagID);
         robot.chassis.Drive(DRIVE_SPEED * 0.5, (int)((targetTag.ftcPose.y/2.54) - DELIVERY_DISTANCE));
         }
 
+
     public AprilTagDetection detect_apriltag(int IDtoDetect) {
+        myVisionPortal.setProcessorEnabled(tfod, false);
+        myVisionPortal.setProcessorEnabled(aprilTag, true);
         boolean foundDetection = false;
         int detect_count = 0;
         AprilTagDetection detectionResult = null;
@@ -495,7 +477,7 @@ public class AutoCommon extends LinearOpMode {
 
             for (AprilTagDetection detection : currentDetections) {
                 // Look to see if we have size info on the tag.
-                debugDetectedAprilTags = debugDetectedAprilTags + detection.id;
+                debugDetectedAprilTags = debugDetectedAprilTags + detection.id + detection.ftcPose.yaw  + detection.ftcPose.x + ';';
 
                 if (detection.id == IDtoDetect) {
                     foundDetection = true;
@@ -513,21 +495,62 @@ public class AutoCommon extends LinearOpMode {
 
         }
 
+    public double[] detect_apriltag_yaw_x_y(int[] possibleIDs, int IDtoDetect) {
+        myVisionPortal.setProcessorEnabled(tfod, false);
+        myVisionPortal.setProcessorEnabled(aprilTag, true);
+        boolean foundDetection = false;
+        int detect_count = 0;
+        double[] detectionResult = null;
+        List<AprilTagDetection> currentDetections = null;
+        for(int i=0; i<5 ; i++){
+            currentDetections = aprilTag.getDetections();
+
+            for (AprilTagDetection detection : currentDetections) {
+                // Look to see if we have size info on the tag.
+                debugDetectedAprilTags = debugDetectedAprilTags + detection.id + detection.ftcPose.yaw  + detection.ftcPose.x + ';';
+
+                if (detection.id == IDtoDetect) {
+                    foundDetection = true;
+                    detectionResult[0] = detection.ftcPose.yaw;
+                    detectionResult[1] = detection.ftcPose.x;
+                    detectionResult[2] = detection.ftcPose.y;
+                    break;
+                }
+            }
+            if(foundDetection) {
+                break;
+            }
+
+            sleep(500);
+        }
+        return detectionResult;
+
+    }
 
 
-    public void deliverToBackboard(){
+
+
+
+    public void deliverToBackboardAndPark(){
+
+        // Swing the arm and wist to low position.
         robot.arm.gotoLowPosition();
         robot.wrist.gotoLowPosition();
         sleep(1000);
+
+        // Open the gate to deliver one pixel.
         robot.gate.middle();
         sleep(2000);
+
+        // Bring the wrist and arm to pickup position.
         robot.wrist.gotoPickupPosition();
         robot.arm.gotoPickupPosoition();
         sleep(2000);
-    }
-    public void finalPark(){
+
+        // Park.
         robot.chassis.Strafe(DRIVE_SPEED,3-targetSpikeMark*6+24);
         robot.chassis.Drive(DRIVE_SPEED, 6);
     }
+
 
 }   // end class
