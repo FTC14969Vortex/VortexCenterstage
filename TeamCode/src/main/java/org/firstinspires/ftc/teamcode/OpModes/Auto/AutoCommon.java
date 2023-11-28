@@ -68,7 +68,7 @@ public class AutoCommon extends LinearOpMode {
     int tagID;
     //Variables for AprilTag delivery
 
-    double DESIRED_DISTANCE = 21; //  this is how close the camera should get to the target (inches)
+    double DELIVERY_DISTANCE = 18; //  this is how close the camera should get to the target (inches)
 
     //  Set the GAIN constants to control the relationship between the measured position error, and how much power is
     //  applied to the drive motors to correct the error.
@@ -131,6 +131,8 @@ public class AutoCommon extends LinearOpMode {
     public int turnAngleNearBackstage; // Blue side requires counter clockwise turn, red requires CW turn.
     //Distance in inches from the middle of the spike mark 2 to the backstage.
     public int strafeDistAfterPurPix; //24 inches when starting from the back and 24+72 inches when starting from front.
+    public int strafeDistAtBackboard;
+    public int strafeDirForParking;
 
 
     public void setUniqueParameters(){
@@ -141,9 +143,10 @@ public class AutoCommon extends LinearOpMode {
         strafeDirAfterPurPix = -1; // +1 is right for Blue, -1 is left for Red.
         turnAngleNearBackstage = 95;
         strafeDistAfterPurPix = 96;
+        strafeDistAtBackboard = -39;
+        strafeDirForParking = -1;
     }
 
-    int strafeDistAtBackboard;
 
     /**
      * All methods for the AutoOpMode, we keep them public so that other opmodes can use them.
@@ -161,6 +164,7 @@ public class AutoCommon extends LinearOpMode {
     double  turn            = 0;        // Desired turning power/speed (-1 to +1)
 
     String debugAutoSequence;
+    String debugDetectedAprilTags;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -170,12 +174,12 @@ public class AutoCommon extends LinearOpMode {
         setUniqueParameters();
         robot.init(hardwareMap);
 //
-        detectTeamElement();
+
 
         while (!isStarted()) {
             if(opModeInInit()) {
-                telemetryAprilTag();
-                telemetryTfod();
+                detectTeamElement(); // run detections continuously.
+                telemetry.addData("Target Tag ID", targetTagID);
                 telemetry.update();
             }
         }
@@ -190,7 +194,7 @@ public class AutoCommon extends LinearOpMode {
             switch(currentStage){
                 case DETECT_TE:
                     detectTeamElement();
-                    telemetryTfod();
+                    telemetry.addData("Target Tag ID", targetTagID);
                     telemetry.update();
                     currentStage = AutoStages.OUTTAKE;
                     break;
@@ -203,16 +207,16 @@ public class AutoCommon extends LinearOpMode {
                     switch(targetSpikeMark){
                         case 1:
                             outTakeRight();
-                            strafeDistAtBackboard = 38;
+//                            strafeDistAtBackboard = -38;
 
                             break;
                         case 2:
                             outTakeStraight();
-                            strafeDistAtBackboard = 36;
+//                            strafeDistAtBackboard = -36;
                             break;
                         case 3:
                             outTakeLeft();
-                            strafeDistAtBackboard = 44;
+//                            strafeDistAtBackboard = -44;
                             break;
                     }
                     currentStage = AutoStages.GOTO_BACKBOARD;
@@ -232,23 +236,19 @@ public class AutoCommon extends LinearOpMode {
                     break;
                 case DELVER_BACKBOARD:
                     deliverToBackboard();
+                    sleep(1000);
+                    finalPark();
                     currentStage =AutoStages.END_AUTO;
                     break;
                 case END_AUTO:
-                    sleep(1000);
-                    finalPark();
                     telemetry.addData("auto sequence", debugAutoSequence);
                     telemetry.addData("Target Tag",targetTag.id);
                     telemetry.addData("Center Tag",centerTag.id);
+                    telemetry.addData("Detection sequence of april tags", debugDetectedAprilTags);
                     telemetry.update();
                     sleep(30000);
 
             }
-
-
-
-
-
 
             doneAuto = true;
 
@@ -341,7 +341,6 @@ public class AutoCommon extends LinearOpMode {
                 telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
             }
         }   // end for() loop
-        telemetry.addData("Target Tag ID", targetTagID);
 
     }   // end method telemetryAprilTag()
 
@@ -370,6 +369,7 @@ public class AutoCommon extends LinearOpMode {
             telemetry.addData("- Position", "%.0f / %.0f", x, y);
             telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
         }   // end for() loop
+
 
         return x;
 
@@ -506,7 +506,7 @@ public class AutoCommon extends LinearOpMode {
         }
 
         if(targetFound) {
-            double  rangeError      = (centerTag.ftcPose.range - DESIRED_DISTANCE);
+            double  rangeError      = (centerTag.ftcPose.range - DELIVERY_DISTANCE);
             double  headingError    = centerTag.ftcPose.bearing;
             double  yawError        = centerTag.ftcPose.yaw;
 
@@ -573,6 +573,8 @@ public class AutoCommon extends LinearOpMode {
     public void centerToTag(){
         double yawError = 0;
         detect_apriltag();
+        debugDetectedAprilTags = debugDetectedAprilTags + "before correction:";
+
         if(centerTagFound) {
             yawError = centerTag.ftcPose.yaw;
         } else if(targetTagFound) {
@@ -582,10 +584,14 @@ public class AutoCommon extends LinearOpMode {
         turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
         robot.chassis.autoTurn((float)-yawError);
         sleep(1000);
+        debugDetectedAprilTags = debugDetectedAprilTags + ", after yaw correction:";
+
         detect_apriltag();
         robot.chassis.Strafe(DRIVE_SPEED, targetTag.ftcPose.x/2.54);
+
+        debugDetectedAprilTags = debugDetectedAprilTags + ", after strafe correction:";
         detect_apriltag();
-        robot.chassis.Drive(DRIVE_SPEED * 0.5, (int)((targetTag.ftcPose.y/2.54) -DESIRED_DISTANCE));
+        robot.chassis.Drive(DRIVE_SPEED * 0.5, (int)((targetTag.ftcPose.y/2.54) - DELIVERY_DISTANCE));
         }
 
     public void detect_apriltag() {
@@ -597,6 +603,8 @@ public class AutoCommon extends LinearOpMode {
 
             for (AprilTagDetection detection : currentDetections) {
                 // Look to see if we have size info on the tag.
+                debugDetectedAprilTags = debugDetectedAprilTags + detection.id;
+
                 if (detection.id == centerTagID) {
                     centerTag = detection;
                     centerTagFound = true;
@@ -619,14 +627,15 @@ public class AutoCommon extends LinearOpMode {
         robot.arm.gotoLowPosition();
         robot.wrist.gotoLowPosition();
         sleep(1000);
-        robot.gate.open();
+        robot.gate.middle();
         sleep(2000);
         robot.wrist.gotoPickupPosition();
         robot.arm.gotoPickupPosoition();
         sleep(2000);
     }
     public void finalPark(){
-        robot.chassis.Strafe(DRIVE_SPEED,-24);
+        robot.chassis.Strafe(DRIVE_SPEED,3-targetSpikeMark*6+24);
+        robot.chassis.Drive(DRIVE_SPEED, 6);
     }
 
 }   // end class
