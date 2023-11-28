@@ -291,11 +291,10 @@ public class Chassis {
 
 
     }
-    public void autoTurn(float turnAngle){
+    public void autoTurn(float turnAngle, float turnOffset){
         float desc_start = 10;
         double acc = 1;
         float turnDirection = java.lang.Math.signum(turnAngle);
-        float turnOffset = 10;
         float startAngle;
         float currentAngle;
         float alreadyTurned = 0;

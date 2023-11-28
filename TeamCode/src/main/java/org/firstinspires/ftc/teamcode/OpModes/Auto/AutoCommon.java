@@ -108,6 +108,7 @@ public class AutoCommon extends LinearOpMode {
     // Robot control parameters
 
     double DRIVE_SPEED = 0.7;
+    float turnOffset = 10;
 
     enum AutoStages {DETECT_TE, OUTTAKE, GOTO_BACKBOARD, DETECT_AprilTag, CENTER_AprilTag, DELVER_BACKBOARD_PARK, END_AUTO}
     AutoStages currentStage = AutoStages.CENTER_AprilTag;
@@ -450,29 +451,29 @@ public class AutoCommon extends LinearOpMode {
 
     public void outTakeLeft() throws InterruptedException {
         robot.chassis.Drive(DRIVE_SPEED, 27);
-        robot.chassis.autoTurn(-100);
+        robot.chassis.autoTurn(-100, turnOffset);
         robot.intake.MoveIntake(0.6,true);
         Thread.sleep(2000);
         robot.intake.MoveIntake(0,true);
         robot.chassis.Drive(DRIVE_SPEED, 1);
         robot.chassis.Strafe(DRIVE_SPEED,35);
-        robot.chassis.autoTurn(95);
+        robot.chassis.autoTurn(95, turnOffset);
 
     }
     public void outTakeRight() throws InterruptedException {
         robot.chassis.Drive(DRIVE_SPEED, 27);
-        robot.chassis.autoTurn(90);
+        robot.chassis.autoTurn(90, turnOffset);
         robot.intake.MoveIntake(0.6,true);
         Thread.sleep(2000);
         robot.intake.MoveIntake(0, true);
         robot.chassis.Drive(DRIVE_SPEED, 1);
         robot.chassis.Strafe(DRIVE_SPEED, -35);
-        robot.chassis.autoTurn(-95);
+        robot.chassis.autoTurn(-95, turnOffset);
     }
 
     public void gotoBackBoard(int strafeDirAfterPurPix, int strafeDistAfterPurPix, int turnAngleNearBackstage, int strafeDistAtBackboard) throws InterruptedException {
         robot.chassis.Strafe(DRIVE_SPEED, strafeDirAfterPurPix*strafeDistAfterPurPix);
-        robot.chassis.autoTurn(turnAngleNearBackstage);
+        robot.chassis.autoTurn(turnAngleNearBackstage, turnOffset);
         robot.chassis.Strafe(DRIVE_SPEED, strafeDistAtBackboard);
     }
 
@@ -480,6 +481,7 @@ public class AutoCommon extends LinearOpMode {
 
     public void centerToTag(){
         double yawError = 0;
+        float turnOffsetAprilTag = 5;
         debugDetectedAprilTags = debugDetectedAprilTags + "before correction:";
         centerTag = detect_apriltag(centerTagID);
         targetTag = detect_apriltag(targetTagID);
@@ -492,7 +494,7 @@ public class AutoCommon extends LinearOpMode {
         }
         // Use the speed and turn "gains" to calculate how we want the robot to move.
         // turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
-        robot.chassis.autoTurn((float)-yawError);
+        robot.chassis.autoTurn((float)-yawError, turnOffsetAprilTag);
         sleep(1000);
         debugDetectedAprilTags = debugDetectedAprilTags + "\n yaw correction:" + -yawError + "tags after after correction:";
 
@@ -537,35 +539,65 @@ public class AutoCommon extends LinearOpMode {
 
         }
 
-    public double[] detect_apriltag_yaw_x_y(int[] possibleIDs, int IDtoDetect) {
-        myVisionPortal.setProcessorEnabled(tfod, false);
-        myVisionPortal.setProcessorEnabled(aprilTag, true);
-        boolean foundDetection = false;
-        int detect_count = 0;
-        double[] detectionResult = null;
-        List<AprilTagDetection> currentDetections = null;
-        for(int i=0; i<5 ; i++){
-            currentDetections = aprilTag.getDetections();
+    public void CenterToTag_BYR() {
+        // CenterToTag using Bearing, Yaw, Range as explained in RobotAutoDriveToAprilTagOmni example.
+        boolean targetFound = false;
+        //  Set the GAIN constants to control the relationship between the measured position error, and how much power is
+        //  applied to the drive motors to correct the error.
+        //  Drive = Error * Gain    Make these values smaller for smoother control, or larger for a more aggressive response.
+        final double SPEED_GAIN  =  0.02  ;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
+        final double STRAFE_GAIN =  0.015 ;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
+        final double TURN_GAIN   =  0.01  ;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
 
+        final double MAX_AUTO_SPEED = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
+        final double MAX_AUTO_STRAFE= 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
+        final double MAX_AUTO_TURN  = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
+
+        float turnOffsetAprilTag = 5;
+
+        for (int attempts=0; attempts < 4; attempts ++) {
+            // Step through the list of detected tags and look for a matching tag
+            List<AprilTagDetection> currentDetections = aprilTag.getDetections();
             for (AprilTagDetection detection : currentDetections) {
-                // Look to see if we have size info on the tag.
-                debugDetectedAprilTags = debugDetectedAprilTags + detection.id + detection.ftcPose.yaw  + detection.ftcPose.x + ';';
-
-                if (detection.id == IDtoDetect) {
-                    foundDetection = true;
-                    detectionResult[0] = detection.ftcPose.yaw;
-                    detectionResult[1] = detection.ftcPose.x;
-                    detectionResult[2] = detection.ftcPose.y;
-                    break;
+                // Look to see if we have size info on this tag.
+                if (detection.metadata != null) {
+                    //  Check to see if we want to track towards this tag.
+                    if ((targetTagID < 0) || (detection.id == targetTagID)) {
+                        // Yes, we want to use this tag.
+                        targetFound = true;
+                        targetTag = detection;
+                        break;  // don't look any further.
+                    } else {
+                        // This tag is in the library, but we do not want to track it right now.
+                        telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
+                    }
+                } else {
+                    // This tag is NOT in the library, so we don't have enough information to track to it.
+                    telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
                 }
             }
-            if(foundDetection) {
-                break;
+
+            // Telemetry the results of detection.
+            if (targetFound) {
+                telemetry.addData("Found", "ID %d (%s)", targetTag.id, targetTag.metadata.name);
+                telemetry.addData("Range", "%5.1f inches", targetTag.ftcPose.range);
+                telemetry.addData("Bearing", "%3.0f degrees", targetTag.ftcPose.bearing);
+                telemetry.addData("Yaw", "%3.0f degrees", targetTag.ftcPose.yaw);
+            } else {
+                telemetry.addData("\n>", "Drive using joysticks to find valid target\n");
             }
 
-            sleep(500);
+            // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
+            double rangeError = (targetTag.ftcPose.range - DELIVERY_DISTANCE);
+            double headingError = targetTag.ftcPose.bearing;
+            double yawError = targetTag.ftcPose.yaw;
+
+            robot.chassis.autoTurn((float) headingError, turnOffsetAprilTag);
+            strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+            robot.chassis.Strafe(DRIVE_SPEED, strafe);
+            robot.chassis.Drive(DRIVE_SPEED, (float) rangeError);
         }
-        return detectionResult;
+
 
     }
 
