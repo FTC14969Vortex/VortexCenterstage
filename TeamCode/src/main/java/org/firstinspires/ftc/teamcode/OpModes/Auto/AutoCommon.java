@@ -284,6 +284,8 @@ public class AutoCommon extends LinearOpMode {
                     .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
                     .addProcessors(tfod, aprilTag)
                     .build();
+            setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
+
         } else {
             myVisionPortal = new VisionPortal.Builder()
                     .setCamera(BuiltinCameraDirection.BACK)
