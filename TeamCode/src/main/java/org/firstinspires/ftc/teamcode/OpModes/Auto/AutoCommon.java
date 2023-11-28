@@ -63,8 +63,8 @@ public class AutoCommon extends LinearOpMode {
    // The variable to store our instance of the AprilTag processor.
     private AprilTagProcessor aprilTag;
 
-    AprilTagDetection centerTag;
-    AprilTagDetection targetTag;
+    AprilTagDetection centerTag = null;
+    AprilTagDetection targetTag = null;
     int tagID;
     //Variables for AprilTag delivery
 
@@ -118,7 +118,7 @@ public class AutoCommon extends LinearOpMode {
     double DRIVE_SPEED = 0.7;
 
     enum AutoStages {DETECT_TE, OUTTAKE, GOTO_BACKBOARD, DETECT_AprilTag, CENTER_AprilTag, DELVER_BACKBOARD, END_AUTO}
-    AutoStages currentStage = AutoStages.DETECT_TE;
+    AutoStages currentStage = AutoStages.CENTER_AprilTag;
 
     /**
      * Variables to change for different autos.
@@ -155,10 +155,8 @@ public class AutoCommon extends LinearOpMode {
 
     //For centering on the AprilTag
     boolean targetFound     = false;    // Set to true when an AprilTag target is detected
-    double centerTagID = 4;             // Middle AprilTag
-    double targetTagID = -1;            // Start ID as -1, will be updated in the function.
-    boolean centerTagFound = false;
-    boolean targetTagFound = false;
+    int centerTagID = 5;             // Middle AprilTag
+    int targetTagID = 4;            // Start ID as -1, will be updated in the function.
     double  drive           = 0;        // Desired forward power/speed (-1 to +1)
     double  strafe          = 0;        // Desired strafe power/speed (-1 to +1)
     double  turn            = 0;        // Desired turning power/speed (-1 to +1)
@@ -230,6 +228,7 @@ public class AutoCommon extends LinearOpMode {
                     currentStage = AutoStages.CENTER_AprilTag;
                     break;
                 case CENTER_AprilTag:
+                    targetTagID = 4;
                     centerToTag();
                     sleep(1000);
                     currentStage = AutoStages.DELVER_BACKBOARD;
@@ -458,126 +457,16 @@ public class AutoCommon extends LinearOpMode {
 
 
 
-    public void moveRobotAprilTags(double x, double y, double yaw) {
-        // Calculate wheel powers.
-        double leftFrontPower    =  x -y -yaw;
-        double rightFrontPower   =  x +y +yaw;
-        double leftBackPower     =  x +y -yaw;
-        double rightBackPower    =  x -y +yaw;
-
-        // Normalize wheel powers to be less than 1.0
-        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-        max = Math.max(max, Math.abs(leftBackPower));
-        max = Math.max(max, Math.abs(rightBackPower));
-
-        if (max > 1.0) {
-            leftFrontPower /= max;
-            rightFrontPower /= max;
-            leftBackPower /= max;
-            rightBackPower /= max;
-        }
-
-        // Send powers to the wheels.
-        robot.chassis.FLMotor.setPower(leftFrontPower);
-        robot.chassis.FRMotor.setPower(rightFrontPower);
-        robot.chassis.BLMotor.setPower(leftBackPower);
-        robot.chassis.BRMotor.setPower(rightBackPower);
-    }
-    public void centerOnAprilTag() {
-
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-        for (AprilTagDetection detection : currentDetections) {
-            // Look to see if we have size info on this tag.
-            if (detection.metadata != null) {
-                //  Check to see if we want to track towards this tag.
-                if (detection.id == targetAprilTag) {
-                    // Yes, we want to use this tag.
-                    targetFound = true;
-                    centerTag = detection;
-                    break;  // don't look any further.
-                } else {
-                    // This tag is in the library, but we do not want to track it right now.
-                    telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
-                }
-            } else {
-                // This tag is NOT in the library, so we don't have enough information to track to it.
-                telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
-            }
-        }
-
-        if(targetFound) {
-            double  rangeError      = (centerTag.ftcPose.range - DELIVERY_DISTANCE);
-            double  headingError    = centerTag.ftcPose.bearing;
-            double  yawError        = centerTag.ftcPose.yaw;
-
-            // Use the speed and turn "gains" to calculate how we want the robot to move.
-            drive  = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
-            turn   = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN) ;
-            strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
-
-        }
-        moveRobotAprilTags(drive, strafe, turn);
-    }
-    public void moveYaw(double yaw) {
-        // Calculate wheel powers.
-        double leftFrontPower    =  -yaw;
-        double rightFrontPower   =  +yaw;
-        double leftBackPower     =  -yaw;
-        double rightBackPower    =  +yaw;
-
-        // Normalize wheel powers to be less than 1.0
-        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-        max = Math.max(max, Math.abs(leftBackPower));
-        max = Math.max(max, Math.abs(rightBackPower));
-
-        if (max > 1.0) {
-            leftFrontPower /= max;
-            rightFrontPower /= max;
-            leftBackPower /= max;
-            rightBackPower /= max;
-        }
-
-        // Send powers to the wheels.
-        robot.chassis.FLMotor.setPower(leftFrontPower);
-        robot.chassis.FRMotor.setPower(rightFrontPower);
-        robot.chassis.BLMotor.setPower(leftBackPower);
-        robot.chassis.BRMotor.setPower(rightBackPower);
-    }
-    public void correctYaw(){
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-        for (AprilTagDetection detection : currentDetections) {
-            // Look to see if we have size info on this tag.
-            if (detection.metadata != null) {
-                //  Check to see if the middle tag is detected
-                if (detection.id == 2) {
-                    // Yes, we want to use this middle tag to adjust the yaw
-                    centerTagFound = true;
-                    centerTag = detection;
-                    break;  // don't look any further.
-                } else {
-                    // This tag is in the library, but we do not want to track it right now.
-                    telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
-                }
-            } else {
-                // This tag is NOT in the library, so we don't have enough information to track to it.
-                telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
-            }
-        }
-        if(centerTagFound) {
-            double  yawError        = centerTag.ftcPose.yaw;
-            // Use the speed and turn "gains" to calculate how we want the robot to move.
-            turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
-        }
-        moveYaw(turn);
-    }
     public void centerToTag(){
         double yawError = 0;
-        detect_apriltag();
         debugDetectedAprilTags = debugDetectedAprilTags + "before correction:";
+        centerTag = detect_apriltag(centerTagID);
+        targetTag = detect_apriltag(targetTagID);
 
-        if(centerTagFound) {
+
+        if(centerTag != null) {
             yawError = centerTag.ftcPose.yaw;
-        } else if(targetTagFound) {
+        } else if(targetTag != null) {
             yawError = targetTag.ftcPose.yaw;
         }
         // Use the speed and turn "gains" to calculate how we want the robot to move.
@@ -586,42 +475,45 @@ public class AutoCommon extends LinearOpMode {
         sleep(1000);
         debugDetectedAprilTags = debugDetectedAprilTags + ", after yaw correction:";
 
-        detect_apriltag();
+        targetTag = detect_apriltag(targetTagID);
         robot.chassis.Strafe(DRIVE_SPEED, targetTag.ftcPose.x/2.54);
+        sleep(1000);
+
 
         debugDetectedAprilTags = debugDetectedAprilTags + ", after strafe correction:";
-        detect_apriltag();
+        targetTag = detect_apriltag(targetTagID);
         robot.chassis.Drive(DRIVE_SPEED * 0.5, (int)((targetTag.ftcPose.y/2.54) - DELIVERY_DISTANCE));
         }
 
-    public void detect_apriltag() {
+    public AprilTagDetection detect_apriltag(int IDtoDetect) {
+        boolean foundDetection = false;
         int detect_count = 0;
+        AprilTagDetection detectionResult = null;
         List<AprilTagDetection> currentDetections = null;
         for(int i=0; i<5 ; i++){
             currentDetections = aprilTag.getDetections();
-            detect_count += 1; //Useful for debugging via telemetry.
 
             for (AprilTagDetection detection : currentDetections) {
                 // Look to see if we have size info on the tag.
                 debugDetectedAprilTags = debugDetectedAprilTags + detection.id;
 
-                if (detection.id == centerTagID) {
-                    centerTag = detection;
-                    centerTagFound = true;
-                    if (detection.id == targetTagID);
-                    targetTag = detection;
-                    targetTagFound = true;
-
-                }
-                if(targetTag != null) {
+                if (detection.id == IDtoDetect) {
+                    foundDetection = true;
+                    detectionResult = detection;
                     break;
                 }
-            sleep(500);
             }
+            if(foundDetection) {
+                break;
+            }
+
+                sleep(500);
+            }
+        return detectionResult;
 
         }
 
-    }
+
 
     public void deliverToBackboard(){
         robot.arm.gotoLowPosition();
