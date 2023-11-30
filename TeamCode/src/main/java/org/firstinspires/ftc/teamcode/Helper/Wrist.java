@@ -9,6 +9,7 @@ public class Wrist {
 
     public double WRIST_DELIVERY_POSITION_HIGH = 0.2;
     public double WRIST_DELIVERY_POSITION_LOW = 0.25;
+    public double WRIST_DELIVERY_POSITION_AUTO = 0.3;
     public double WRIST_PICKUP_POSITION = 0.78;
 
 
@@ -36,6 +37,10 @@ public class Wrist {
     public void gotoHighPosition(){
         servo.setPosition(WRIST_DELIVERY_POSITION_HIGH);
     }
+    public void gotoAutoPosition(){
+        servo.setPosition(WRIST_DELIVERY_POSITION_AUTO);
+    }
+
 
 
 }

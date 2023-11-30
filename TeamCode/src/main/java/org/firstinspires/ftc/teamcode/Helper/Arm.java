@@ -16,6 +16,7 @@ public class Arm {
     int currentPosition;
     public int ARM_DELIVERY_POSITION_LOW = -1665;
     public int ARM_DELIVERY_POSITION_HIGH = -1450;
+    public int ARM_DELIVERY_POSITION_AUTO = -2000;
     public int ARM_PICKUP_POSITION = 30;
 //    int slowDown;
 
@@ -63,6 +64,9 @@ public class Arm {
 
     public void gotoHighPosition(){
         this.gotoPosition(ARM_DELIVERY_POSITION_HIGH);
+    }
+    public void gotoAutoPosition(){
+        this.gotoPosition(ARM_DELIVERY_POSITION_AUTO);
     }
 
 }

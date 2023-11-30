@@ -68,10 +68,10 @@ public class AutoCommon extends LinearOpMode {
 
     AprilTagDetection centerTag = null;
     AprilTagDetection targetTag = null;
-    double DELIVERY_DISTANCE = 18; //  this is how close the camera should get to the target (inches)
+    double DELIVERY_DISTANCE = 21; //  this is how close the camera should get to the target (inches)
     //For centering on the AprilTag
     int centerTagID = 5;             // Middle AprilTag
-    int targetTagID = 4;            // Start ID as -1, will be updated in the function.
+    int targetTagID = -1;            // Start ID as -1, will be updated in the function.
     double  drive           = 0;        // Desired forward power/speed (-1 to +1)
     double  strafe          = 0;        // Desired strafe power/speed (-1 to +1)
     double  turn            = 0;        // Desired turning power/speed (-1 to +1)
@@ -111,7 +111,7 @@ public class AutoCommon extends LinearOpMode {
     float turnOffset = 10;
 
     enum AutoStages {DETECT_TE, OUTTAKE, GOTO_BACKBOARD, DETECT_AprilTag, CENTER_AprilTag, DELVER_BACKBOARD_PARK, END_AUTO}
-    AutoStages currentStage = AutoStages.CENTER_AprilTag;
+    AutoStages currentStage = AutoStages.DETECT_TE;
 
     /**
      * Variables to change for different autos.
@@ -209,8 +209,8 @@ public class AutoCommon extends LinearOpMode {
                     currentStage = AutoStages.CENTER_AprilTag;
                     break;
                 case CENTER_AprilTag:
-                    targetTagID = 1;
                     centerToTag();
+//                    CenterToTag_BYR();
                     sleep(1000);
                     currentStage = AutoStages.DELVER_BACKBOARD_PARK;
                     break;
@@ -285,7 +285,7 @@ public class AutoCommon extends LinearOpMode {
                     .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
                     .addProcessors(tfod, aprilTag)
                     .build();
-            setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
+            setManualExposure(200, 250);  // Use low exposure time to reduce motion blur
 
         } else {
             myVisionPortal = new VisionPortal.Builder()
@@ -487,24 +487,30 @@ public class AutoCommon extends LinearOpMode {
         targetTag = detect_apriltag(targetTagID);
 
 
-        if(targetTag != null) {
-            yawError = targetTag.ftcPose.yaw;
-        } else if(centerTag != null) {
+        if(centerTag != null) {
             yawError = centerTag.ftcPose.yaw;
+        } else if(targetTag != null) {
+            yawError = targetTag.ftcPose.yaw;
         }
         // Use the speed and turn "gains" to calculate how we want the robot to move.
         // turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
         robot.chassis.autoTurn((float)-yawError, turnOffsetAprilTag);
         sleep(1000);
         debugDetectedAprilTags = debugDetectedAprilTags + "\n yaw correction:" + -yawError + "tags after after correction:";
-
-        targetTag = detect_apriltag(targetTagID);
+        AprilTagDetection temptargetTag = null;
+        temptargetTag = detect_apriltag(targetTagID);
+        if (temptargetTag !=null){
+            targetTag = temptargetTag;
+        }
         robot.chassis.Strafe(DRIVE_SPEED * 0.5, targetTag.ftcPose.x); //x is in inches.
-        sleep(1000);
+        sleep(500);
 
 
         debugDetectedAprilTags = debugDetectedAprilTags + "\n strafe correction:" + targetTag.ftcPose.x/2.54 + "after correction:";
-        targetTag = detect_apriltag(targetTagID);
+        temptargetTag = detect_apriltag(targetTagID);
+        if (temptargetTag !=null){
+            targetTag = temptargetTag;
+        }
         robot.chassis.Drive(DRIVE_SPEED * 0.5, (int)((targetTag.ftcPose.y/2.54) - DELIVERY_DISTANCE));
         }
 
@@ -608,12 +614,12 @@ public class AutoCommon extends LinearOpMode {
     public void deliverToBackboardAndPark(){
 
         // Swing the arm and wist to low position.
-        robot.arm.gotoLowPosition();
-        robot.wrist.gotoLowPosition();
+        robot.arm.gotoAutoPosition();
+        robot.wrist.gotoAutoPosition();
         sleep(1000);
 
         // Open the gate to deliver one pixel.
-        robot.gate.middle();
+        robot.gate.open();
         sleep(2000);
 
         // Bring the wrist and arm to pickup position.
