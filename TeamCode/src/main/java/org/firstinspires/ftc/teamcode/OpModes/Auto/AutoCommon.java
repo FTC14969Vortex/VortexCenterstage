@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode.OpModes.Auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -68,7 +69,7 @@ public class AutoCommon extends LinearOpMode {
 
     AprilTagDetection centerTag = null;
     AprilTagDetection targetTag = null;
-    double DELIVERY_DISTANCE = 21; //  this is how close the camera should get to the target (inches)
+    double DELIVERY_DISTANCE = 19; //  this is how close the camera should get to the target (inches)
     //For centering on the AprilTag
     int centerTagID = 5;             // Middle AprilTag
     int targetTagID = -1;            // Start ID as -1, will be updated in the function.
@@ -126,6 +127,7 @@ public class AutoCommon extends LinearOpMode {
     public int strafeDistAfterPurPix; //24 inches when starting from the back and 24+72 inches when starting from front.
     public int strafeDistAtBackboard;
     public int strafeDirForParking;
+    public int redOrBlueSide;
 
 
     public void setUniqueParameters(){
@@ -137,6 +139,7 @@ public class AutoCommon extends LinearOpMode {
         turnAngleNearBackstage = 95;
         strafeDistAfterPurPix = 96;
         strafeDistAtBackboard = -39;
+        redOrBlueSide = 1;
         strafeDirForParking = -1;
     }
 
@@ -153,8 +156,6 @@ public class AutoCommon extends LinearOpMode {
         initDoubleVision();
         setUniqueParameters();
         robot.init(hardwareMap);
-//
-
 
         while (!isStarted()) {
             if(opModeInInit()) {
@@ -186,16 +187,36 @@ public class AutoCommon extends LinearOpMode {
                     switch(targetSpikeMark){
                         case 1:
                             outTakeRight();
-//                            strafeDistAtBackboard = -38;
-
+                            //Red Offset
+                            if(redOrBlueSide == 1) {
+                                strafeDistAtBackboard = 30;
+                            }
+                            //Blue
+                            if(redOrBlueSide == -1) {
+                                strafeDistAtBackboard = -38;
+                            }
                             break;
                         case 2:
                             outTakeStraight();
-//                            strafeDistAtBackboard = -36;
+                            //Red Offset
+                            if(redOrBlueSide == 1) {
+                                strafeDistAtBackboard = 36;
+                            }
+                            //Blue Offset
+                            if(redOrBlueSide == 1) {
+                                strafeDistAtBackboard = -36;
+                            }
                             break;
                         case 3:
                             outTakeLeft();
-//                            strafeDistAtBackboard = -44;
+                            //Red Offset
+                            if(redOrBlueSide == 1) {
+                                strafeDistAtBackboard = 38;
+                            }
+                            //Blue
+                            if(redOrBlueSide == -1) {
+                                strafeDistAtBackboard = -30;
+                            }
                             break;
                     }
                     currentStage = AutoStages.GOTO_BACKBOARD;
@@ -463,7 +484,7 @@ public class AutoCommon extends LinearOpMode {
     public void outTakeRight() throws InterruptedException {
         robot.chassis.Drive(DRIVE_SPEED, 27);
         robot.chassis.autoTurn(90, turnOffset);
-        robot.intake.MoveIntake(0.6,true);
+        robot.intake.MoveIntake(0.5,true);
         Thread.sleep(2000);
         robot.intake.MoveIntake(0, true);
         robot.chassis.Drive(DRIVE_SPEED, 1);
@@ -614,6 +635,7 @@ public class AutoCommon extends LinearOpMode {
     public void deliverToBackboardAndPark(){
 
         // Swing the arm and wist to low position.
+        robot.arm.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.arm.gotoAutoPosition();
         robot.wrist.gotoAutoPosition();
         sleep(1000);

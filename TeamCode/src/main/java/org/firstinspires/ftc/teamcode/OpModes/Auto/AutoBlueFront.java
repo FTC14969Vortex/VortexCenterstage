@@ -14,6 +14,8 @@ public class AutoBlueFront extends AutoCommon {
         strafeDistAfterPurPix = 98;
         strafeDistAtBackboard = -39;
         strafeDirForParking = -1;
+        //-1 for blue, 1 for Red
+        redOrBlueSide = -1;
         super.centerTagID = 2;
     }
 

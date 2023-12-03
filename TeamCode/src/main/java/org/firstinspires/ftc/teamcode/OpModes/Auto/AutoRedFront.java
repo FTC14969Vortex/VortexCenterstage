@@ -12,9 +12,11 @@ public class AutoRedFront extends AutoCommon {
         targetAprilTagOffset = 3;
         strafeDirAfterPurPix = 1;
         turnAngleNearBackstage = 95;
-        strafeDistAfterPurPix = 96;
-        strafeDistAtBackboard = 39;
+        strafeDistAfterPurPix = 90;
+        strafeDistAtBackboard = 32;
         strafeDirForParking = 1;
+        //-1 for blue, 1 for Red
+        redOrBlueSide = 1;
         super.centerTagID = 5;
     }
 
