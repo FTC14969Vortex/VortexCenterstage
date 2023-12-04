@@ -25,7 +25,7 @@ public class Teleop extends LinearOpMode {
     double ARM_HOLDING_POWER = 0.1;
 
 
-    double INTAKE_SPEED = 0.7;
+    double INTAKE_SPEED = 1;
 
 
     int timeout_ms = 5000;
@@ -36,7 +36,7 @@ public class Teleop extends LinearOpMode {
     public double fr_power = 0;
     public double br_power = 0;
 
-    public double DRIVETRAIN_SPEED = 0.7;
+    public double DRIVETRAIN_SPEED = 1;
     public double slider_position = 0;
 
 //    //ArmWrist
@@ -163,14 +163,14 @@ public class Teleop extends LinearOpMode {
             if(gamepad2.dpad_up){
                 robot.gate.close();
                 robot.arm.gotoHighPosition();
-                Thread.sleep(500);
+                Thread.sleep(150);
                 robot.wrist.gotoHighPosition();
             }
             //Lower delivery
             if(gamepad2.dpad_left){
                 robot.gate.close();
                 robot.arm.gotoLowPosition();
-                Thread.sleep(500);
+                Thread.sleep(150);
                 robot.wrist.gotoLowPosition();
             }
             //Pickup position

@@ -69,7 +69,7 @@ public class AutoCommon extends LinearOpMode {
 
     AprilTagDetection centerTag = null;
     AprilTagDetection targetTag = null;
-    double DELIVERY_DISTANCE = 19; //  this is how close the camera should get to the target (inches)
+    double DELIVERY_DISTANCE = 21; //  this is how close the camera should get to the target (inches)
     //For centering on the AprilTag
     int centerTagID = 5;             // Middle AprilTag
     int targetTagID = -1;            // Start ID as -1, will be updated in the function.
@@ -188,35 +188,35 @@ public class AutoCommon extends LinearOpMode {
                         case 1:
                             outTakeRight();
                             //Red Offset
-                            if(redOrBlueSide == 1) {
-                                strafeDistAtBackboard = 30;
-                            }
-                            //Blue
-                            if(redOrBlueSide == -1) {
-                                strafeDistAtBackboard = -38;
-                            }
+//                            if(redOrBlueSide == 1) {
+//                                strafeDistAtBackboard = 30;
+//                            }
+//                            //Blue
+//                            if(redOrBlueSide == -1) {
+//                                strafeDistAtBackboard = -38;
+//                            }
                             break;
                         case 2:
                             outTakeStraight();
                             //Red Offset
-                            if(redOrBlueSide == 1) {
-                                strafeDistAtBackboard = 36;
-                            }
-                            //Blue Offset
-                            if(redOrBlueSide == 1) {
-                                strafeDistAtBackboard = -36;
-                            }
+//                            if(redOrBlueSide == 1) {
+//                                strafeDistAtBackboard = 36;
+//                            }
+//                            //Blue Offset
+//                            if(redOrBlueSide == 1) {
+//                                strafeDistAtBackboard = -36;
+//                            }
                             break;
                         case 3:
                             outTakeLeft();
                             //Red Offset
-                            if(redOrBlueSide == 1) {
-                                strafeDistAtBackboard = 38;
-                            }
-                            //Blue
-                            if(redOrBlueSide == -1) {
-                                strafeDistAtBackboard = -30;
-                            }
+//                            if(redOrBlueSide == 1) {
+//                                strafeDistAtBackboard = 38;
+//                            }
+//                            //Blue
+//                            if(redOrBlueSide == -1) {
+//                                strafeDistAtBackboard = -30;
+//                            }
                             break;
                     }
                     currentStage = AutoStages.GOTO_BACKBOARD;
