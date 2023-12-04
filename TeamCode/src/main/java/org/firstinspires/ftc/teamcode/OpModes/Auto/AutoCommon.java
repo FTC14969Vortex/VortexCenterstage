@@ -69,7 +69,7 @@ public class AutoCommon extends LinearOpMode {
 
     AprilTagDetection centerTag = null;
     AprilTagDetection targetTag = null;
-    double DELIVERY_DISTANCE = 19; //  this is how close the camera should get to the target (inches)
+    double DELIVERY_DISTANCE = 21; //  this is how close the camera should get to the target (inches)
     //For centering on the AprilTag
     int centerTagID = 5;             // Middle AprilTag
     int targetTagID = -1;            // Start ID as -1, will be updated in the function.
