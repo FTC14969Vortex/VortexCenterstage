@@ -13,10 +13,11 @@ public class AutoBlueBack extends AutoCommon {
         strafeDirAfterPurPix = -1;
         turnAngleNearBackstage = -93;
         strafeDistAfterPurPix = 27;
-        strafeDistAtBackboard = -39;
+        strafeDistAtBackboard = -34;
         strafeDirForParking = -1;
         //-1 for blue, 1 for Red
         redOrBlueSide = -1;
+        DELIVERY_DISTANCE = 22;
         super.centerTagID = 2;
     }
     

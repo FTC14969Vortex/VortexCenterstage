@@ -69,7 +69,7 @@ public class AutoCommon extends LinearOpMode {
 
     AprilTagDetection centerTag = null;
     AprilTagDetection targetTag = null;
-    double DELIVERY_DISTANCE = 20; //  this is how close the camera should get to the target (inches)
+    double DELIVERY_DISTANCE = 19; //  this is how close the camera should get to the target (inches)
     //For centering on the AprilTag
     int centerTagID = 5;             // Middle AprilTag
     int targetTagID = -1;            // Start ID as -1, will be updated in the function.
@@ -141,6 +141,8 @@ public class AutoCommon extends LinearOpMode {
         strafeDistAtBackboard = -39;
         redOrBlueSide = 1;
         strafeDirForParking = -1;
+        double DELIVERY_DISTANCE = 19; //  this is how close the camera should get to the target (inches)
+
     }
 
 
@@ -473,11 +475,11 @@ public class AutoCommon extends LinearOpMode {
     public void outTakeLeft() throws InterruptedException {
         robot.chassis.Drive(DRIVE_SPEED, 27);
         robot.chassis.autoTurn(-100, turnOffset);
-        robot.intake.MoveIntake(0.6,true);
+        robot.intake.MoveIntake(0.5,true);
         Thread.sleep(2000);
         robot.intake.MoveIntake(0,true);
         robot.chassis.Drive(DRIVE_SPEED, 1);
-        robot.chassis.Strafe(DRIVE_SPEED,35);
+        robot.chassis.Strafe(DRIVE_SPEED,30);
         robot.chassis.autoTurn(95, turnOffset);
 
     }
@@ -488,7 +490,7 @@ public class AutoCommon extends LinearOpMode {
         Thread.sleep(2000);
         robot.intake.MoveIntake(0, true);
         robot.chassis.Drive(DRIVE_SPEED, 1);
-        robot.chassis.Strafe(DRIVE_SPEED, -35);
+        robot.chassis.Strafe(DRIVE_SPEED, -30);
         robot.chassis.autoTurn(-95, turnOffset);
     }
 
