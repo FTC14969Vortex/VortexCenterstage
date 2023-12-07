@@ -36,7 +36,7 @@ public class Teleop extends LinearOpMode {
     public double fr_power = 0;
     public double br_power = 0;
 
-    public double DRIVETRAIN_SPEED = 1;
+    public double DRIVETRAIN_SPEED = 0.5;
     public double slider_position = 0;
 
 //    //ArmWrist
@@ -79,8 +79,15 @@ public class Teleop extends LinearOpMode {
             /**
              * Joystick controls for Drivetrain, Intake on GAMEPAD 1
              */
-
             //Drive train
+
+            //Speed Control
+            if (gamepad1.a){
+                DRIVETRAIN_SPEED = 0.5;
+            }
+            if (gamepad1.b){
+                DRIVETRAIN_SPEED = 1;
+            }
 
             // Controller to motor powers.
             double move_y_axis = gamepad1.left_stick_y;

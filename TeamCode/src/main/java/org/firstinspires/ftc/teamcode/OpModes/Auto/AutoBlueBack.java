@@ -12,7 +12,7 @@ public class AutoBlueBack extends AutoCommon {
         targetAprilTagOffset = 0;
         strafeDirAfterPurPix = -1;
         turnAngleNearBackstage = -93;
-        strafeDistAfterPurPix = 21;
+        strafeDistAfterPurPix = 27;
         strafeDistAtBackboard = -39;
         strafeDirForParking = -1;
         //-1 for blue, 1 for Red
