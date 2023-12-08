@@ -41,6 +41,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainCon
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
@@ -71,7 +72,7 @@ public class AutoCommon extends LinearOpMode {
     AprilTagDetection targetTag = null;
     double DELIVERY_DISTANCE = 19; //  this is how close the camera should get to the target (inches)
     //For centering on the AprilTag
-    int centerTagID = 5;             // Middle AprilTag
+    int centerTagID = 2;             // Middle AprilTag
     int targetTagID = -1;            // Start ID as -1, will be updated in the function.
     double  drive           = 0;        // Desired forward power/speed (-1 to +1)
     double  strafe          = 0;        // Desired strafe power/speed (-1 to +1)
@@ -111,7 +112,7 @@ public class AutoCommon extends LinearOpMode {
     double DRIVE_SPEED = 0.7;
     float turnOffset = 10;
 
-    enum AutoStages {DETECT_TE, OUTTAKE, GOTO_BACKBOARD, DETECT_AprilTag, CENTER_AprilTag, DELVER_BACKBOARD_PARK, END_AUTO}
+    enum AutoStages {DETECT_TE, OUTTAKE, GOTO_BACKBOARD, CENTER_AprilTag, DELVER_BACKBOARD_PARK, END_AUTO}
     AutoStages currentStage = AutoStages.DETECT_TE;
 
     /**
@@ -232,8 +233,8 @@ public class AutoCommon extends LinearOpMode {
                     currentStage = AutoStages.CENTER_AprilTag;
                     break;
                 case CENTER_AprilTag:
-                    centerToTag();
-//                    CenterToTag_BYR();
+                    centerToCenterTag();
+                    //CenterToTag_BYR();
                     sleep(1000);
                     currentStage = AutoStages.DELVER_BACKBOARD_PARK;
                     break;
@@ -245,8 +246,8 @@ public class AutoCommon extends LinearOpMode {
                 case END_AUTO:
                     // End Auto keeps printing debug information via telemetry.
                     telemetry.addData("auto sequence", debugAutoSequence);
-                    telemetry.addData("Target Tag",targetTag.id);
-                    telemetry.addData("Center Tag",centerTag.id);
+//                    telemetry.addData("Target Tag",targetTag.id);
+//                    telemetry.addData("Center Tag",centerTag.id);
                     telemetry.addData("Detection sequence of april tags", debugDetectedAprilTags);
                     telemetry.update();
                     sleep(5000); //5 sec delay between telemetry.
@@ -466,7 +467,7 @@ public class AutoCommon extends LinearOpMode {
      * Methods for driving the robot.
      */
     public void outTakeStraight() throws InterruptedException {
-        robot.chassis.Drive(DRIVE_SPEED,51);
+        robot.chassis.Drive(DRIVE_SPEED,49);
         robot.intake.MoveIntake(0.6,true);
         Thread.sleep(2000);
         robot.intake.MoveIntake(0,true);
@@ -499,7 +500,58 @@ public class AutoCommon extends LinearOpMode {
         robot.chassis.autoTurn(turnAngleNearBackstage, turnOffset);
         robot.chassis.Strafe(DRIVE_SPEED, strafeDistAtBackboard);
     }
+    public void centerToCenterTag(){
+        double yawError = 0;
+        float turnOffsetAprilTag = 5;
+        float edgeOffset = 7;
+        AprilTagDetection tempTag = null;
+        debugDetectedAprilTags = debugDetectedAprilTags + "before correction:";
+        centerTag = detect_apriltag(centerTagID);
 
+
+        if(centerTag != null) {
+            yawError = centerTag.ftcPose.yaw;
+            robot.chassis.autoTurn((float)-yawError, turnOffsetAprilTag);
+            sleep(1000);
+            debugDetectedAprilTags = debugDetectedAprilTags + "\n yaw correction:" + -yawError ;
+        }
+
+        // Use the speed and turn "gains" to calculate how we want the robot to move.
+        // turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+
+
+        tempTag = detect_apriltag(centerTagID);
+        if (tempTag !=null) {
+            centerTag = tempTag; //Update the center tag if detection was successful.
+        }
+
+        double stafeError = centerTag.ftcPose.x;
+        if (targetTagID < centerTagID) {
+            stafeError += -edgeOffset;
+        } else if (targetTagID > centerTagID) {
+            stafeError += edgeOffset;
+        }
+
+        robot.chassis.Strafe(DRIVE_SPEED * 0.5, stafeError); //x is in inches.
+        sleep(500);
+
+        debugDetectedAprilTags = debugDetectedAprilTags + "\n strafe correction:" + stafeError;
+
+
+        tempTag = detect_apriltag(targetTagID);
+        if (tempTag != null) {
+            centerTag  = tempTag;
+        }
+        double rangeError = centerTag.ftcPose.y/2.54 - DELIVERY_DISTANCE;
+
+        robot.chassis.Drive(DRIVE_SPEED * 0.5, (float)rangeError);
+
+        debugDetectedAprilTags = debugDetectedAprilTags + "\n range correction:" + rangeError;
+
+
+        sleep(500);
+
+    }
 
 
     public void centerToTag(){
@@ -517,8 +569,11 @@ public class AutoCommon extends LinearOpMode {
         }
         // Use the speed and turn "gains" to calculate how we want the robot to move.
         // turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
-        robot.chassis.autoTurn((float)-yawError, turnOffsetAprilTag);
-        sleep(1000);
+        if (yawError != 0){
+            robot.chassis.autoTurn((float)-yawError, turnOffsetAprilTag);
+            sleep(1000);
+        }
+
         debugDetectedAprilTags = debugDetectedAprilTags + "\n yaw correction:" + -yawError + "tags after after correction:";
         AprilTagDetection temptargetTag = null;
         temptargetTag = detect_apriltag(targetTagID);
@@ -591,7 +646,7 @@ public class AutoCommon extends LinearOpMode {
                 // Look to see if we have size info on this tag.
                 if (detection.metadata != null) {
                     //  Check to see if we want to track towards this tag.
-                    if ((targetTagID < 0) || (detection.id == targetTagID)) {
+                    if (detection.id == targetTagID) {
                         // Yes, we want to use this tag.
                         targetFound = true;
                         targetTag = detection;
