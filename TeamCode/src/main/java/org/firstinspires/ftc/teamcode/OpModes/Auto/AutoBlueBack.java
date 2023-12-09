@@ -17,8 +17,7 @@ public class AutoBlueBack extends AutoCommon {
         strafeDirForParking = -1;
         //-1 for blue, 1 for Red
         redOrBlueSide = -1;
-        DELIVERY_DISTANCE = 19;
-        super.centerTagID = 2;
+        centerTagID = 2;
     }
     
 }

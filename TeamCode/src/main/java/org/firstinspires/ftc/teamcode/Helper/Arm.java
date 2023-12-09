@@ -16,7 +16,7 @@ public class Arm {
     int currentPosition;
     public int ARM_DELIVERY_POSITION_LOW = -1665;
     public int ARM_DELIVERY_POSITION_HIGH = -1450;
-    public int ARM_DELIVERY_POSITION_AUTO = -1700;
+    public int ARM_DELIVERY_POSITION_AUTO = -1850;
     public int ARM_PICKUP_POSITION = 30;
 //    int slowDown;
 
