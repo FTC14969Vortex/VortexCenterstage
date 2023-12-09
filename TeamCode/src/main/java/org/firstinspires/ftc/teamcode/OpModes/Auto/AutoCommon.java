@@ -41,7 +41,6 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainCon
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
@@ -72,8 +71,8 @@ public class AutoCommon extends LinearOpMode {
     AprilTagDetection targetTag = null;
     double DELIVERY_DISTANCE = 19; //  this is how close the camera should get to the target (inches)
     //For centering on the AprilTag
-    int centerTagID = 2;             // Middle AprilTag
-    int targetTagID = -1;            // Start ID as -1, will be updated in the function.
+    int centerTagID = 5;             // Middle AprilTag
+    int targetTagID = 6;            // Start ID as -1, will be updated in the function.
     double  drive           = 0;        // Desired forward power/speed (-1 to +1)
     double  strafe          = 0;        // Desired strafe power/speed (-1 to +1)
     double  turn            = 0;        // Desired turning power/speed (-1 to +1)
@@ -113,7 +112,7 @@ public class AutoCommon extends LinearOpMode {
     float turnOffset = 10;
 
     enum AutoStages {DETECT_TE, OUTTAKE, GOTO_BACKBOARD, CENTER_AprilTag, DELVER_BACKBOARD_PARK, END_AUTO}
-    AutoStages currentStage = AutoStages.DETECT_TE;
+    AutoStages currentStage = AutoStages.CENTER_AprilTag;
 
     /**
      * Variables to change for different autos.
@@ -189,7 +188,7 @@ public class AutoCommon extends LinearOpMode {
 
                     switch(targetSpikeMark){
                         case 1:
-                            outTakeRight();
+                            outTake14();
                             //Red Offset
 //                            if(redOrBlueSide == 1) {
 //                                strafeDistAtBackboard = 30;
@@ -200,7 +199,7 @@ public class AutoCommon extends LinearOpMode {
 //                            }
                             break;
                         case 2:
-                            outTakeStraight();
+                            outTake25();
                             //Red Offset
 //                            if(redOrBlueSide == 1) {
 //                                strafeDistAtBackboard = 36;
@@ -211,7 +210,7 @@ public class AutoCommon extends LinearOpMode {
 //                            }
                             break;
                         case 3:
-                            outTakeLeft();
+                            outTake36();
                             //Red Offset
 //                            if(redOrBlueSide == 1) {
 //                                strafeDistAtBackboard = 38;
@@ -233,9 +232,8 @@ public class AutoCommon extends LinearOpMode {
                     currentStage = AutoStages.CENTER_AprilTag;
                     break;
                 case CENTER_AprilTag:
-                    centerToCenterTag();
+                    centerToTag();
                     //CenterToTag_BYR();
-                    sleep(1000);
                     currentStage = AutoStages.DELVER_BACKBOARD_PARK;
                     break;
                 case DELVER_BACKBOARD_PARK:
@@ -466,33 +464,36 @@ public class AutoCommon extends LinearOpMode {
     /**
      * Methods for driving the robot.
      */
-    public void outTakeStraight() throws InterruptedException {
-        robot.chassis.Drive(DRIVE_SPEED,49);
-        robot.intake.MoveIntake(0.6,true);
+    public void outTake25() throws InterruptedException {
+        robot.chassis.Drive(DRIVE_SPEED,48);
+        robot.intake.MoveIntake(0.4,true);
         Thread.sleep(2000);
         robot.intake.MoveIntake(0,true);
+        robot.chassis.Drive(DRIVE_SPEED, 2);
     }
 
-    public void outTakeLeft() throws InterruptedException {
+    public void outTake36() throws InterruptedException {
         robot.chassis.Drive(DRIVE_SPEED, 27);
-        robot.chassis.autoTurn(-100, turnOffset);
-        robot.intake.MoveIntake(0.5,true);
+        robot.chassis.autoTurn(-93, turnOffset);
+        robot.chassis.Drive(DRIVE_SPEED, 3);
+        robot.intake.MoveIntake(0.4,true);
         Thread.sleep(2000);
         robot.intake.MoveIntake(0,true);
-        robot.chassis.Drive(DRIVE_SPEED, 1);
+        robot.chassis.Drive(DRIVE_SPEED, -2);
         robot.chassis.Strafe(DRIVE_SPEED,30);
-        robot.chassis.autoTurn(95, turnOffset);
+        robot.chassis.autoTurn(93, turnOffset);
 
     }
-    public void outTakeRight() throws InterruptedException {
+    public void outTake14() throws InterruptedException {
         robot.chassis.Drive(DRIVE_SPEED, 27);
-        robot.chassis.autoTurn(90, turnOffset);
-        robot.intake.MoveIntake(0.5,true);
+        robot.chassis.autoTurn(93, turnOffset);
+        robot.chassis.Drive(DRIVE_SPEED, 3);
+        robot.intake.MoveIntake(0.4,true);
         Thread.sleep(2000);
         robot.intake.MoveIntake(0, true);
-        robot.chassis.Drive(DRIVE_SPEED, 1);
+        robot.chassis.Drive(DRIVE_SPEED, -3);
         robot.chassis.Strafe(DRIVE_SPEED, -30);
-        robot.chassis.autoTurn(-95, turnOffset);
+        robot.chassis.autoTurn(-93, turnOffset);
     }
 
     public void gotoBackBoard(int strafeDirAfterPurPix, int strafeDistAfterPurPix, int turnAngleNearBackstage, int strafeDistAtBackboard) throws InterruptedException {
@@ -503,7 +504,7 @@ public class AutoCommon extends LinearOpMode {
     public void centerToCenterTag(){
         double yawError = 0;
         float turnOffsetAprilTag = 5;
-        float edgeOffset = 7;
+        float edgeOffset = 7 ;
         AprilTagDetection tempTag = null;
         debugDetectedAprilTags = debugDetectedAprilTags + "before correction:";
         centerTag = detect_apriltag(centerTagID);
@@ -511,8 +512,11 @@ public class AutoCommon extends LinearOpMode {
 
         if(centerTag != null) {
             yawError = centerTag.ftcPose.yaw;
-            robot.chassis.autoTurn((float)-yawError, turnOffsetAprilTag);
-            sleep(1000);
+            if (yawError != 0){
+                robot.chassis.autoTurn((float)-yawError, turnOffsetAprilTag);
+                sleep(1000);
+            }
+
             debugDetectedAprilTags = debugDetectedAprilTags + "\n yaw correction:" + -yawError ;
         }
 
@@ -533,7 +537,7 @@ public class AutoCommon extends LinearOpMode {
         }
 
         robot.chassis.Strafe(DRIVE_SPEED * 0.5, stafeError); //x is in inches.
-        sleep(500);
+        sleep(1000);
 
         debugDetectedAprilTags = debugDetectedAprilTags + "\n strafe correction:" + stafeError;
 
@@ -549,7 +553,7 @@ public class AutoCommon extends LinearOpMode {
         debugDetectedAprilTags = debugDetectedAprilTags + "\n range correction:" + rangeError;
 
 
-        sleep(500);
+        sleep(1000);
 
     }
 
