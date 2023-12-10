@@ -7,10 +7,10 @@ public class Wrist {
     public Servo servo;
     public double TARGET_POSITION;
 
-    public double WRIST_DELIVERY_POSITION_HIGH = 0.22;
-    public double WRIST_DELIVERY_POSITION_LOW = 0.28;
-    public double WRIST_DELIVERY_POSITION_AUTO = 0.32;
-    public double WRIST_PICKUP_POSITION = 0.8;
+    public double WRIST_DELIVERY_POSITION_HIGH = 0.285;
+    public double WRIST_DELIVERY_POSITION_LOW = 0.36;
+    public double WRIST_DELIVERY_POSITION_AUTO = 0.4;
+    public double WRIST_PICKUP_POSITION = 0.85;
 
 
     HardwareMap hwMap = null;

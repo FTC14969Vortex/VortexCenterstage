@@ -11,9 +11,9 @@ public class AutoBlueBack extends AutoCommon {
         // Specific values for AutoBlueFront
         targetAprilTagOffset = 0;
         strafeDirAfterPurPix = -1;
-        turnAngleNearBackstage = -93;
-        strafeDistAfterPurPix = 28;
-        strafeDistAtBackboard = -36;
+        turnAngleNearBackstage = -100;
+        strafeDistAfterPurPix = 24;
+        strafeDistAtBackboard = -37;
         strafeDirForParking = -1;
         //-1 for blue, 1 for Red
         redOrBlueSide = -1;

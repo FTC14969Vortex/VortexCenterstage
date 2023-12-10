@@ -229,6 +229,7 @@ public class AutoCommon extends LinearOpMode {
                      * Step 3: Drive to Backstage.
                      *
                      */
+                    sleep(4000);
                     gotoBackBoard(strafeDirAfterPurPix, strafeDistAfterPurPix, turnAngleNearBackstage, strafeDistAtBackboard);
                     currentStage = AutoStages.CENTER_AprilTag;
                     break;
@@ -306,7 +307,7 @@ public class AutoCommon extends LinearOpMode {
                     .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
                     .addProcessors(tfod, aprilTag)
                     .build();
-            setManualExposure(200, 250);  // Use low exposure time to reduce motion blur
+            setManualExposure(50, 250);  // Use low exposure time to reduce motion blur
 
         } else {
             myVisionPortal = new VisionPortal.Builder()
@@ -491,7 +492,7 @@ public class AutoCommon extends LinearOpMode {
         robot.intake.MoveIntake(0, true);
         robot.chassis.Drive(DRIVE_SPEED, -3);
         robot.chassis.Strafe(DRIVE_SPEED, -30);
-        robot.chassis.autoTurn(-93, turnOffset);
+        robot.chassis.autoTurn(-90, turnOffset);
     }
 
     public void gotoBackBoard(int strafeDirAfterPurPix, int strafeDistAfterPurPix, int turnAngleNearBackstage, int strafeDistAtBackboard) throws InterruptedException {
@@ -594,20 +595,20 @@ public class AutoCommon extends LinearOpMode {
         robot.arm.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.arm.gotoAutoPosition();
         robot.wrist.gotoAutoPosition();
-        sleep(500);
+        sleep(1000);
 
         // Open the gate to deliver one pixel.
         robot.gate.open();
-        sleep(1000);
+        sleep(2000);
 
         // Bring the wrist and arm to pickup position.
         robot.wrist.gotoPickupPosition();
+        sleep(850);
         robot.arm.gotoPickupPosoition();
-        sleep(500);
 
         // Park.
         robot.chassis.Strafe(DRIVE_SPEED, 3 - targetSpikeMark * 6 + 24);
-        robot.chassis.Drive(DRIVE_SPEED, 6);
+        robot.chassis.Drive(DRIVE_SPEED, 9);
     }
 
 

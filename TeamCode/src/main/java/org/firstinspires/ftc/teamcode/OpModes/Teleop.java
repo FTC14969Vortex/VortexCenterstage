@@ -188,6 +188,13 @@ public class Teleop extends LinearOpMode {
                 robot.arm.gotoPickupPosoition();
             }
 
+            if(gamepad2.dpad_right){
+                robot.wrist.gotoAutoPosition();
+                robot.gate.open();
+                Thread.sleep(850);
+                robot.arm.gotoAutoPosition();
+            }
+
 
 
 //          T E L E M E T R Y
