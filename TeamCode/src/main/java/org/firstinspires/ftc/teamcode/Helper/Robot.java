@@ -3,10 +3,6 @@ package org.firstinspires.ftc.teamcode.Helper;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import org.firstinspires.ftc.vision.tfod.TfodProcessor;
-
 //Related to IMU
 
 
@@ -47,6 +43,8 @@ public class Robot {
 
     public Gate gate = new Gate();
 
+    public Drone drone = new Drone();
+
 
     /* local OpMode members. */
     //Init hardware map
@@ -65,5 +63,6 @@ public class Robot {
         wrist.init(hwMap);
         //slider.init(hwMap);
         gate.init(hwMap);
+        drone.init(hwMap);
     }
 }

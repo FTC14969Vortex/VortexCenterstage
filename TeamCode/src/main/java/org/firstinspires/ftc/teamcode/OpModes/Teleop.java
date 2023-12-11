@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 //imports
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.Helper.Intake;
 import org.firstinspires.ftc.teamcode.Helper.Robot;
 
 @TeleOp(name = "CenterStageTeleOp", group = "TeleOp")
@@ -150,6 +150,7 @@ public class Teleop extends LinearOpMode {
 //            if(slider_position>1){
 //                slider_position = 1;
 //            }
+//            }
            // robot.slider.servo.setPosition(slider_position);
 
 
@@ -193,6 +194,12 @@ public class Teleop extends LinearOpMode {
                 robot.gate.open();
                 Thread.sleep(850);
                 robot.arm.gotoAutoPosition();
+            }
+
+            if(gamepad2.left_bumper){
+                robot.drone.Unlatched();
+                Thread.sleep(1000);
+                robot.drone.Latched();
             }
 
 
