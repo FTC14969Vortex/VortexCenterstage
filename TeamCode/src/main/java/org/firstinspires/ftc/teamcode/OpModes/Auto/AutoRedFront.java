@@ -13,7 +13,7 @@ public class AutoRedFront extends AutoCommon {
         strafeDirAfterPurPix = 1;
         turnAngleNearBackstage = 95;
         strafeDistAfterPurPix = 92;
-        strafeDistAtBackboard = 20;
+        strafeDistAtBackboard = -20;
         strafeDirForParking = 1;
         //-1 for blue, 1 for Red
         redOrBlueSide = 1;

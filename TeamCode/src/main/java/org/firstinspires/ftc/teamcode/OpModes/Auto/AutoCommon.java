@@ -478,8 +478,9 @@ public class AutoCommon extends LinearOpMode {
         Thread.sleep(2000);
         robot.intake.MoveIntake(0, true);
         robot.chassis.Drive(DRIVE_SPEED, -2);
-        robot.chassis.Strafe(DRIVE_SPEED, 30);
         robot.chassis.autoTurn(93, turnOffset);
+        robot.chassis.Drive(DRIVE_SPEED, -30);
+
 
     }
 
@@ -491,8 +492,8 @@ public class AutoCommon extends LinearOpMode {
         Thread.sleep(2000);
         robot.intake.MoveIntake(0, true);
         robot.chassis.Drive(DRIVE_SPEED, -3);
-        robot.chassis.Strafe(DRIVE_SPEED, -30);
         robot.chassis.autoTurn(-90, turnOffset);
+        robot.chassis.Drive(DRIVE_SPEED, -30);
     }
 
     public void gotoBackBoard(int strafeDirAfterPurPix, int strafeDistAfterPurPix, int turnAngleNearBackstage, int strafeDistAtBackboard) throws InterruptedException {

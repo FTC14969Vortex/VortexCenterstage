@@ -12,7 +12,7 @@ public class AutoBlueFront extends AutoCommon {
         strafeDirAfterPurPix = -1;
         turnAngleNearBackstage = -95;
         strafeDistAfterPurPix = 90;
-        strafeDistAtBackboard = -30;
+        strafeDistAtBackboard = 30;
         strafeDirForParking = -1;
         //-1 for blue, 1 for Red
         redOrBlueSide = -1;
