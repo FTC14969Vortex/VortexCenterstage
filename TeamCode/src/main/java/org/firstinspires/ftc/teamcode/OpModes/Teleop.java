@@ -198,7 +198,8 @@ public class Teleop extends LinearOpMode {
 
             if(gamepad2.left_bumper){
                 robot.drone.Unlatched();
-                Thread.sleep(1000);
+            }
+            if(gamepad2.right_bumper) {
                 robot.drone.Latched();
             }
 

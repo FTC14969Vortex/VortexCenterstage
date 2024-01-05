@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Helper;
 
+import android.graphics.Path;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -7,8 +9,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Drone {
     public Servo servo;
 
-    public double Open = 0.8;
-    public double Close = 0;
+    public double Open = 0.92;
+    public double Close = 0.87;
 
     HardwareMap hwMap = null;
 
@@ -16,13 +18,17 @@ public class Drone {
 
         hwMap = ahwMap;
         servo = hwMap.get(Servo.class, "Drone");
-        servo.setDirection(Servo.Direction.FORWARD);
+        servo.setDirection(Servo.Direction.REVERSE);
     }
 
-    public void Unlatched() {servo.setPosition(Open);}
+    public void Unlatched() {
+        servo.setPosition(Open);
+    }
 
 
-    public void Latched() {servo.setPosition(Close);}
+    public void Latched() {
+        servo.setPosition(Close);
+    }
 
 
 }
