@@ -131,12 +131,13 @@ public class Teleop extends LinearOpMode {
              * Joystick controls for Slider, Arm, Wrist, Gate on GAMEPAD 2
              */
 
+            if(!gamepad2.dpad_up || !gamepad2.dpad_down || !gamepad2.dpad_right || !gamepad2.dpad_left) {
+                double swing_arm_power = gamepad2.left_stick_y * 0.6 + 0.05;
+                // Running without encoder allows the arm to be swung from current position.
+                robot.arm.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                robot.arm.motor.setPower(swing_arm_power);
+            }
 
-            // Arm
-            double swing_arm_power = gamepad2.left_stick_y * 0.6 + 0.05;
-            // Running without encoder allows the arm to be swung from current position.
-            robot.arm.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.arm.motor.setPower(swing_arm_power);
 
 
             // Slider

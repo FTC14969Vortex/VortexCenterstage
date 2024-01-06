@@ -33,20 +33,22 @@ public class Arm {
 
 // ARM WITH BUTTONS V2
     public void gotoPosition(int targetPosition) {
-        ElapsedTime runtime = new ElapsedTime();
-        timeout_ms = 3000;
+//        ElapsedTime runtime = new ElapsedTime();
+//        timeout_ms = 3000;
         currentPosition = motor.getCurrentPosition();
         motor.setTargetPosition(targetPosition);
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         speed = speed * java.lang.Math.signum(targetPosition - currentPosition);
 ////        //Set the power of the motor.
         motor.setPower(speed);
-        runtime.reset();
 
-        while ((runtime.milliseconds() < timeout_ms) && (motor.isBusy())) {
-        }
+        //used to stop the override of joystick
+//        runtime.reset();
+//
+//        while ((runtime.milliseconds() < timeout_ms) && (motor.isBusy())) {
+//        }
+        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motor.setPower(0); //Holding power.
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
