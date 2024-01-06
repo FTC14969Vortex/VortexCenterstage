@@ -37,22 +37,7 @@ public class Teleop extends LinearOpMode {
     public double br_power = 0;
 
     public double DRIVETRAIN_SPEED = 0.5;
-    public double slider_position = 0;
 
-//    //ArmWrist
-//    public void DeliverPosition() {
-//        robot.arm.swingUp();
-//        //robot.arm.motor.setPower(armHoldingPower);
-//        robot.wrist.Deliver();
-//        //robot.wrist.servo.setPosition(WristHoldingPower);
-//
-//    }
-//    public void DefaultPosition() {
-//        robot.arm.motor.setPower(0);
-//        robot.arm.swingDown();
-//        robot.wrist.Default();
-//        robot.wrist.servo.setPosition(0);
-//    }
 
     @Override
     public void runOpMode() throws InterruptedException{
@@ -131,10 +116,10 @@ public class Teleop extends LinearOpMode {
              * Joystick controls for Slider, Arm, Wrist, Gate on GAMEPAD 2
              */
 
-            if(!gamepad2.dpad_up || !gamepad2.dpad_down || !gamepad2.dpad_right || !gamepad2.dpad_left) {
-                double swing_arm_power = gamepad2.left_stick_y * 0.6 + 0.05;
+            double swing_arm_power = gamepad2.left_stick_y * 0.6 + 0.05;
+
+            if(robot.arm.motor.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
                 // Running without encoder allows the arm to be swung from current position.
-                robot.arm.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 robot.arm.motor.setPower(swing_arm_power);
             }
 
@@ -172,6 +157,7 @@ public class Teleop extends LinearOpMode {
             if(gamepad2.dpad_up){
                 robot.gate.close();
                 robot.arm.gotoHighPosition();
+                robot.arm.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 Thread.sleep(150);
                 robot.wrist.gotoHighPosition();
             }
@@ -179,6 +165,7 @@ public class Teleop extends LinearOpMode {
             if(gamepad2.dpad_left){
                 robot.gate.close();
                 robot.arm.gotoLowPosition();
+                robot.arm.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 Thread.sleep(150);
                 robot.wrist.gotoLowPosition();
             }
@@ -188,6 +175,7 @@ public class Teleop extends LinearOpMode {
                 robot.gate.open();
                 Thread.sleep(850);
                 robot.arm.gotoPickupPosoition();
+                robot.arm.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             }
 
             if(gamepad2.dpad_right){
@@ -195,6 +183,7 @@ public class Teleop extends LinearOpMode {
                 robot.gate.open();
                 Thread.sleep(850);
                 robot.arm.gotoAutoPosition();
+                robot.arm.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             }
 
             if(gamepad2.left_bumper){

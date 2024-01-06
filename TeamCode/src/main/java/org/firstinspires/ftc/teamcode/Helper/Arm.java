@@ -35,24 +35,16 @@ public class Arm {
     public void gotoPosition(int targetPosition) {
 //        ElapsedTime runtime = new ElapsedTime();
 //        timeout_ms = 3000;
+        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         currentPosition = motor.getCurrentPosition();
         motor.setTargetPosition(targetPosition);
-        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
         speed = speed * java.lang.Math.signum(targetPosition - currentPosition);
 ////        //Set the power of the motor.
         motor.setPower(speed);
 
-        //used to stop the override of joystick
-//        runtime.reset();
-//
-//        while ((runtime.milliseconds() < timeout_ms) && (motor.isBusy())) {
-//        }
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motor.setPower(0); //Holding power.
-        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-
     }
 
     public void gotoPickupPosoition(){
