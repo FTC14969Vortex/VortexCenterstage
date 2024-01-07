@@ -463,11 +463,12 @@ public class AutoCommon extends LinearOpMode {
      * Methods for driving the robot.
      */
     public void outTake25() throws InterruptedException {
-        robot.chassis.Drive(DRIVE_SPEED, 48);
+        robot.chassis.Drive(DRIVE_SPEED, 36);
+        robot.chassis.autoTurn(180, turnOffset);
         robot.intake.MoveIntake(0.4, true);
         Thread.sleep(2000);
         robot.intake.MoveIntake(0, true);
-        robot.chassis.Drive(DRIVE_SPEED, 2);
+        robot.chassis.Drive(DRIVE_SPEED, -30);
     }
 
     public void outTake36() throws InterruptedException {
