@@ -307,7 +307,12 @@ public class AutoCommon extends LinearOpMode {
                     .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
                     .addProcessors(tfod, aprilTag)
                     .build();
-            setManualExposure(50, 250);  // Use low exposure time to reduce motion blur
+
+            //Competition exposure
+//            setManualExposure(50, 250);  // Use low exposure time to reduce motion blur
+
+            //Garage Exposure
+            setManualExposure(200, 250);
 
         } else {
             myVisionPortal = new VisionPortal.Builder()
@@ -463,36 +468,40 @@ public class AutoCommon extends LinearOpMode {
      * Methods for driving the robot.
      */
     public void outTake25() throws InterruptedException {
-        robot.chassis.Drive(DRIVE_SPEED, 48);
+        robot.chassis.Drive(DRIVE_SPEED, 23);
+        robot.chassis.autoTurn(175, turnOffset);
         robot.intake.MoveIntake(0.4, true);
         Thread.sleep(2000);
         robot.intake.MoveIntake(0, true);
-        robot.chassis.Drive(DRIVE_SPEED, 2);
+        robot.chassis.Drive(DRIVE_SPEED, 23);
     }
 
     public void outTake36() throws InterruptedException {
         robot.chassis.Drive(DRIVE_SPEED, 27);
-        robot.chassis.autoTurn(-93, turnOffset);
+        robot.chassis.autoTurn(-100, turnOffset);
         robot.chassis.Drive(DRIVE_SPEED, 3);
         robot.intake.MoveIntake(0.4, true);
         Thread.sleep(2000);
         robot.intake.MoveIntake(0, true);
         robot.chassis.Drive(DRIVE_SPEED, -2);
-        robot.chassis.Strafe(DRIVE_SPEED, 30);
-        robot.chassis.autoTurn(93, turnOffset);
+        robot.chassis.Strafe(DRIVE_SPEED, -23);
+        robot.chassis.autoTurn(-100, turnOffset);
+
+
 
     }
 
     public void outTake14() throws InterruptedException {
         robot.chassis.Drive(DRIVE_SPEED, 27);
-        robot.chassis.autoTurn(93, turnOffset);
+        robot.chassis.autoTurn(100, turnOffset);
         robot.chassis.Drive(DRIVE_SPEED, 3);
         robot.intake.MoveIntake(0.4, true);
         Thread.sleep(2000);
         robot.intake.MoveIntake(0, true);
         robot.chassis.Drive(DRIVE_SPEED, -3);
-        robot.chassis.Strafe(DRIVE_SPEED, -30);
-        robot.chassis.autoTurn(-90, turnOffset);
+        robot.chassis.Strafe(DRIVE_SPEED, 21);
+        robot.chassis.autoTurn(100, turnOffset);
+
     }
 
     public void gotoBackBoard(int strafeDirAfterPurPix, int strafeDistAfterPurPix, int turnAngleNearBackstage, int strafeDistAtBackboard) throws InterruptedException {
@@ -607,7 +616,7 @@ public class AutoCommon extends LinearOpMode {
         robot.arm.gotoPickupPosoition();
 
         // Park.
-        robot.chassis.Strafe(DRIVE_SPEED, 3 - targetSpikeMark * 6 + 24);
+        robot.chassis.Strafe(DRIVE_SPEED, 3 - targetSpikeMark * 6 - 24);
         robot.chassis.Drive(DRIVE_SPEED, 9);
     }
 
