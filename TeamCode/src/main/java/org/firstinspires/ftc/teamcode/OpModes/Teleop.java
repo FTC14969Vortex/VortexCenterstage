@@ -170,6 +170,7 @@ public class Teleop extends LinearOpMode {
             //Higher Delivery
             if(gamepad2.dpad_up){
                 robot.gate.close();
+                robot.chassis.stopDriveMotors();
                 robot.arm.gotoHighPosition();
                 Thread.sleep(150);
                 robot.wrist.gotoHighPosition();
@@ -177,6 +178,7 @@ public class Teleop extends LinearOpMode {
             //Lower delivery
             if(gamepad2.dpad_left){
                 robot.gate.close();
+                robot.chassis.stopDriveMotors();
                 robot.arm.gotoLowPosition();
                 Thread.sleep(150);
                 robot.wrist.gotoLowPosition();
@@ -186,6 +188,7 @@ public class Teleop extends LinearOpMode {
                 robot.wrist.gotoPickupPosition();
                 robot.gate.open();
                 Thread.sleep(850);
+                robot.chassis.stopDriveMotors();
                 robot.arm.gotoPickupPosoition();
             }
 
@@ -193,6 +196,7 @@ public class Teleop extends LinearOpMode {
                 robot.wrist.gotoAutoPosition();
                 robot.gate.open();
                 Thread.sleep(850);
+                robot.chassis.stopDriveMotors();
                 robot.arm.gotoAutoPosition();
             }
 
