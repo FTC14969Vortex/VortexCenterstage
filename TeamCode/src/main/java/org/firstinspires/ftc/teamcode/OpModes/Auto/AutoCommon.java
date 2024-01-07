@@ -35,7 +35,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 
 import org.firstinspires.ftc.teamcode.Helper.Robot;
-import org.firstinspires.ftc.teamcode.Helper.AutoVision;
 
 
 @Autonomous(name = "AutoCommon", group = "Auto")
