@@ -210,12 +210,12 @@ public class AutoCommon extends LinearOpMode {
             robot.chassis.autoTurn(-100, TURN_OFFSET);
         } else {
             robot.chassis.Drive(DRIVE_SPEED, 27);
-            robot.chassis.autoTurn(-93, TURN_OFFSET);
+            robot.chassis.autoTurn(-100, TURN_OFFSET);
             robot.chassis.Drive(DRIVE_SPEED, 3);
             robot.intake.MoveIntake(0.4, true);
             Thread.sleep(2000);
             robot.intake.MoveIntake(0, true);
-            robot.chassis.Drive(DRIVE_SPEED, -2);
+            robot.chassis.Drive(DRIVE_SPEED, 0);
             robot.chassis.Strafe(DRIVE_SPEED, 30);
             robot.chassis.autoTurn(93, TURN_OFFSET);
         }
@@ -241,7 +241,7 @@ public class AutoCommon extends LinearOpMode {
             robot.intake.MoveIntake(0, true);
             robot.chassis.Drive(DRIVE_SPEED, -3);
             robot.chassis.Strafe(DRIVE_SPEED, -30);
-            robot.chassis.autoTurn(-90, TURN_OFFSET);
+            robot.chassis.autoTurn(-95, TURN_OFFSET);
         }
     }
 
