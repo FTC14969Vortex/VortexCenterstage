@@ -35,6 +35,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 
 import org.firstinspires.ftc.teamcode.Helper.Robot;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 
 @Autonomous(name = "AutoCommon", group = "Auto")
@@ -104,9 +105,10 @@ public class AutoCommon extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         // Initialize
-        vision.initDoubleVision();
-        setUniqueParameters();
         robot.init(hardwareMap);
+        vision.initDoubleVision(hardwareMap);
+        setUniqueParameters();
+
 
         while (!isStarted()) {
             if (opModeInInit()) {
@@ -157,7 +159,7 @@ public class AutoCommon extends LinearOpMode {
                     currentStage = AutoStages.CENTER_AprilTag;
                     break;
                 case CENTER_AprilTag:
-                    vision.centerToCenterTag();
+                    centerToCenterTag();
                     currentStage = AutoStages.DELVER_BACKBOARD_PARK;
                     break;
                 case DELVER_BACKBOARD_PARK:
@@ -222,7 +224,7 @@ public class AutoCommon extends LinearOpMode {
     public void outtakeToMark1And4() throws InterruptedException {
         if(USE_NEW_PATH) {
             robot.chassis.Drive(DRIVE_SPEED, 27);
-            robot.chassis.autoTurn(100, TURN_OFFSET);
+            robot.chassis.autoTurn(90, TURN_OFFSET);
             robot.chassis.Drive(DRIVE_SPEED, 3);
             robot.intake.MoveIntake(0.4, true);
             Thread.sleep(2000);
@@ -267,7 +269,58 @@ public class AutoCommon extends LinearOpMode {
         robot.arm.gotoPickupPosoition();
 
         // Park.
-        robot.chassis.Strafe(DRIVE_SPEED, 3 - vision.TARGET_SPIKE_MARK * 6 + (24*STRAFE_DIRECTION_FOR_PARKING));
+        robot.chassis.Strafe(DRIVE_SPEED, 3 - vision.TARGET_SPIKE_MARK * 6 + (20*STRAFE_DIRECTION_FOR_PARKING));
         robot.chassis.Drive(DRIVE_SPEED, 9);
     }
+
+
+    public void centerToCenterTag() {
+        double yawError = 0;
+        float turnOffsetAprilTag = 0;
+        double edgeOffset = 7;
+        AprilTagDetection tempTag = null;
+        vision.centerTag = vision.detect_apriltag(vision.CENTER_TAG_ID);
+
+        if (vision.centerTag != null) {
+            yawError = vision.centerTag.ftcPose.yaw;
+            if (yawError != 0) {
+                robot.chassis.autoTurn((float) -yawError, turnOffsetAprilTag);
+                sleep(500);
+            }
+        }
+
+        // Use the speed and turn "gains" to calculate how we want the robot to move.
+        // turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+
+
+        tempTag = vision.detect_apriltag(vision.CENTER_TAG_ID);
+        if (tempTag != null) {
+            vision.centerTag = tempTag; //Update the center tag if detection was successful.
+        }
+
+        double strafeError = vision.centerTag.ftcPose.x;
+        if (vision.TARGET_TAG_ID < vision.CENTER_TAG_ID) {
+            strafeError -= edgeOffset;
+        } else if (vision.TARGET_TAG_ID > vision.CENTER_TAG_ID) {
+            strafeError += edgeOffset;
+        }
+
+        robot.chassis.Strafe(DRIVE_SPEED, strafeError); //x is in inches.
+        sleep(500);
+
+
+        tempTag = vision.detect_apriltag(vision.TARGET_TAG_ID);
+        if (tempTag != null) {
+            vision.centerTag = tempTag;
+        }
+        double rangeError = vision.centerTag.ftcPose.y / 2.54 - vision.DELIVERY_DISTANCE;
+
+        robot.chassis.Drive(DRIVE_SPEED * 0.5, (float) rangeError);
+
+
+        sleep(500);
+
+    }
+
+
 }

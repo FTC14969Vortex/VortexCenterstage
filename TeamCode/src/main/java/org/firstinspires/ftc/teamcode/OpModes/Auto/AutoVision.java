@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -110,7 +111,7 @@ public class AutoVision extends LinearOpMode {
     /**
      * Initialize AprilTag and TFOD.
      */
-    public void initDoubleVision() {
+    public void initDoubleVision(HardwareMap hwMap) {
         // -----------------------------------------------------------------------------------------
         // AprilTag Configuration
         // -----------------------------------------------------------------------------------------
@@ -138,7 +139,7 @@ public class AutoVision extends LinearOpMode {
 
         if (USE_WEBCAM) {
             myVisionPortal = new VisionPortal.Builder()
-                    .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                    .setCamera(hwMap.get(WebcamName.class, "Webcam 1"))
                     .addProcessors(tfod, aprilTag)
                     .build();
 
@@ -169,13 +170,13 @@ public class AutoVision extends LinearOpMode {
 
         // Make sure camera is streaming before we try to set the exposure controls
         if (myVisionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
-            telemetry.addData("Camera", "Waiting");
-            telemetry.update();
+//            telemetry.addData("Camera", "Waiting");
+//            telemetry.update();
             while (!isStopRequested() && (myVisionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
                 sleep(20);
             }
-            telemetry.addData("Camera", "Ready");
-            telemetry.update();
+//            telemetry.addData("Camera", "Ready");
+//            telemetry.update();
         }
 
         // Set camera controls unless we are stopping.
@@ -268,55 +269,6 @@ public class AutoVision extends LinearOpMode {
 
 
     }
-
-    public void centerToCenterTag() {
-        double yawError = 0;
-        float turnOffsetAprilTag = 0;
-        double edgeOffset = 7;
-        AprilTagDetection tempTag = null;
-        centerTag = detect_apriltag(CENTER_TAG_ID);
-
-        if (centerTag != null) {
-            yawError = centerTag.ftcPose.yaw;
-            if (yawError != 0) {
-                robot.chassis.autoTurn((float) -yawError, turnOffsetAprilTag);
-                sleep(500);
-            }
-        }
-
-        // Use the speed and turn "gains" to calculate how we want the robot to move.
-        // turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
-
-
-        tempTag = detect_apriltag(CENTER_TAG_ID);
-        if (tempTag != null) {
-            centerTag = tempTag; //Update the center tag if detection was successful.
-        }
-
-        double strafeError = centerTag.ftcPose.x;
-        if (TARGET_TAG_ID < CENTER_TAG_ID) {
-            strafeError -= edgeOffset;
-        } else if (TARGET_TAG_ID > CENTER_TAG_ID) {
-            strafeError += edgeOffset;
-        }
-
-        robot.chassis.Strafe(DRIVE_SPEED, strafeError); //x is in inches.
-        sleep(500);
-
-
-        tempTag = detect_apriltag(TARGET_TAG_ID);
-        if (tempTag != null) {
-            centerTag = tempTag;
-        }
-        double rangeError = centerTag.ftcPose.y / 2.54 - DELIVERY_DISTANCE;
-
-        robot.chassis.Drive(DRIVE_SPEED * 0.5, (float) rangeError);
-
-
-        sleep(500);
-
-    }
-
 
     public AprilTagDetection detect_apriltag(int IDtoDetect) {
         myVisionPortal.setProcessorEnabled(tfod, false);
