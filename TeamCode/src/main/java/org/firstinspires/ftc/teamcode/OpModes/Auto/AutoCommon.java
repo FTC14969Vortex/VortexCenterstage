@@ -205,8 +205,8 @@ public class AutoCommon extends LinearOpMode {
             robot.intake.MoveIntake(0.4, true);
             Thread.sleep(2000);
             robot.intake.MoveIntake(0, true);
-            robot.chassis.Drive(DRIVE_SPEED, -2);
-            robot.chassis.Strafe(DRIVE_SPEED, -23);
+            robot.chassis.Drive(DRIVE_SPEED, -3);
+            robot.chassis.Strafe(DRIVE_SPEED, -30);
             robot.chassis.autoTurn(-100, TURN_OFFSET);
         } else {
             robot.chassis.Drive(DRIVE_SPEED, 27);
@@ -224,14 +224,14 @@ public class AutoCommon extends LinearOpMode {
     public void outtakeToMark1And4() throws InterruptedException {
         if(USE_NEW_PATH) {
             robot.chassis.Drive(DRIVE_SPEED, 27);
-            robot.chassis.autoTurn(90, TURN_OFFSET);
+            robot.chassis.autoTurn(93, TURN_OFFSET);
             robot.chassis.Drive(DRIVE_SPEED, 3);
             robot.intake.MoveIntake(0.4, true);
             Thread.sleep(2000);
             robot.intake.MoveIntake(0, true);
             robot.chassis.Drive(DRIVE_SPEED, -3);
-            robot.chassis.Strafe(DRIVE_SPEED, 21);
-            robot.chassis.autoTurn(100, TURN_OFFSET);
+            robot.chassis.Strafe(DRIVE_SPEED, 33);
+            robot.chassis.autoTurn(93, TURN_OFFSET);
         } else {
             robot.chassis.Drive(DRIVE_SPEED, 27);
             robot.chassis.autoTurn(93, TURN_OFFSET);
@@ -241,7 +241,7 @@ public class AutoCommon extends LinearOpMode {
             robot.intake.MoveIntake(0, true);
             robot.chassis.Drive(DRIVE_SPEED, -3);
             robot.chassis.Strafe(DRIVE_SPEED, -30);
-            robot.chassis.autoTurn(-95, TURN_OFFSET);
+            robot.chassis.autoTurn(-105, TURN_OFFSET);
         }
     }
 
@@ -279,12 +279,16 @@ public class AutoCommon extends LinearOpMode {
         float turnOffsetAprilTag = 0;
         double edgeOffset = 7;
         AprilTagDetection tempTag = null;
-        vision.centerTag = vision.detect_apriltag(vision.CENTER_TAG_ID);
 
         if (vision.centerTag != null) {
             yawError = vision.centerTag.ftcPose.yaw;
-            if (yawError != 0) {
+            if (yawError < 5) {
                 robot.chassis.autoTurn((float) -yawError, turnOffsetAprilTag);
+                sleep(500);
+            } else if (yawError > 5) {
+                robot.chassis.autoTurn((float) -yawError, turnOffsetAprilTag);
+                sleep(500);
+            } else {
                 sleep(500);
             }
         }
@@ -298,6 +302,12 @@ public class AutoCommon extends LinearOpMode {
             vision.centerTag = tempTag; //Update the center tag if detection was successful.
         }
 
+
+        tempTag = vision.detect_apriltag(vision.TARGET_TAG_ID);
+        if (tempTag != null) {
+            vision.centerTag = tempTag;
+        }
+        vision.centerTag = vision.detect_apriltag(vision.CENTER_TAG_ID);
         double strafeError = vision.centerTag.ftcPose.x;
         if (vision.TARGET_TAG_ID < vision.CENTER_TAG_ID) {
             strafeError -= edgeOffset;
@@ -307,12 +317,6 @@ public class AutoCommon extends LinearOpMode {
 
         robot.chassis.Strafe(DRIVE_SPEED, strafeError); //x is in inches.
         sleep(500);
-
-
-        tempTag = vision.detect_apriltag(vision.TARGET_TAG_ID);
-        if (tempTag != null) {
-            vision.centerTag = tempTag;
-        }
         double rangeError = vision.centerTag.ftcPose.y / 2.54 - vision.DELIVERY_DISTANCE;
 
         robot.chassis.Drive(DRIVE_SPEED * 0.5, (float) rangeError);

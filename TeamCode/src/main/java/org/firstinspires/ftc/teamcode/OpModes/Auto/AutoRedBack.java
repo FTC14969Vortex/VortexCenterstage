@@ -18,7 +18,7 @@ public class AutoRedBack extends AutoCommon{
         STRAFE_TO_BACKBOARD_DISTANCE = -24; //24 inches when starting from the back and 96 inches when starting from front.
 
         //What angle to turn for the camera to face the backboard
-        TURN_ANGLE_TO_FACE_BACKBOARD = -90; // Blue side requires counter clockwise turn, red requires clockwise turn.
+        TURN_ANGLE_TO_FACE_BACKBOARD = 90; // Blue side requires counter clockwise turn, red requires clockwise turn.
 
         //What distance to strafe so the camera can see the middle tag
         STRAFE_TO_MIDDLE_TAG_DISTANCE = 27; //constant for both sides

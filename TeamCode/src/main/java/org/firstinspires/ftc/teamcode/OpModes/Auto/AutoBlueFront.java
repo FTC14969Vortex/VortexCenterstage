@@ -20,7 +20,7 @@ public class AutoBlueFront extends AutoCommon {
         TURN_ANGLE_TO_FACE_BACKBOARD = -95; // Blue side requires positive turn, red requires positive turn.
 
         //What distance to strafe so the camera can see the middle tag
-        STRAFE_TO_MIDDLE_TAG_DISTANCE = -30; //constant for both sides
+        STRAFE_TO_MIDDLE_TAG_DISTANCE = -35; //constant for both sides
 
         //What direction to strafe to park.
         STRAFE_DIRECTION_FOR_PARKING = -1; //-1 for blue, 1 for red
