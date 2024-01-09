@@ -82,10 +82,10 @@ public class AutoVision extends LinearOpMode {
 
     double DELIVERY_DISTANCE = 19; //  This is how close the camera should get to the target (inches)
     //For centering on the AprilTag
-    public int TARGET_TAG_ID = 6;            // Start ID as -1, will be updated in the function.
+    public int TARGET_TAG_ID = -1;            // Start ID as -1, will be updated in the function.
     // X-coordinate of team element at the start of auto.
     public float XPOS_OF_TEAM_ELEMENT = 320; // Frame size is 640, default in the middle.
-    public int TARGET_SPIKE_MARK = 2;
+    public int TARGET_SPIKE_MARK = 3;
     public float RECOGNITION_SIZE;
 
     //------------------------------------------------------------------

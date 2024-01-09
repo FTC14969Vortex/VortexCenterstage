@@ -200,12 +200,13 @@ public class AutoCommon extends LinearOpMode {
     public void outtakeToMark3And6() throws InterruptedException {
         if(USE_NEW_PATH) {
             robot.chassis.Drive(DRIVE_SPEED, 27);
-            robot.chassis.autoTurn(-100, TURN_OFFSET);
+            robot.chassis.autoTurn(-110, TURN_OFFSET);
             robot.chassis.Drive(DRIVE_SPEED, 3);
             robot.intake.MoveIntake(0.4, true);
             Thread.sleep(2000);
             robot.intake.MoveIntake(0, true);
             robot.chassis.Drive(DRIVE_SPEED, -3);
+            robot.chassis.Drive(DRIVE_SPEED, 3);
             robot.chassis.Strafe(DRIVE_SPEED, -30);
             robot.chassis.autoTurn(-100, TURN_OFFSET);
         } else {
@@ -239,7 +240,7 @@ public class AutoCommon extends LinearOpMode {
             robot.intake.MoveIntake(0.4, true);
             Thread.sleep(2000);
             robot.intake.MoveIntake(0, true);
-            robot.chassis.Drive(DRIVE_SPEED, -3);
+//            robot.chassis.Drive(DRIVE_SPEED, -3);
             robot.chassis.Strafe(DRIVE_SPEED, -30);
             robot.chassis.autoTurn(-105, TURN_OFFSET);
         }
