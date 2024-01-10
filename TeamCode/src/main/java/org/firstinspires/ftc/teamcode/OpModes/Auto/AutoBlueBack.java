@@ -27,6 +27,9 @@ public class AutoBlueBack extends AutoCommon {
         //What direction to strafe to park.
         STRAFE_DIRECTION_FOR_PARKING = -1; //-1 for blue, 1 for red
 
+        //How far the robot needs to move to be out of the way of the backboard.
+        STRAFE_DISTANCE = 20; // 20 for blue, 25 for red.
+
         //Use the new path that goes under the truss, or the original path that goes under the gate
         USE_NEW_PATH = false; //True for new path, false for old path
 

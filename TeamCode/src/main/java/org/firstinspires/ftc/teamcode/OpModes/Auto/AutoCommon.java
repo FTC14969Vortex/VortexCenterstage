@@ -78,6 +78,8 @@ public class AutoCommon extends LinearOpMode {
     //What direction to strafe to park.
     public int STRAFE_DIRECTION_FOR_PARKING;
 
+    public int STRAFE_DISTANCE;
+
     //Use the new path that goes under the truss, or the original path that goes under the gate
     public boolean USE_NEW_PATH; //True for new path, false for old path
 
@@ -154,7 +156,7 @@ public class AutoCommon extends LinearOpMode {
                      * Step 3: Drive to Backstage.
                      *
                      */
-                    sleep(4000);
+                    sleep(2000);
                     gotoBackBoard(STRAFE_TO_BACKBOARD_DIRECTION, STRAFE_TO_BACKBOARD_DISTANCE, TURN_ANGLE_TO_FACE_BACKBOARD, STRAFE_TO_MIDDLE_TAG_DISTANCE);
                     currentStage = AutoStages.CENTER_AprilTag;
                     break;
@@ -240,7 +242,8 @@ public class AutoCommon extends LinearOpMode {
             robot.intake.MoveIntake(0.4, true);
             Thread.sleep(2000);
             robot.intake.MoveIntake(0, true);
-//            robot.chassis.Drive(DRIVE_SPEED, -3);
+            robot.chassis.Drive(DRIVE_SPEED, -3);
+            robot.chassis.Drive(DRIVE_SPEED,3);
             robot.chassis.Strafe(DRIVE_SPEED, -30);
             robot.chassis.autoTurn(-105, TURN_OFFSET);
         }
@@ -270,7 +273,7 @@ public class AutoCommon extends LinearOpMode {
         robot.arm.gotoPickupPosoition();
 
         // Park.
-        robot.chassis.Strafe(DRIVE_SPEED, 3 - vision.TARGET_SPIKE_MARK * 6 + (20*STRAFE_DIRECTION_FOR_PARKING));
+        robot.chassis.Strafe(DRIVE_SPEED, 3 - vision.TARGET_SPIKE_MARK * 6 + (STRAFE_DISTANCE*STRAFE_DIRECTION_FOR_PARKING));
         robot.chassis.Drive(DRIVE_SPEED, 9);
     }
 
@@ -283,13 +286,8 @@ public class AutoCommon extends LinearOpMode {
 
         if (vision.centerTag != null) {
             yawError = vision.centerTag.ftcPose.yaw;
-            if (yawError < 5) {
+            if (yawError != 0) {
                 robot.chassis.autoTurn((float) -yawError, turnOffsetAprilTag);
-                sleep(500);
-            } else if (yawError > 5) {
-                robot.chassis.autoTurn((float) -yawError, turnOffsetAprilTag);
-                sleep(500);
-            } else {
                 sleep(500);
             }
         }
