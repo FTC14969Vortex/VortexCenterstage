@@ -9,10 +9,10 @@ public class Wrist {
     public double TARGET_POSITION;
 
 
-    public double WRIST_DELIVERY_POSITION_HIGH = 0.21;
-    public double WRIST_DELIVERY_POSITION_LOW = 0.23;
+    public double WRIST_DELIVERY_POSITION_HIGH = 0.3;
+    public double WRIST_DELIVERY_POSITION_LOW = 0.28;
     public double WRIST_DELIVERY_POSITION_AUTO = 0.23;
-    public double WRIST_PICKUP_POSITION = 0.3;
+    public double WRIST_PICKUP_POSITION = 0.2;
 
 
     HardwareMap hwMap = null;
@@ -22,7 +22,7 @@ public class Wrist {
         hwMap = ahwMap;
         //Init motors and servos
         servo = hwMap.get(Servo.class, "Wrist");
-        servo.setDirection(Servo.Direction.FORWARD);
+        servo.setDirection(Servo.Direction.REVERSE);
     }
 
     public void servoPosition(double TARGET_POSITION) {
