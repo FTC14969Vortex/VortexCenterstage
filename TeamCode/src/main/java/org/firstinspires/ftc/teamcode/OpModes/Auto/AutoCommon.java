@@ -161,6 +161,7 @@ public class AutoCommon extends LinearOpMode {
                     currentStage = AutoStages.CENTER_AprilTag;
                     break;
                 case CENTER_AprilTag:
+//                    vision.TARGET_TAG_ID = 4; //Overriding the target tag for testing.
                     centerToCenterTag();
                     currentStage = AutoStages.DELVER_BACKBOARD_PARK;
                     break;
@@ -209,7 +210,7 @@ public class AutoCommon extends LinearOpMode {
             robot.intake.MoveIntake(0, true);
             robot.chassis.Drive(DRIVE_SPEED, -3);
             robot.chassis.Drive(DRIVE_SPEED, 3);
-            robot.chassis.Strafe(DRIVE_SPEED, -30);
+            robot.chassis.Strafe(DRIVE_SPEED, -27);
             robot.chassis.autoTurn(-100, TURN_OFFSET);
         } else {
             robot.chassis.Drive(DRIVE_SPEED, 27);
@@ -244,7 +245,7 @@ public class AutoCommon extends LinearOpMode {
             robot.intake.MoveIntake(0, true);
             robot.chassis.Drive(DRIVE_SPEED, -3);
             robot.chassis.Drive(DRIVE_SPEED,3);
-            robot.chassis.Strafe(DRIVE_SPEED, -30);
+            robot.chassis.Strafe(DRIVE_SPEED, -27);
             robot.chassis.autoTurn(-105, TURN_OFFSET);
         }
     }
@@ -260,6 +261,7 @@ public class AutoCommon extends LinearOpMode {
         // Swing the arm and wist to low position.
         robot.arm.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.arm.gotoAutoPosition();
+        sleep(150);
         robot.wrist.gotoAutoPosition();
         sleep(1000);
 
@@ -284,8 +286,13 @@ public class AutoCommon extends LinearOpMode {
         double edgeOffset = 7;
         AprilTagDetection tempTag = null;
 
+
+        vision.centerTag = vision.detect_apriltag(vision.CENTER_TAG_ID);
+
         if (vision.centerTag != null) {
             yawError = vision.centerTag.ftcPose.yaw;
+//            telemetry.addData("yaw error", yawError);
+//            telemetry.update();
             if (yawError != 0) {
                 robot.chassis.autoTurn((float) -yawError, turnOffsetAprilTag);
                 sleep(500);
