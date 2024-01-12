@@ -161,7 +161,7 @@ public class AutoCommon extends LinearOpMode {
                     currentStage = AutoStages.CENTER_AprilTag;
                     break;
                 case CENTER_AprilTag:
-//                    vision.TARGET_TAG_ID = 4; //Overriding the target tag for testing.
+//                    vision.TARGET_TAG_ID = 5; //Overriding the target tag for testing.
                     centerToCenterTag();
                     currentStage = AutoStages.DELVER_BACKBOARD_PARK;
                     break;
@@ -287,12 +287,20 @@ public class AutoCommon extends LinearOpMode {
         AprilTagDetection tempTag = null;
 
 
-        vision.centerTag = vision.detect_apriltag(vision.CENTER_TAG_ID);
+
+        tempTag = vision.detect_apriltag(vision.CENTER_TAG_ID);
+        if (tempTag != null) {
+            vision.centerTag = tempTag; //Update the center tag if detection was successful.
+        }
+
+        tempTag = vision.detect_apriltag(vision.CENTER_TAG_ID);
+        if (tempTag != null) {
+            vision.centerTag = tempTag; //Update the center tag if detection was successful.
+        }
 
         if (vision.centerTag != null) {
             yawError = vision.centerTag.ftcPose.yaw;
-//            telemetry.addData("yaw error", yawError);
-//            telemetry.update();
+            //telemetry.update();
             if (yawError != 0) {
                 robot.chassis.autoTurn((float) -yawError, turnOffsetAprilTag);
                 sleep(500);
@@ -303,17 +311,12 @@ public class AutoCommon extends LinearOpMode {
         // turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
 
 
+
+
         tempTag = vision.detect_apriltag(vision.CENTER_TAG_ID);
-        if (tempTag != null) {
-            vision.centerTag = tempTag; //Update the center tag if detection was successful.
-        }
-
-
-        tempTag = vision.detect_apriltag(vision.TARGET_TAG_ID);
         if (tempTag != null) {
             vision.centerTag = tempTag;
         }
-        vision.centerTag = vision.detect_apriltag(vision.CENTER_TAG_ID);
         double strafeError = vision.centerTag.ftcPose.x;
         if (vision.TARGET_TAG_ID < vision.CENTER_TAG_ID) {
             strafeError -= edgeOffset;
@@ -323,12 +326,20 @@ public class AutoCommon extends LinearOpMode {
 
         robot.chassis.Strafe(DRIVE_SPEED, strafeError); //x is in inches.
         sleep(500);
-        double rangeError = vision.centerTag.ftcPose.y / 2.54 - vision.DELIVERY_DISTANCE;
+
+        tempTag = vision.detect_apriltag(vision.TARGET_TAG_ID);
+        double rangeError = (tempTag.ftcPose.range / 2.54) - vision.DELIVERY_DISTANCE;
 
         robot.chassis.Drive(DRIVE_SPEED * 0.5, (float) rangeError);
 
 
         sleep(500);
+        telemetry.addData("yaw error", yawError);
+        telemetry.addData("strafe error", strafeError);
+        telemetry.addData("measured range", tempTag.ftcPose.range);
+        telemetry.addData("range error", rangeError);
+
+
 
     }
 
