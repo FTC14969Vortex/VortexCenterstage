@@ -14,8 +14,8 @@ public class Arm {
     double speed = 0.8;
     int targetPosition;
     int currentPosition;
-    public int ARM_DELIVERY_POSITION_LOW = -1920;
-    public int ARM_DELIVERY_POSITION_HIGH = -1499;
+    public int ARM_DELIVERY_POSITION_LOW = -1602;
+    public int ARM_DELIVERY_POSITION_HIGH = -1448;
     public int ARM_DELIVERY_POSITION_AUTO = -1850;
     public int ARM_PICKUP_POSITION = 30;
 //    int slowDown;
