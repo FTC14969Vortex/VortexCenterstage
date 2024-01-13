@@ -158,7 +158,7 @@ public class AutoCommon extends LinearOpMode {
                      */
                     sleep(1000);
                     gotoBackBoard(STRAFE_TO_BACKBOARD_DIRECTION, STRAFE_TO_BACKBOARD_DISTANCE, TURN_ANGLE_TO_FACE_BACKBOARD, STRAFE_TO_MIDDLE_TAG_DISTANCE);
-                    sleep(1000);
+                    sleep(500);
                     currentStage = AutoStages.CENTER_AprilTag;
                     break;
                 case CENTER_AprilTag:
@@ -230,11 +230,11 @@ public class AutoCommon extends LinearOpMode {
         if(USE_NEW_PATH) {
             robot.chassis.Drive(DRIVE_SPEED, 27);
             robot.chassis.autoTurn(93, TURN_OFFSET);
-            robot.chassis.Drive(DRIVE_SPEED, 3);
+            robot.chassis.Drive(DRIVE_SPEED, 6);
             robot.intake.MoveIntake(0.4, true);
-            Thread.sleep(2000);
+            Thread.sleep(1000);
             robot.intake.MoveIntake(0, true);
-            robot.chassis.Drive(DRIVE_SPEED, -3);
+            robot.chassis.Drive(DRIVE_SPEED, -6);
             robot.chassis.Strafe(DRIVE_SPEED, 33);
             robot.chassis.autoTurn(93, TURN_OFFSET);
         } else {
@@ -242,7 +242,7 @@ public class AutoCommon extends LinearOpMode {
             robot.chassis.autoTurn(93, TURN_OFFSET);
             robot.chassis.Drive(DRIVE_SPEED, 3);
             robot.intake.MoveIntake(0.4, true);
-            Thread.sleep(2000);
+            Thread.sleep(1000);
             robot.intake.MoveIntake(0, true);
             robot.chassis.Drive(DRIVE_SPEED, -3);
             robot.chassis.Drive(DRIVE_SPEED,3);
@@ -264,7 +264,7 @@ public class AutoCommon extends LinearOpMode {
         robot.arm.gotoAutoPosition();
         sleep(150);
         robot.wrist.gotoAutoPosition();
-        sleep(1000);
+        sleep(500);
 
         // Open the gate to deliver one pixel.
         robot.gate.open();
@@ -305,7 +305,7 @@ public class AutoCommon extends LinearOpMode {
                     yawError += rotation_comp;
                 }
                 robot.chassis.autoTurn((float) -yawError, turnOffsetAprilTag);
-                sleep(3000);
+                sleep(2000);
 
            }
         }

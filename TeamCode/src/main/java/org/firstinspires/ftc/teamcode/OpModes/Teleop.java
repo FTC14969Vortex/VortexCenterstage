@@ -220,6 +220,9 @@ public class Teleop extends LinearOpMode {
             if(gamepad2.right_bumper) {
                 robot.drone.Latched();
             }
+            if(gamepad2.y) {
+                robot.wrist.gotoPickupPosition();
+            }
 
 
 

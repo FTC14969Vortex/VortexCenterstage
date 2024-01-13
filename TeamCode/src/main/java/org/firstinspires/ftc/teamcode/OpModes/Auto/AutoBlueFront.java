@@ -14,7 +14,7 @@ public class AutoBlueFront extends AutoCommon {
         STRAFE_TO_BACKBOARD_DIRECTION = -1; // 1 for blue, -1 for red
 
         //What distance to strafe to move to the backboard
-        STRAFE_TO_BACKBOARD_DISTANCE = 90; //24 inches when starting from the back and 96 inches when starting from front.
+        STRAFE_TO_BACKBOARD_DISTANCE = 93; //24 inches when starting from the back and 96 inches when starting from front.
 
         //What angle to turn for the camera to face the backboard
         TURN_ANGLE_TO_FACE_BACKBOARD = -95; // Blue side requires positive turn, red requires positive turn.

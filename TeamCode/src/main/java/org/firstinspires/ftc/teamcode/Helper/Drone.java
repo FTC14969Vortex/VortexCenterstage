@@ -10,7 +10,7 @@ public class Drone {
     public Servo servo;
 
     public double Open = 0.92;
-    public double Close = 0.87;
+    public double Close = 0;
 
     HardwareMap hwMap = null;
 
