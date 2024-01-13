@@ -156,8 +156,9 @@ public class AutoCommon extends LinearOpMode {
                      * Step 3: Drive to Backstage.
                      *
                      */
-                    sleep(2000);
+                    sleep(1000);
                     gotoBackBoard(STRAFE_TO_BACKBOARD_DIRECTION, STRAFE_TO_BACKBOARD_DISTANCE, TURN_ANGLE_TO_FACE_BACKBOARD, STRAFE_TO_MIDDLE_TAG_DISTANCE);
+                    sleep(1000);
                     currentStage = AutoStages.CENTER_AprilTag;
                     break;
                 case CENTER_AprilTag:
@@ -282,30 +283,33 @@ public class AutoCommon extends LinearOpMode {
 
     public void centerToCenterTag() {
         double yawError = 0;
+        double rotation_comp = 10;
         float turnOffsetAprilTag = 0;
         double edgeOffset = 7;
         AprilTagDetection tempTag = null;
 
 
-
         tempTag = vision.detect_apriltag(vision.CENTER_TAG_ID);
         if (tempTag != null) {
             vision.centerTag = tempTag; //Update the center tag if detection was successful.
         }
-
         tempTag = vision.detect_apriltag(vision.CENTER_TAG_ID);
         if (tempTag != null) {
             vision.centerTag = tempTag; //Update the center tag if detection was successful.
         }
-
         if (vision.centerTag != null) {
+
             yawError = vision.centerTag.ftcPose.yaw;
-            //telemetry.update();
-            if (yawError != 0) {
+            if (Math.abs(yawError) > 1) {
+                if (yawError > 0){
+                    yawError += rotation_comp;
+                }
                 robot.chassis.autoTurn((float) -yawError, turnOffsetAprilTag);
-                sleep(500);
-            }
+                sleep(3000);
+
+           }
         }
+
 
         // Use the speed and turn "gains" to calculate how we want the robot to move.
         // turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
