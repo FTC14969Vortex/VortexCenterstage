@@ -156,13 +156,13 @@ public class Teleop extends LinearOpMode {
 
 
             //Gate
-            if(gamepad2.a){
+            if(gamepad2.cross){
                 robot.gate.close();
             }
-            if(gamepad2.b){
+            if(gamepad2.circle){
                 robot.gate.open();
             }
-            if(gamepad2.x){
+            if(gamepad2.square){
                 robot.gate.middle();
             }
 

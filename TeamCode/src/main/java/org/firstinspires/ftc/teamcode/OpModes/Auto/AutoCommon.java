@@ -48,7 +48,7 @@ public class AutoCommon extends LinearOpMode {
 
 
     // Robot control parameters
-    double DRIVE_SPEED = 0.7;
+    double DRIVE_SPEED = 0.8;
     float TURN_OFFSET = 10;
 
     enum AutoStages {DETECT_TE, OUTTAKE, GOTO_BACKBOARD, CENTER_AprilTag, DELVER_BACKBOARD_PARK, END_AUTO}
@@ -188,10 +188,10 @@ public class AutoCommon extends LinearOpMode {
         if(USE_NEW_PATH) {
             robot.chassis.Drive(DRIVE_SPEED, 23);
             robot.chassis.autoTurn(175, TURN_OFFSET);
-            robot.intake.MoveIntake(0.4, true);
+            robot.intake.MoveIntake(0.5, true);
             Thread.sleep(2000);
             robot.intake.MoveIntake(0, true);
-            robot.chassis.Drive(DRIVE_SPEED, 23);
+            robot.chassis.Drive(DRIVE_SPEED, 22);
         } else {
             robot.chassis.Drive(DRIVE_SPEED, 48);
             robot.intake.MoveIntake(0.4, true);
@@ -220,8 +220,9 @@ public class AutoCommon extends LinearOpMode {
             robot.intake.MoveIntake(0.4, true);
             Thread.sleep(2000);
             robot.intake.MoveIntake(0, true);
-            robot.chassis.Drive(DRIVE_SPEED, 0);
-            robot.chassis.Strafe(DRIVE_SPEED, 30);
+            robot.chassis.Drive(DRIVE_SPEED, -3);
+            robot.chassis.Drive(DRIVE_SPEED, 3);
+            robot.chassis.Strafe(DRIVE_SPEED, 26);
             robot.chassis.autoTurn(93, TURN_OFFSET);
         }
     }
@@ -230,17 +231,16 @@ public class AutoCommon extends LinearOpMode {
         if(USE_NEW_PATH) {
             robot.chassis.Drive(DRIVE_SPEED, 27);
             robot.chassis.autoTurn(93, TURN_OFFSET);
-            robot.chassis.Drive(DRIVE_SPEED, 6);
+            robot.chassis.Drive(DRIVE_SPEED, 3);
             robot.intake.MoveIntake(0.4, true);
             Thread.sleep(1000);
             robot.intake.MoveIntake(0, true);
-            robot.chassis.Drive(DRIVE_SPEED, -6);
+            robot.chassis.Drive(DRIVE_SPEED, -3);
             robot.chassis.Strafe(DRIVE_SPEED, 33);
             robot.chassis.autoTurn(93, TURN_OFFSET);
         } else {
             robot.chassis.Drive(DRIVE_SPEED, 27);
             robot.chassis.autoTurn(93, TURN_OFFSET);
-            robot.chassis.Drive(DRIVE_SPEED, 3);
             robot.intake.MoveIntake(0.4, true);
             Thread.sleep(1000);
             robot.intake.MoveIntake(0, true);
@@ -264,7 +264,7 @@ public class AutoCommon extends LinearOpMode {
         robot.arm.gotoAutoPosition();
         sleep(150);
         robot.wrist.gotoAutoPosition();
-        sleep(500);
+        sleep(1000);
 
         // Open the gate to deliver one pixel.
         robot.gate.open();
@@ -283,7 +283,7 @@ public class AutoCommon extends LinearOpMode {
 
     public void centerToCenterTag() {
         double yawError = 0;
-        double rotation_comp = 10;
+//        double rotation_comp = 10;
         float turnOffsetAprilTag = 0;
         double edgeOffset = 7;
         AprilTagDetection tempTag = null;
@@ -298,12 +298,11 @@ public class AutoCommon extends LinearOpMode {
             vision.centerTag = tempTag; //Update the center tag if detection was successful.
         }
         if (vision.centerTag != null) {
-
             yawError = vision.centerTag.ftcPose.yaw;
-            if (Math.abs(yawError) > 1) {
-                if (yawError > 0){
-                    yawError += rotation_comp;
-                }
+            if (Math.abs(yawError) > 3) {
+//                if (yawError > 0){
+//                    yawError += rotation_comp;
+//                }
                 robot.chassis.autoTurn((float) -yawError, turnOffsetAprilTag);
                 sleep(2000);
 
