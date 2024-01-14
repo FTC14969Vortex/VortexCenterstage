@@ -24,7 +24,7 @@ public class AutoRedBackNew extends AutoCommon{
         STRAFE_TO_MIDDLE_TAG_DISTANCE = -27; //constant for both sides
 
         //What direction to strafe to park.
-        STRAFE_DIRECTION_FOR_PARKING = 1; //-1 for blue, 1 for red
+        STRAFE_DIRECTION_FOR_PARKING = -1; //-1 for blue, 1 for red
 
         //How far the robot needs to move to be out of the way of the backboard.
         STRAFE_DISTANCE = 32; // 20 for blue, 25 for red.

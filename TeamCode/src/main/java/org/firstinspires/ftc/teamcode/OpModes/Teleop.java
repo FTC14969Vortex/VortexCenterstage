@@ -83,7 +83,8 @@ public class Teleop extends LinearOpMode {
 
             //Speed Control
             if (gamepad1.a){
-                DRIVETRAIN_SPEED = 0.5;
+                DRIVETRAIN_SPEED = 0.3;
+
             }
             if (gamepad1.b){
                 DRIVETRAIN_SPEED = 1;

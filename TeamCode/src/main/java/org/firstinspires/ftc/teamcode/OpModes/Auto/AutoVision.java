@@ -80,7 +80,7 @@ public class AutoVision extends LinearOpMode {
             "Red"
     };
 
-    double DELIVERY_DISTANCE = 20; //  This is how close the camera should get to the target (inches)
+    double DELIVERY_DISTANCE = 21; //  This is how close the camera should get to the target (inches)
     //For centering on the AprilTag
     public int TARGET_TAG_ID = -1;            // Start ID as -1, will be updated in the function.
     // X-coordinate of team element at the start of auto.
@@ -144,10 +144,10 @@ public class AutoVision extends LinearOpMode {
                     .build();
 
             //Competition exposure
-//            setManualExposure(50, 250);  // Use low exposure time to reduce motion blur
+            setManualExposure(60, 250);  // Use low exposure time to reduce motion blur
 
             //Garage Exposure
-            setManualExposure(200, 250);
+            //setManualExposure(200, 250);
 
         } else {
             myVisionPortal = new VisionPortal.Builder()
@@ -292,7 +292,7 @@ public class AutoVision extends LinearOpMode {
                 break;
             }
 
-            sleep(500);
+            sleep(300);
         }
         return detectionResult;
 

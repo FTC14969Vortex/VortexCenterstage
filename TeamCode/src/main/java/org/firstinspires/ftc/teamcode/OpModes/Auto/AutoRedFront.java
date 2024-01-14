@@ -15,13 +15,13 @@ public class AutoRedFront extends AutoCommon{
         STRAFE_TO_BACKBOARD_DIRECTION = -1; // 1 for blue, -1 for red
 
         //What distance to strafe to move to the backboard
-        STRAFE_TO_BACKBOARD_DISTANCE = -88; //24 inches when starting from the back and 96 inches when starting from front.
+        STRAFE_TO_BACKBOARD_DISTANCE = -85; //24 inches when starting from the back and 96 inches when starting from front.
 
         //What angle to turn for the camera to face the backboard
         TURN_ANGLE_TO_FACE_BACKBOARD = 95; // Blue side requires counter clockwise turn, red requires clockwise turn.
 
         //What distance to strafe so the camera can see the middle tag
-        STRAFE_TO_MIDDLE_TAG_DISTANCE = 31; //constant for both sides
+        STRAFE_TO_MIDDLE_TAG_DISTANCE = 35; //constant for both sides
 
         //What direction to strafe to park.
         STRAFE_DIRECTION_FOR_PARKING = 1; //-1 for blue, 1 for red

@@ -162,7 +162,7 @@ public class AutoCommon extends LinearOpMode {
                     currentStage = AutoStages.CENTER_AprilTag;
                     break;
                 case CENTER_AprilTag:
-//                    vision.TARGET_TAG_ID = 5; //Overriding the target tag for testing.
+//                    vision.TARGET_TAG_ID = 6; //Overriding the target tag for testing.
                     centerToCenterTag();
                     currentStage = AutoStages.DELVER_BACKBOARD_PARK;
                     break;
@@ -209,8 +209,8 @@ public class AutoCommon extends LinearOpMode {
             robot.intake.MoveIntake(0.4, true);
             Thread.sleep(2000);
             robot.intake.MoveIntake(0, true);
-            robot.chassis.Drive(DRIVE_SPEED, -3);
-            robot.chassis.Drive(DRIVE_SPEED, 3);
+            robot.chassis.Drive(DRIVE_SPEED, -2);
+            robot.chassis.Drive(DRIVE_SPEED, 2);
             robot.chassis.Strafe(DRIVE_SPEED, -27);
             robot.chassis.autoTurn(-100, TURN_OFFSET);
         } else {
@@ -231,11 +231,11 @@ public class AutoCommon extends LinearOpMode {
         if(USE_NEW_PATH) {
             robot.chassis.Drive(DRIVE_SPEED, 27);
             robot.chassis.autoTurn(93, TURN_OFFSET);
-            robot.chassis.Drive(DRIVE_SPEED, 3);
             robot.intake.MoveIntake(0.4, true);
             Thread.sleep(1000);
             robot.intake.MoveIntake(0, true);
             robot.chassis.Drive(DRIVE_SPEED, -3);
+            robot.chassis.Drive(DRIVE_SPEED, 4); //avoid collision with truss.
             robot.chassis.Strafe(DRIVE_SPEED, 33);
             robot.chassis.autoTurn(93, TURN_OFFSET);
         } else {
@@ -262,13 +262,13 @@ public class AutoCommon extends LinearOpMode {
         // Swing the arm and wist to low position.
         robot.arm.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.arm.gotoAutoPosition();
-        sleep(150);
+        sleep(100);
         robot.wrist.gotoAutoPosition();
-        sleep(1000);
+        sleep(1500);
 
         // Open the gate to deliver one pixel.
         robot.gate.open();
-        sleep(2000);
+        sleep(1000);
 
         // Bring the wrist and arm to pickup position.
         robot.wrist.gotoPickupPosition();
@@ -277,15 +277,16 @@ public class AutoCommon extends LinearOpMode {
 
         // Park.
         robot.chassis.Strafe(DRIVE_SPEED, 3 - vision.TARGET_SPIKE_MARK * 6 + (STRAFE_DISTANCE*STRAFE_DIRECTION_FOR_PARKING));
-        robot.chassis.Drive(DRIVE_SPEED, 9);
+        robot.chassis.Drive(DRIVE_SPEED, 13);
     }
 
 
     public void centerToCenterTag() {
         double yawError = 0;
-//        double rotation_comp = 10;
+        double yawCorrection = 0;
+        double rotation_comp = 7;
         float turnOffsetAprilTag = 0;
-        double edgeOffset = 7;
+        double edgeOffset = 7.5;
         AprilTagDetection tempTag = null;
 
 
@@ -293,17 +294,17 @@ public class AutoCommon extends LinearOpMode {
         if (tempTag != null) {
             vision.centerTag = tempTag; //Update the center tag if detection was successful.
         }
-        tempTag = vision.detect_apriltag(vision.CENTER_TAG_ID);
-        if (tempTag != null) {
-            vision.centerTag = tempTag; //Update the center tag if detection was successful.
-        }
+//        tempTag = vision.detect_apriltag(vision.CENTER_TAG_ID);
+//        if (tempTag != null) {
+//            vision.centerTag = tempTag; //Update the center tag if detection was successful.
+//        }
         if (vision.centerTag != null) {
             yawError = vision.centerTag.ftcPose.yaw;
-            if (Math.abs(yawError) > 3) {
-//                if (yawError > 0){
-//                    yawError += rotation_comp;
-//                }
-                robot.chassis.autoTurn((float) -yawError, turnOffsetAprilTag);
+            if (yawError > -3){
+                yawCorrection += rotation_comp;
+            }
+            if (Math.abs(yawCorrection) > 3) {
+                robot.chassis.autoTurn((float) -yawCorrection, turnOffsetAprilTag);
                 sleep(2000);
 
            }
@@ -314,33 +315,39 @@ public class AutoCommon extends LinearOpMode {
         // turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
 
 
-
-
         tempTag = vision.detect_apriltag(vision.CENTER_TAG_ID);
         if (tempTag != null) {
             vision.centerTag = tempTag;
         }
-        double strafeError = vision.centerTag.ftcPose.x;
-        if (vision.TARGET_TAG_ID < vision.CENTER_TAG_ID) {
-            strafeError -= edgeOffset;
-        } else if (vision.TARGET_TAG_ID > vision.CENTER_TAG_ID) {
-            strafeError += edgeOffset;
+        if (vision.centerTag != null) {
+            double strafeError = vision.centerTag.ftcPose.x;
+            if (vision.TARGET_TAG_ID < vision.CENTER_TAG_ID) {
+                strafeError -= edgeOffset;
+            } else if (vision.TARGET_TAG_ID > vision.CENTER_TAG_ID) {
+                strafeError += edgeOffset;
+            }
+
+            robot.chassis.Strafe(DRIVE_SPEED, strafeError); //x is in inches.
+            sleep(500);
+            telemetry.addData("strafe error", strafeError);
         }
 
-        robot.chassis.Strafe(DRIVE_SPEED, strafeError); //x is in inches.
-        sleep(500);
 
         tempTag = vision.detect_apriltag(vision.TARGET_TAG_ID);
-        double rangeError = (tempTag.ftcPose.range / 2.54) - vision.DELIVERY_DISTANCE;
+        if (tempTag != null) {
+            double rangeError = (tempTag.ftcPose.range / 2.54) - vision.DELIVERY_DISTANCE;
+            robot.chassis.Drive(DRIVE_SPEED * 0.5, (float) rangeError);
+            telemetry.addData("range error", rangeError);
 
-        robot.chassis.Drive(DRIVE_SPEED * 0.5, (float) rangeError);
+        }
+
 
 
         sleep(500);
         telemetry.addData("yaw error", yawError);
-        telemetry.addData("strafe error", strafeError);
-        telemetry.addData("measured range", tempTag.ftcPose.range);
-        telemetry.addData("range error", rangeError);
+        telemetry.addData("yaw correction", yawCorrection);
+
+        //telemetry.addData("measured range", tempTag.ftcPose.range);
 
 
 
