@@ -9,8 +9,8 @@ public class Wrist {
     public double TARGET_POSITION;
 
 
-    public double WRIST_DELIVERY_POSITION_HIGH = 0.3;
-    public double WRIST_DELIVERY_POSITION_LOW = 0.28;
+    public double WRIST_DELIVERY_POSITION_HIGH = 0.28;
+    public double WRIST_DELIVERY_POSITION_LOW = 0.27;
     public double WRIST_DELIVERY_POSITION_AUTO = 0.28;
     public double WRIST_PICKUP_POSITION = 0.2;
 
