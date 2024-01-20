@@ -140,6 +140,13 @@ public class Teleop extends LinearOpMode {
             robot.arm.motor.setPower(swing_arm_power);
 
 
+
+            double wrist_power = gamepad2.right_stick_y * 0.6 + 0.05;
+            // Running without encoder allows the arm to be swung from current position.
+            robot.wrist.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.wrist.motor.setPower(wrist_power);
+
+
             // Slider
 
             // Slider is driven by servo, which goes to absolute position.
@@ -187,11 +194,11 @@ public class Teleop extends LinearOpMode {
             }
             //Pickup position
             if(gamepad2.dpad_down){
-                robot.wrist.gotoPickupPosition();
+                robot.wrist.gotoPosition(robot.wrist.WRIST_PICKUP_POSITION);
                 robot.gate.open();
                 Thread.sleep(850);
                 robot.chassis.stopDriveMotors();
-                robot.arm.gotoPickupPosoition();
+                robot.arm.gotoPickupPosition();
             }
 
             if(gamepad2.dpad_right) {
@@ -209,8 +216,8 @@ public class Teleop extends LinearOpMode {
                 double currPos = 0;
                 double increment = -0.01;
 
-                for (currPos = startPos; currPos > endPos; currPos = currPos + increment) {
-                    robot.wrist.gotoPosition(currPos);
+               for (currPos = startPos; currPos > endPos; currPos = currPos + increment) {
+                    //robot.wrist.gotoPosition(0);
                     Thread.sleep(1000);
                 }
             }
@@ -222,7 +229,7 @@ public class Teleop extends LinearOpMode {
                 robot.drone.Latched();
             }
             if(gamepad2.y) {
-                robot.wrist.gotoPickupPosition();
+                robot.wrist.gotoPosition(robot.wrist.WRIST_PICKUP_POSITION);
             }
 
 
@@ -238,7 +245,7 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("Arm Position", robot.arm.motor.getCurrentPosition());
             telemetry.addData("Motor Status", robot.arm.motor.isBusy());
             telemetry.addData("Arm Power", robot.arm.motor.getPower());
-            telemetry.addData("Wrist Position", robot.wrist.servo.getPosition());
+            telemetry.addData("Wrist Position", robot.wrist.motor.getCurrentPosition());
             //telemetry.addData("Slider Position", robot.slider.servo.getPosition());
             telemetry.addData("Gate Position", robot.gate.servo.getPosition());
             telemetry.update();

@@ -53,7 +53,7 @@ public class Arm {
 
     }
 
-    public void gotoPickupPosoition(){
+    public void gotoPickupPosition(){
         this.gotoPosition(ARM_PICKUP_POSITION);
 
     }

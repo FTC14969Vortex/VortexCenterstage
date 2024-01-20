@@ -271,9 +271,9 @@ public class AutoCommon extends LinearOpMode {
         sleep(1000);
 
         // Bring the wrist and arm to pickup position.
-        robot.wrist.gotoPickupPosition();
+        robot.wrist.gotoPosition(robot.wrist.WRIST_PICKUP_POSITION);
         sleep(850);
-        robot.arm.gotoPickupPosoition();
+        robot.arm.gotoPickupPosition();
 
         // Park.
         robot.chassis.Strafe(DRIVE_SPEED, 3 - vision.TARGET_SPIKE_MARK * 6 + (STRAFE_DISTANCE*STRAFE_DIRECTION_FOR_PARKING));
