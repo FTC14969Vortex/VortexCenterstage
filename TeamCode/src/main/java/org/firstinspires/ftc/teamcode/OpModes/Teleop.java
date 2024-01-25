@@ -140,13 +140,6 @@ public class Teleop extends LinearOpMode {
             robot.arm.motor.setPower(swing_arm_power);
 
 
-
-            double wrist_power = gamepad2.right_stick_y * 0.6 + 0.05;
-            // Running without encoder allows the arm to be swung from current position.
-            robot.wrist.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.wrist.motor.setPower(wrist_power);
-
-
             // Slider
 
             // Slider is driven by servo, which goes to absolute position.
@@ -194,11 +187,12 @@ public class Teleop extends LinearOpMode {
             }
             //Pickup position
             if(gamepad2.dpad_down){
-                robot.wrist.gotoPosition(robot.wrist.WRIST_PICKUP_POSITION);
                 robot.gate.open();
                 Thread.sleep(850);
                 robot.chassis.stopDriveMotors();
+                robot.wrist.gotoPickupPosition();
                 robot.arm.gotoPickupPosition();
+
             }
 
             if(gamepad2.dpad_right) {
@@ -211,8 +205,8 @@ public class Teleop extends LinearOpMode {
             }
 
             if(gamepad1.y){
-                double startPos = 0.3;
-                double endPos = 0.15;
+                double startPos = 0.1;
+                double endPos = 0;
                 double currPos = 0;
                 double increment = -0.01;
 
@@ -245,11 +239,9 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("Arm Position", robot.arm.motor.getCurrentPosition());
             telemetry.addData("Motor Status", robot.arm.motor.isBusy());
             telemetry.addData("Arm Power", robot.arm.motor.getPower());
-            telemetry.addData("Wrist Position", robot.wrist.motor.getCurrentPosition());
             //telemetry.addData("Slider Position", robot.slider.servo.getPosition());
             telemetry.addData("Gate Position", robot.gate.servo.getPosition());
             telemetry.update();
-
         }
 
 
