@@ -20,7 +20,9 @@ import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAcceleration
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import org.firstinspires.ftc.teamcode.Helper.Robot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -58,29 +60,41 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
 
 public class AutoBBOdometry extends AutoCommon {
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException{
+        // Initialize
+        // robot.init(hardwareMap);
+        // vision.initDoubleVision(hardwareMap);
+        setUniqueParameters();
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        robot.intake.init(hardwareMap);
 
-        Pose2d startPose = new Pose2d(0, 0, Math.toRadians(90));
+        Pose2d startPose = new Pose2d(0, 0, Math.toRadians(0));
 
-        drive.setPoseEstimate(startPose);
+        drive.setPoseEstimate(new Pose2d());
 
         Trajectory outake = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(20, 9), Math.toRadians(45))
+                .back(48)
                 .build();
 
-        Trajectory goToBackboard = drive.trajectoryBuilder(new Pose2d())
-                .strafeRight(10)
-                .forward(5)
+        Trajectory gotoBackBoard = drive.trajectoryBuilder(outake.end())
+                .splineTo(new Vector2d(50, 33), Math.toRadians(-85))
+                //.splineTo(new Vector2d(9, -10), 0)
                 .build();
-                    
+
+        Trajectory traj3 = drive.trajectoryBuilder(gotoBackBoard.end())
+                .splineTo(new Vector2d(5, 6), 0)
+                .splineTo(new Vector2d(9, -10), 0)
+                .build();
+
         waitForStart();
 
-        if(isStopRequested()) return;
-
         drive.followTrajectory(outake);
+        robot.intake.motor.setPower(0.5);
         robot.intake.MoveIntake(0.5, true);
-        drive.followTrajectory(goToBackboard);
+        Thread.sleep(2000);
+        robot.intake.MoveIntake(0, false);
+        drive.followTrajectory(gotoBackBoard);
+//        drive.followTrajectory(traj3);
     }
 }
 

@@ -141,10 +141,7 @@ public class Teleop extends LinearOpMode {
 
 
 
-            double wrist_power = gamepad2.right_stick_y * 0.6 + 0.05;
             // Running without encoder allows the arm to be swung from current position.
-            robot.wrist.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.wrist.motor.setPower(wrist_power);
 
 
             // Slider
@@ -245,7 +242,6 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("Arm Position", robot.arm.motor.getCurrentPosition());
             telemetry.addData("Motor Status", robot.arm.motor.isBusy());
             telemetry.addData("Arm Power", robot.arm.motor.getPower());
-            telemetry.addData("Wrist Position", robot.wrist.motor.getCurrentPosition());
             //telemetry.addData("Slider Position", robot.slider.servo.getPosition());
             telemetry.addData("Gate Position", robot.gate.servo.getPosition());
             telemetry.update();

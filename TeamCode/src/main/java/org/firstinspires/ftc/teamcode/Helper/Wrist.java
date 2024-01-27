@@ -1,72 +1,50 @@
 package org.firstinspires.ftc.teamcode.Helper;
 
-
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class Wrist {
+    public Servo servo;
+    //servo in use is 5 turn: 0.01 change ~ 5 degrees.
+    public double TARGET_POSITION;
 
-    //Object creation
-    public DcMotor motor;
-    int timeout_ms = 5000;
-    double speed = 0.7;
-    int targetPosition;
-    int currentPosition;
-    public int WRIST_DELIVERY_POSITION_LOW = -96;
-    public int WRIST_DELIVERY_POSITION_HIGH = -96;
-    public int WRIST_DELIVERY_POSITION_AUTO = -96;
-    public int WRIST_PICKUP_POSITION = 0;
-//    int slowDown;
+    public double WRIST_DELIVERY_POSITION_HIGH = 0.2;
+    public double WRIST_DELIVERY_POSITION_LOW = 0.27;
+    public double WRIST_DELIVERY_POSITION_AUTO = 0.28;
+    public double WRIST_PICKUP_POSITION = 0.302;
 
+
+
+    HardwareMap hwMap = null;
 
     public void init(HardwareMap ahwMap) throws InterruptedException {
-        HardwareMap hwMap = ahwMap;
+
+        hwMap = ahwMap;
         //Init motors and servos
-        motor = hwMap.get(DcMotor.class, "Wrist");
-        motor.setDirection(DcMotor.Direction.FORWARD);
-        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        servo = hwMap.get(Servo.class, "Wrist");
+        servo.setDirection(Servo.Direction.FORWARD);
+    }
+
+    public void servoPosition(double TARGET_POSITION) {
+        servo.setPosition(TARGET_POSITION);
 
     }
 
-    // ARM WITH BUTTONS V2
-    public void gotoPosition(int targetPosition) {
-        ElapsedTime runtime = new ElapsedTime();
-        timeout_ms = 3000;
-        currentPosition = motor.getCurrentPosition();
-        motor.setTargetPosition(targetPosition);
-        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        speed = speed * java.lang.Math.signum(targetPosition - currentPosition);
-////        //Set the power of the motor.
-        motor.setPower(speed);
-        runtime.reset();
-
-        while ((runtime.milliseconds() < timeout_ms) && (motor.isBusy())) {
-        }
-        motor.setPower(0); //Holding power.
-        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-
+    public void gotoPickupPosition(){
+        servo.setPosition(WRIST_PICKUP_POSITION);
     }
-
-    public void gotoPickupPosoition(){
-        this.gotoPosition(WRIST_PICKUP_POSITION);
-
-    }
-
     public void gotoLowPosition(){
-        this.gotoPosition(WRIST_DELIVERY_POSITION_LOW);
+        servo.setPosition(WRIST_DELIVERY_POSITION_LOW);
     }
-
     public void gotoHighPosition(){
-        this.gotoPosition(WRIST_DELIVERY_POSITION_HIGH);
+        servo.setPosition(WRIST_DELIVERY_POSITION_HIGH);
     }
     public void gotoAutoPosition(){
-        this.gotoPosition(WRIST_DELIVERY_POSITION_AUTO);
+        servo.setPosition(WRIST_DELIVERY_POSITION_AUTO);
     }
+
+    public void gotoPosition(double currPos) {servo.setPosition(currPos); }
+
+
 
 }
