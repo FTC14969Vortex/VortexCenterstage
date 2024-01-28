@@ -7,7 +7,7 @@ public class Gate {
     public Servo servo;
 
     public double OPEN = 1;
-    public double CLOSE = 0.35;
+    public double CLOSE = 0.65;
 
     HardwareMap hwMap = null;
 

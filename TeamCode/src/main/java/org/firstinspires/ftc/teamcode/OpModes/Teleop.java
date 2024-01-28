@@ -82,10 +82,10 @@ public class Teleop extends LinearOpMode {
             robot.chassis.BRMotor.setPower(DRIVETRAIN_SPEED * br_power);
 
             // Claw
-            if (gamepad1.cross) {
+            if (gamepad1.right_bumper) {
                 robot.gate.close();
             }
-            if (gamepad1.circle) {
+            if (gamepad1.left_bumper) {
                 robot.gate.open();
             }
 
