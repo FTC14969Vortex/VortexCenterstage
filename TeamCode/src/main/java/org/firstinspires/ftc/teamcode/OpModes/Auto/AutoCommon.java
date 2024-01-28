@@ -51,7 +51,7 @@ public class AutoCommon extends LinearOpMode {
     double DRIVE_SPEED = 0.8;
     float TURN_OFFSET = 10;
 
-    enum AutoStages {DETECT_TE, OUTTAKE, GOTO_BACKBOARD, CENTER_AprilTag, DELVER_BACKBOARD_PARK, END_AUTO}
+    enum AutoStages {DETECT_TE,GOTOOUTTAKE, OUTTAKE, GOTO_BACKBOARD, CENTER_AprilTag, DELVER_BACKBOARD_PARK, END_AUTO}
 
     AutoStages currentStage = AutoStages.DETECT_TE;
 

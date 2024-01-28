@@ -59,42 +59,177 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
 @Autonomous(name = "AutoBBOdometry", group = "Auto")
 
 public class AutoBBOdometry extends AutoCommon {
-    @Override
-    public void runOpMode() throws InterruptedException{
+
+    public void outakeCommon() throws InterruptedException {
         // Initialize
         // robot.init(hardwareMap);
         // vision.initDoubleVision(hardwareMap);
         setUniqueParameters();
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         robot.intake.init(hardwareMap);
+        robot.arm.init(hardwareMap);
+        robot.wrist.init(hardwareMap);
+        robot.gate.init(hardwareMap);
 
-        Pose2d startPose = new Pose2d(0, 0, Math.toRadians(0));
 
-        drive.setPoseEstimate(new Pose2d());
 
-        Trajectory outake = drive.trajectoryBuilder(startPose)
-                .back(48)
+
+        Pose2d startPose = new Pose2d(12, 72, Math.toRadians(90));
+
+        drive.setPoseEstimate(startPose);
+//
+        Trajectory outakePart1 = drive.trajectoryBuilder(startPose)
+//                .back(48)
+                .lineTo(new Vector2d(12, 62))
                 .build();
 
-        Trajectory gotoBackBoard = drive.trajectoryBuilder(outake.end())
-                .splineTo(new Vector2d(50, 33), Math.toRadians(-85))
+        Trajectory outakePart2 = drive.trajectoryBuilder(outakePart1.end())
+                .splineTo(new Vector2d(36, 45), Math.toRadians(180))
                 //.splineTo(new Vector2d(9, -10), 0)
                 .build();
-
-        Trajectory traj3 = drive.trajectoryBuilder(gotoBackBoard.end())
+//
+        Trajectory goToBackboard = drive.trajectoryBuilder(outakePart2.end())
                 .splineTo(new Vector2d(5, 6), 0)
                 .splineTo(new Vector2d(9, -10), 0)
                 .build();
 
         waitForStart();
 
-        drive.followTrajectory(outake);
+        drive.followTrajectory(outakePart1);
+        //drive.turn(Math.toRadians(90));
+//        robot.intake.MoveIntake(0, false);
+        drive.followTrajectory(outakePart2);
         robot.intake.motor.setPower(0.5);
         robot.intake.MoveIntake(0.5, true);
         Thread.sleep(2000);
         robot.intake.MoveIntake(0, false);
-        drive.followTrajectory(gotoBackBoard);
-//        drive.followTrajectory(traj3);
+        drive.followTrajectory(goToBackboard);
     }
+
+    //    @Override
+    public void RunOdometry() throws InterruptedException {
+
+        // Initialize
+        robot.init(hardwareMap);
+        vision.initDoubleVision(hardwareMap);
+        setUniqueParameters();
+
+
+        while (!isStarted()) {
+            if (opModeInInit()) {
+                vision.detectTeamElement(); // run detections continuously.
+                telemetry.addData("Target Tag ID", vision.TARGET_TAG_ID);
+                vision.telemetryAprilTag();
+                telemetry.update();
+            }
+        }
+
+
+        waitForStart();
+
+        while (opModeIsActive()) {
+            switch (currentStage) {
+                case DETECT_TE:
+                    vision.detectTeamElement();
+                    telemetry.addData("Target Tag ID", vision.TARGET_TAG_ID);
+                    telemetry.update();
+                    currentStage = AutoStages.GOTOOUTTAKE;
+                    break;
+                case GOTOOUTTAKE:
+                    outakeCommon();
+                    currentStage = AutoStages.OUTTAKE;
+                    break;
+                case OUTTAKE:
+                    /**
+                     * Step 2: Deliver purple pixel to the detected Position.
+                     * (common to all auto)
+                     */
+
+                    switch (vision.TARGET_SPIKE_MARK) {
+                        case 1:
+                            odometry1and4();
+                            break;
+                        case 2:
+                            odometry2and5();
+                            break;
+                        case 3:
+                            odometry3and6();
+                            break;
+                    }
+                    currentStage = AutoStages.GOTO_BACKBOARD;
+                    break;
+                case GOTO_BACKBOARD:
+                    odometryToBackboard();
+                    currentStage = AutoStages.CENTER_AprilTag;
+                    break;
+                case CENTER_AprilTag:
+//                    vision.TARGET_TAG_ID = 6; //Overriding the target tag for testing.
+                    centerToCenterTag();
+                    currentStage = AutoStages.DELVER_BACKBOARD_PARK;
+                    break;
+                case DELVER_BACKBOARD_PARK:
+                    deliverToBackboardAndPark();
+                    sleep(1000);
+                    currentStage = AutoStages.END_AUTO;
+                    break;
+                case END_AUTO:
+                    // End Auto keeps printing debug information via telemetry.
+                    telemetry.update();
+                    sleep(5000); //5 sec delay between telemetry.
+            }
+
+        } // end while loop
+
+    }  //end opMode
+
+    public void odometry1and4() throws InterruptedException {
+        robot.intake.motor.setPower(0.5);
+        robot.intake.MoveIntake(0.5, true);
+        Thread.sleep(2000);
+        robot.intake.MoveIntake(0, false);
+    }
+
+    public void odometry2and5() throws InterruptedException {
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        robot.intake.init(hardwareMap);
+        Trajectory twoandfivePart1 = drive.trajectoryBuilder(new Pose2d(36,45),Math.toRadians(180))
+                .lineTo(new Vector2d(33,42))
+                .build();
+        drive.followTrajectory(twoandfivePart1);
+        robot.intake.motor.setPower(0.5);
+        robot.intake.MoveIntake(0.5, true);
+        Thread.sleep(2000);
+        robot.intake.MoveIntake(0, false);
+        Trajectory twoandfivePart2 = drive.trajectoryBuilder(twoandfivePart1.end(),Math.toRadians(180))
+                .lineTo(new Vector2d(36,45))
+                .build();
+        drive.followTrajectory(twoandfivePart2);
+    }
+    public void odometry3and6() throws InterruptedException {
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        robot.intake.init(hardwareMap);
+        Trajectory threeandsixPart1 = drive.trajectoryBuilder(new Pose2d(36,45),Math.toRadians(180))
+                .lineTo(new Vector2d(30,45))
+                .build();
+        drive.followTrajectory(threeandsixPart1);
+        robot.intake.motor.setPower(0.5);
+        robot.intake.MoveIntake(0.5, true);
+        Thread.sleep(2000);
+        robot.intake.MoveIntake(0, false);
+        Trajectory threeandsixPart2 = drive.trajectoryBuilder(threeandsixPart1.end(),Math.toRadians(180))
+                .lineTo(new Vector2d(36,45))
+                .build();
+        drive.followTrajectory(threeandsixPart2);
+    }
+    public void odometryToBackboard() throws InterruptedException {
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        robot.intake.init(hardwareMap);
+        Trajectory goToBackboard = drive.trajectoryBuilder(new Pose2d(36,45),Math.toRadians(180))
+                .lineTo(new Vector2d(39,45))
+                .build();
+        drive.followTrajectory(goToBackboard);
+    }
+
 }
+
 
