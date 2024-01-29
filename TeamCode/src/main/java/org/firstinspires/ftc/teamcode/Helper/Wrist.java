@@ -8,10 +8,10 @@ public class Wrist {
     //servo in use is 5 turn: 0.01 change ~ 5 degrees.
     public double TARGET_POSITION;
 
-    public double WRIST_DELIVERY_POSITION_HIGH = 0.2;
-    public double WRIST_DELIVERY_POSITION_LOW = 0.27;
+    public double WRIST_DELIVERY_POSITION_HIGH = 0.196;
+    public double WRIST_DELIVERY_POSITION_LOW = 0.275;
     public double WRIST_DELIVERY_POSITION_AUTO = 0.28;
-    public double WRIST_PICKUP_POSITION = 0.302;
+    public double WRIST_PICKUP_POSITION = 0.31;
 
 
 

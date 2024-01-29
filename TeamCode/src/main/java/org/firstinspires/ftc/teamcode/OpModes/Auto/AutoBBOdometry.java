@@ -1,120 +1,68 @@
 package org.firstinspires.ftc.teamcode.OpModes.Auto;
 
-import androidx.annotation.NonNull;
-
-import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.control.PIDCoefficients;
-import com.acmerobotics.roadrunner.drive.DriveSignal;
-import com.acmerobotics.roadrunner.drive.MecanumDrive;
-import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
-import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
-import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
-import com.acmerobotics.roadrunner.trajectory.constraints.AngularVelocityConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.MinVelocityConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
-import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import org.firstinspires.ftc.teamcode.Helper.Robot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
-import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.OpModes.Auto.AutoCommon;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner;
-import org.firstinspires.ftc.teamcode.util.LynxModuleUtil;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ACCEL;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_ACCEL;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_VEL;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_VEL;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MOTOR_VELO_PID;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.RUN_USING_ENCODER;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.TRACK_WIDTH;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.encoderTicksToInches;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kA;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kStatic;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
 
 @Autonomous(name = "AutoBBOdometry", group = "Auto")
 
-public class AutoBBOdometry extends AutoCommon {
+/*
+class TrajPoses{
+    public Vector2d start;
+    public Vector2d end;
 
-    public void outakeCommon() throws InterruptedException {
-        // Initialize
-        // robot.init(hardwareMap);
-        // vision.initDoubleVision(hardwareMap);
-        setUniqueParameters();
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        robot.intake.init(hardwareMap);
-        robot.arm.init(hardwareMap);
-        robot.wrist.init(hardwareMap);
-        robot.gate.init(hardwareMap);
+    public TrajPoses(Vector2d _start, Vector2d _end){
+        start = _start;
+        end = _end;
+*/
 
+public class AutoBBOdometry extends LinearOpMode {
+    public Robot robot = new Robot();
+    public AutoVision vision = new AutoVision();
+    // Initialize
+    double DRIVE_SPEED = 0.8;
 
+    // setUniqueParameters();
+    enum AutoStages {DETECT_TE,GOTOOUTTAKE, OUTTAKE, GOTO_BACKBOARD, CENTER_AprilTag, DELVER_BACKBOARD_PARK, END_AUTO}
+    AutoBBOdometry.AutoStages currentStage = AutoBBOdometry.AutoStages.DETECT_TE;
+    // What direction to strafe to move to the backboard
+    public int STRAFE_TO_BACKBOARD_DIRECTION; // Blue autos require strafing right, and red require strafing left.
 
+    //What distance to strafe to move to the backboard
+    public int STRAFE_TO_BACKBOARD_DISTANCE; //24 inches when starting from the back and 24+72 inches when starting from front.
 
-        Pose2d startPose = new Pose2d(12, 72, Math.toRadians(90));
+    //What angle to turn for the camera to face the backboard
+    public int TURN_ANGLE_TO_FACE_BACKBOARD; // Blue side requires counter clockwise turn, red requires clockwise turn.
 
-        drive.setPoseEstimate(startPose);
-//
-        Trajectory outakePart1 = drive.trajectoryBuilder(startPose)
-//                .back(48)
-                .lineTo(new Vector2d(12, 62))
-                .build();
+    //What distance to strafe so the camera can see the middle tag
+    public int STRAFE_TO_MIDDLE_TAG_DISTANCE;
 
-        Trajectory outakePart2 = drive.trajectoryBuilder(outakePart1.end())
-                .splineTo(new Vector2d(36, 45), Math.toRadians(180))
-                //.splineTo(new Vector2d(9, -10), 0)
-                .build();
-//
-        Trajectory goToBackboard = drive.trajectoryBuilder(outakePart2.end())
-                .splineTo(new Vector2d(5, 6), 0)
-                .splineTo(new Vector2d(9, -10), 0)
-                .build();
+    //What direction to strafe to park.
+    public int STRAFE_DIRECTION_FOR_PARKING;
 
-        waitForStart();
+    public int STRAFE_DISTANCE;
+    public void setUniqueParameters() {
+        vision.RED_APRILTAG_OFFSET = 0;
+        STRAFE_TO_BACKBOARD_DIRECTION = -1; // +1 is right for Blue, -1 is left for Red.
+        TURN_ANGLE_TO_FACE_BACKBOARD = 95;
+        STRAFE_TO_BACKBOARD_DISTANCE = 96;
+        STRAFE_TO_MIDDLE_TAG_DISTANCE = -39;
+        STRAFE_DIRECTION_FOR_PARKING = -1;
+        vision.CENTER_TAG_ID = 5;
 
-        drive.followTrajectory(outakePart1);
-        //drive.turn(Math.toRadians(90));
-//        robot.intake.MoveIntake(0, false);
-        drive.followTrajectory(outakePart2);
-        robot.intake.motor.setPower(0.5);
-        robot.intake.MoveIntake(0.5, true);
-        Thread.sleep(2000);
-        robot.intake.MoveIntake(0, false);
-        drive.followTrajectory(goToBackboard);
     }
 
-    //    @Override
-    public void RunOdometry() throws InterruptedException {
-
-        // Initialize
-        robot.init(hardwareMap);
+    public void runOpMode() throws InterruptedException {
+        //Robot Object
         vision.initDoubleVision(hardwareMap);
-        setUniqueParameters();
-
-
         while (!isStarted()) {
             if (opModeInInit()) {
                 vision.detectTeamElement(); // run detections continuously.
@@ -124,10 +72,9 @@ public class AutoBBOdometry extends AutoCommon {
             }
         }
 
-
         waitForStart();
 
-        while (opModeIsActive()) {
+        while (opModeInInit()) {
             switch (currentStage) {
                 case DETECT_TE:
                     vision.detectTeamElement();
@@ -181,6 +128,148 @@ public class AutoBBOdometry extends AutoCommon {
         } // end while loop
 
     }  //end opMode
+    public void deliverToBackboardAndPark() {
+
+        // Swing the arm and wist to low position.
+        robot.arm.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.arm.gotoAutoPosition();
+        sleep(100);
+        robot.wrist.gotoAutoPosition();
+        sleep(1500);
+
+        // Open the gate to deliver one pixel.
+        robot.gate.open();
+        sleep(1000);
+
+        // Bring the wrist and arm to pickup position.
+        robot.wrist.gotoPosition(robot.wrist.WRIST_PICKUP_POSITION);
+        sleep(850);
+        robot.arm.gotoPickupPosition();
+
+        // Park.
+        robot.chassis.Strafe(DRIVE_SPEED, 3 - vision.TARGET_SPIKE_MARK * 6 + (STRAFE_DISTANCE*STRAFE_DIRECTION_FOR_PARKING));
+        robot.chassis.Drive(DRIVE_SPEED, 13);
+    }
+    public void centerToCenterTag() {
+        double yawError = 0;
+        double yawCorrection = 0;
+        double rotation_comp = 7;
+        float turnOffsetAprilTag = 0;
+        double edgeOffset = 7.5;
+        AprilTagDetection tempTag = null;
+
+
+        tempTag = vision.detect_apriltag(vision.CENTER_TAG_ID);
+        if (tempTag != null) {
+            vision.centerTag = tempTag; //Update the center tag if detection was successful.
+        }
+//        tempTag = vision.detect_apriltag(vision.CENTER_TAG_ID);
+//        if (tempTag != null) {
+//            vision.centerTag = tempTag; //Update the center tag if detection was successful.
+//        }
+        if (vision.centerTag != null) {
+            yawError = vision.centerTag.ftcPose.yaw;
+            if (yawError > -3){
+                yawCorrection += rotation_comp;
+            }
+            if (Math.abs(yawCorrection) > 3) {
+                robot.chassis.autoTurn((float) -yawCorrection, turnOffsetAprilTag);
+                sleep(2000);
+
+            }
+        }
+
+
+        // Use the speed and turn "gains" to calculate how we want the robot to move.
+        // turn = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+
+
+        tempTag = vision.detect_apriltag(vision.CENTER_TAG_ID);
+        if (tempTag != null) {
+            vision.centerTag = tempTag;
+        }
+        if (vision.centerTag != null) {
+            double strafeError = vision.centerTag.ftcPose.x;
+            if (vision.TARGET_TAG_ID < vision.CENTER_TAG_ID) {
+                strafeError -= edgeOffset;
+            } else if (vision.TARGET_TAG_ID > vision.CENTER_TAG_ID) {
+                strafeError += edgeOffset;
+            }
+
+            robot.chassis.Strafe(DRIVE_SPEED, strafeError); //x is in inches.
+            sleep(500);
+            telemetry.addData("strafe error", strafeError);
+        }
+
+
+        tempTag = vision.detect_apriltag(vision.TARGET_TAG_ID);
+        if (tempTag != null) {
+            double rangeError = (tempTag.ftcPose.range / 2.54) - vision.DELIVERY_DISTANCE;
+            robot.chassis.Drive(DRIVE_SPEED * 0.5, (float) rangeError);
+            telemetry.addData("range error", rangeError);
+
+        }
+
+
+
+        sleep(500);
+        telemetry.addData("yaw error", yawError);
+        telemetry.addData("yaw correction", yawCorrection);
+
+        //telemetry.addData("measured range", tempTag.ftcPose.range);
+
+
+
+    }
+    public void outakeCommon() throws InterruptedException {
+        // Initialize
+        // robot.init(hardwareMap);
+        vision.initDoubleVision(hardwareMap);
+        // setUniqueParameters();
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        robot.intake.init(hardwareMap);
+        robot.arm.init(hardwareMap);
+        robot.wrist.init(hardwareMap);
+        robot.gate.init(hardwareMap);
+
+
+
+        Pose2d startPose = new Pose2d(12, 72, Math.toRadians(90));
+
+        drive.setPoseEstimate(startPose);
+        //TrajPoses outakePart1 = new TrajPoses(new Vector2d(12, 62), new Vector2d(14, 72));
+
+
+//
+        Trajectory outakePart1 = drive.trajectoryBuilder(startPose)
+//                .back(48)
+                .lineTo(new Vector2d(12, 62))
+                .build();
+
+        Trajectory outakePart2 = drive.trajectoryBuilder(outakePart1.end())
+                .splineTo(new Vector2d(36, 45), Math.toRadians(180))
+                //.splineTo(new Vector2d(9, -10), 0)
+                .build();
+//
+        Trajectory goToBackboard = drive.trajectoryBuilder(outakePart2.end())
+                .splineTo(new Vector2d(5, 6), 0)
+                .splineTo(new Vector2d(9, -10), 0)
+                .build();
+
+        waitForStart();
+
+        outakePart1.velocity(50);
+        drive.followTrajectory(outakePart1);
+        //drive.turn(Math.toRadians(90));
+//        robot.intake.MoveIntake(0, false);
+        drive.followTrajectory(outakePart2);
+        robot.intake.motor.setPower(0.5);
+        robot.intake.MoveIntake(0.5, true);
+        Thread.sleep(2000);
+        robot.intake.MoveIntake(0, false);
+        drive.followTrajectory(goToBackboard);
+    }
+
 
     public void odometry1and4() throws InterruptedException {
         robot.intake.motor.setPower(0.5);
