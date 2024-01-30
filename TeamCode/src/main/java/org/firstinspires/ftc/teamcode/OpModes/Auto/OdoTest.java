@@ -61,6 +61,9 @@ public class OdoTest extends LinearOpMode {
 
         Trajectory park = drive.trajectoryBuilder(outakePart2.end())
                 .lineTo(new Vector2d(48, 65))
+                .build();
+
+        Trajectory park2 = drive.trajectoryBuilder(outakePart2.end())
                 .lineTo(new Vector2d(65, 65))
                 .build();
 
@@ -86,7 +89,7 @@ public class OdoTest extends LinearOpMode {
         robot.arm.gotoPickupPosition();
         Thread.sleep(1000);
         drive.followTrajectory(park);
-
+        drive.followTrajectory(park2);
 
 
     }
