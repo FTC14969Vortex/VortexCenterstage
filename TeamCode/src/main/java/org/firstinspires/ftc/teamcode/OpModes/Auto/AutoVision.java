@@ -144,10 +144,10 @@ public class AutoVision extends LinearOpMode {
                     .build();
 
             //Competition exposure
-            setManualExposure(60, 250);  // Use low exposure time to reduce motion blur
+            //setManualExposure(60, 250);  // Use low exposure time to reduce motion blur
 
             //Garage Exposure
-            //setManualExposure(200, 250);
+            setManualExposure(200, 250);
 
         } else {
             myVisionPortal = new VisionPortal.Builder()

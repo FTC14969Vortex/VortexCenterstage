@@ -64,12 +64,12 @@ public class AutoBBOdometry extends LinearOpMode {
         //Robot Object
         vision.initDoubleVision(hardwareMap);
         while (!isStarted()) {
-            if (opModeInInit()) {
+            if (isStopRequested()) return;
                 vision.detectTeamElement(); // run detections continuously.
                 telemetry.addData("Target Tag ID", vision.TARGET_TAG_ID);
                 vision.telemetryAprilTag();
                 telemetry.update();
-            }
+
         }
 
         waitForStart();
@@ -84,6 +84,7 @@ public class AutoBBOdometry extends LinearOpMode {
                     break;
                 case GOTOOUTTAKE:
                     outakeCommon();
+
                     currentStage = AutoStages.OUTTAKE;
                     break;
                 case OUTTAKE:
@@ -260,8 +261,7 @@ public class AutoBBOdometry extends LinearOpMode {
 
         outakePart1.velocity(50);
         drive.followTrajectory(outakePart1);
-        //drive.turn(Math.toRadians(90));
-//        robot.intake.MoveIntake(0, false);
+        robot.intake.MoveIntake(0, false);
         drive.followTrajectory(outakePart2);
         robot.intake.motor.setPower(0.5);
         robot.intake.MoveIntake(0.5, true);
