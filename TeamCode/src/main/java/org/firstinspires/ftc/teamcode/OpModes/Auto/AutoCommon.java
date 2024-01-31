@@ -125,7 +125,7 @@ public class AutoCommon extends LinearOpMode {
 
         waitForStart();
 
-        while (opModeIsActive()) {
+
             switch (currentStage) {
                 case DETECT_TE:
                     vision.detectTeamElement();
@@ -180,7 +180,7 @@ public class AutoCommon extends LinearOpMode {
 
         } // end while loop
 
-    }  //end opMode
+      //end opMode
 
     /**
      * Methods for driving the robot.

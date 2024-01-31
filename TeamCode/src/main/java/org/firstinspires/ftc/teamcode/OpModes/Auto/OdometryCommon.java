@@ -10,9 +10,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
 @Autonomous(name = "OdometryCommon", group = "Auto")
 
@@ -23,28 +20,11 @@ public class OdometryCommon extends LinearOpMode{
     Vision Variables
      */
 
-    private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
-
-    // The variable to store our instance of the AprilTag processor.
-    public AprilTagProcessor aprilTag;
-    public TfodProcessor tfod;
-    public VisionPortal myVisionPortal;
-
-    // Custom model with blue and red team elements.
-    private static final String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/FixedLightingCenterstage.tflite";
-    private static final String[] LABELS = {
-            "Blue",
-            "Red"
-    };
-
     //For centering on the AprilTag
     public int TARGET_TAG_ID = 2;            // Start ID as -1, will be updated in the function.
     // X-coordinate of team element at the start of auto.
-    public float XPOS_OF_TEAM_ELEMENT = 320; // Frame size is 640, default in the middle.
-    public int TARGET_SPIKE_MARK = 2;
 
     public int RED_APRILTAG_OFFSET;
-    public float RECOGNITION_SIZE;
 
     // Set Unique Parameters
 
@@ -54,29 +34,48 @@ public class OdometryCommon extends LinearOpMode{
     public Robot robot = new Robot();
     public AutoVision vision = new AutoVision();
     SampleMecanumDrive drive;
-    enum AutoStages {DETECT_TE, GOTOOUTTAKE, OUTTAKE, GOTO_BACKBOARD, DELVER_BACKBOARD_PARK, END_AUTO}
+
+
+    enum AutoStages {DETECT_TE, GOTOOUTTAKE, OUTTAKE, GO_TO_BACKBOARD, DELVER_BACKBOARD, INTAKE_STACK, RETURN_BACKBOARD, PARK, END_AUTO}
     AutoStages currentStage = AutoStages.DETECT_TE;
 
     /*
         Road Runner Variables; vectors, poses, etc.
      */
     Pose2d startPose = new Pose2d(12, 72, Math.toRadians(90));
-    Vector2d outakePart1end = new Vector2d(12, 62);
-    Vector2d outakePart2end = new Vector2d(36, 45);
-    Vector2d goToBackboardend = new Vector2d(45, 48);
-    Vector2d parkend = new Vector2d(50, 72);
-    Vector2d strafeToCenterTag = new Vector2d(60, 65);
-    Vector2d rangeCorrect = new Vector2d(51, 48);
+    Trajectory avoidPerimeter;
+    Trajectory goToOutake;
+    Trajectory outtake_2_5;
+    Trajectory outtake_3_6;
+    Trajectory goToBackboard;
+    Trajectory park;
 
+    Vector2d avoidPerimeterPosition;
+    Vector2d outtakeCommonPosition;
+    Vector2d outtake25Position;
+    Vector2d outtake36Position;
+    Vector2d backboardPosition;
+    Vector2d parkPosition;
+    Vector2d centerTagPosition;
 
     public void setUniqueParameters() {
         vision.RED_APRILTAG_OFFSET = 0;
         vision.CENTER_TAG_ID = 5;
 
+        avoidPerimeterPosition = new Vector2d(12, 62);
+        outtakeCommonPosition = new Vector2d(36, 45);
+        outtake25Position = new Vector2d(17, 30);
+        outtake36Position = new Vector2d(12,45);
+        backboardPosition = new Vector2d(45, 48);
+        parkPosition = new Vector2d(50, 72);
+        centerTagPosition = new Vector2d(60, 65);
+
     }
     
     @Override
     public void runOpMode() throws InterruptedException {
+
+        setUniqueParameters();
 
         robot.intake.init(hardwareMap);
         robot.arm.init(hardwareMap);
@@ -92,17 +91,16 @@ public class OdometryCommon extends LinearOpMode{
         vision.CENTER_TAG_ID = 2;
 
 
-
         while (!isStarted()) {
             if (opModeInInit()) {
                 vision.detectTeamElement(); // run detections continuously.
                 telemetry.addData("Target Tag ID", TARGET_TAG_ID);
-//                vision.telemetryAprilTag();
                 telemetry.update();
             }
         }
 
         waitForStart();
+
 
 
         while (opModeIsActive()) {
@@ -115,7 +113,7 @@ public class OdometryCommon extends LinearOpMode{
                     break;
                 case GOTOOUTTAKE:
                     outakeCommon();
-                    currentStage = AutoStages.GOTOOUTTAKE;
+                    currentStage = AutoStages.OUTTAKE;
                     break;
                 case OUTTAKE:
                     /**
@@ -125,21 +123,30 @@ public class OdometryCommon extends LinearOpMode{
 
                     switch (vision.TARGET_SPIKE_MARK) {
                         case 1:
+                            outtake_1_4();
                             telemetry.addLine("Case 1");
                             break;
                         case 2:
+                            outtake_2_5();
                             telemetry.addLine("Case 2");
                             break;
                         case 3:
+                            outtake_3_6();
                             telemetry.addLine("Case 3");
                             break;
                     }
-                    currentStage = AutoStages.GOTO_BACKBOARD;
+                    currentStage = AutoStages.GO_TO_BACKBOARD;
                     break;
-                case GOTO_BACKBOARD:
-                    currentStage = AutoStages.DELVER_BACKBOARD_PARK;
+                case GO_TO_BACKBOARD:
+                    goToBackboard();
+                    currentStage = AutoStages.DELVER_BACKBOARD;
                     break;
-                case DELVER_BACKBOARD_PARK:
+                case DELVER_BACKBOARD:
+                    deliver();
+                    currentStage = AutoStages.PARK;
+                    break;
+                case PARK:
+                    park();
                     currentStage = AutoStages.END_AUTO;
                     break;
                 case END_AUTO:
@@ -154,55 +161,93 @@ public class OdometryCommon extends LinearOpMode{
 
         drive.setPoseEstimate(startPose);
 
-        Trajectory backOut = drive.trajectoryBuilder(startPose)
-                .lineTo(outakePart1end)
+        avoidPerimeter = drive.trajectoryBuilder(startPose)
+                .lineTo(avoidPerimeterPosition)
                 .build();
 
-        Trajectory outakePart2 = drive.trajectoryBuilder(backOut.end())
-                .splineTo(outakePart2end, Math.toRadians(180))
-                .build();
-
-        Trajectory goToBackboard = drive.trajectoryBuilder(outakePart2.end())
-                .lineTo(goToBackboardend)
-                .build();
-
-        Trajectory park = drive.trajectoryBuilder(goToBackboard.end())
-                .splineTo(parkend, Math.toRadians(180))
+        goToOutake = drive.trajectoryBuilder(avoidPerimeter.end())
+                .splineTo(outtakeCommonPosition, Math.toRadians(180))
                 .build();
 
 
         //Move away so we don't hit the perimeter.
-        drive.followTrajectory(backOut);
-
-        //Stop intake
-        robot.intake.MoveIntake(0, false);
+        drive.followTrajectory(avoidPerimeter);
 
         //Drive to spikemark
-        drive.followTrajectory(outakePart2);
+        drive.followTrajectory(goToOutake);
+
+    }
+    public void outtake_1_4() {
+        //Outtake at spike mark
+        robot.intake.motor.setPower(0.5);
+        robot.intake.MoveIntake(0.6, true);
+        sleep(2000);
+        robot.intake.MoveIntake(0, false);
+    }
+    public void outtake_2_5() {
+        outtake_2_5 = drive.trajectoryBuilder(goToOutake.end())
+                .lineTo(outtake25Position)
+                .build();
+
+        drive.followTrajectory(outtake_2_5);
 
         //Outtake at spike mark
         robot.intake.motor.setPower(0.5);
         robot.intake.MoveIntake(0.5, true);
-        Thread.sleep(2000);
+        sleep(2000);
         robot.intake.MoveIntake(0, false);
 
-        //Go to backboard
+        //Come Back
+        Trajectory comeBack = drive.trajectoryBuilder(outtake_2_5.end())
+                .lineTo(outtakeCommonPosition)
+                .build();
+        drive.followTrajectory(comeBack);
+
+    }
+    public void outtake_3_6() {
+        outtake_3_6 = drive.trajectoryBuilder(goToOutake.end())
+                .lineTo(outtake36Position)
+                .build();
+
+        drive.followTrajectory(outtake_3_6);
+
+        //Outtake at spike mark
+        robot.intake.motor.setPower(0.5);
+        robot.intake.MoveIntake(0.5, true);
+        sleep(2000);
+        robot.intake.MoveIntake(0, false);
+
+        //Come back
+        Trajectory comeBack = drive.trajectoryBuilder(outtake_3_6.end())
+                .lineTo(outtakeCommonPosition)
+                .build();
+        drive.followTrajectory(comeBack);
+    }
+
+    public void goToBackboard() {
+        goToBackboard = drive.trajectoryBuilder(goToOutake.end())
+                .lineTo(backboardPosition)
+                .build();
         drive.followTrajectory(goToBackboard);
-
-        //Delivery
+    }
+    public void deliver() {
         robot.arm.gotoAutoPosition();
-        Thread.sleep(2000);
+        sleep(2000);
         robot.wrist.gotoAutoPosition();
-        Thread.sleep(1500);
+        sleep(1500);
         robot.gate.open();
-        Thread.sleep(2000);
+        sleep(2000);
         robot.wrist.gotoPickupPosition();
-        Thread.sleep(1000);
+        sleep(1000);
         robot.arm.gotoPickupPosition();
-        Thread.sleep(1000);
-
-        //Park
+        sleep(1000);
+    }
+    public void park() {
+        park = drive.trajectoryBuilder(goToBackboard.end())
+                .splineTo(parkPosition, Math.toRadians(180))
+                .build();
         drive.followTrajectory(park);
+
     }
 
     // initializing Vision
