@@ -40,6 +40,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -65,7 +66,7 @@ public class AutoVision extends LinearOpMode {
     /**
      * Vision Variables.
      */
-    private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
+    public boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
     AprilTagDetection centerTag = null;
 
     // The variable to store our instance of the AprilTag processor.
@@ -133,6 +134,7 @@ public class AutoVision extends LinearOpMode {
                 .setModelLabels(LABELS)
                 .build();
 
+
         // -----------------------------------------------------------------------------------------
         // Camera Configuration
         // -----------------------------------------------------------------------------------------
@@ -147,6 +149,7 @@ public class AutoVision extends LinearOpMode {
             //setManualExposure(60, 250);  // Use low exposure time to reduce motion blur
 
             //Garage Exposure
+
             setManualExposure(200, 250);
 
         } else {
@@ -157,11 +160,7 @@ public class AutoVision extends LinearOpMode {
         }
     }   // end initDoubleVision()
 
-    /*
-   Manually set the camera gain and exposure.
-   This can only be called AFTER calling initAprilTag(), and only works for Webcams;
-  */
-    private void setManualExposure(int exposureMS, int gain) {
+    public void setManualExposure(int exposureMS, int gain) {
         // Wait for the camera to be open, then use the controls
 
         if (myVisionPortal == null) {
@@ -194,9 +193,6 @@ public class AutoVision extends LinearOpMode {
         }
     }
 
-    /**
-     * Add telemetry about AprilTag detections.
-     */
     public void telemetryAprilTag() {
         myVisionPortal.setProcessorEnabled(tfod, false);
         myVisionPortal.setProcessorEnabled(aprilTag, true);
@@ -224,18 +220,14 @@ public class AutoVision extends LinearOpMode {
 
     }   // end method telemetryAprilTag()
 
-    /**
-     * Add telemetry about TensorFlow Object Detection (TFOD) recognitions.
-     */
-
     public void detectTeamElement() { // detect position of team element.
         /**
          * Step 1: Detect object
          * (common to all Auto)
          */
         // Enable TFOD to detect object and store the value.
-        myVisionPortal.setProcessorEnabled(tfod, true);
         myVisionPortal.setProcessorEnabled(aprilTag, false);
+        myVisionPortal.setProcessorEnabled(tfod, true);
 
 
         //Get a recognition

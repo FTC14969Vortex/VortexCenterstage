@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode.OpModes.Auto;
 
+import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -338,6 +339,7 @@ public class AutoCommon extends LinearOpMode {
             double rangeError = (tempTag.ftcPose.range / 2.54) - vision.DELIVERY_DISTANCE;
             robot.chassis.Drive(DRIVE_SPEED * 0.5, (float) rangeError);
             telemetry.addData("range error", rangeError);
+
 
         }
 
