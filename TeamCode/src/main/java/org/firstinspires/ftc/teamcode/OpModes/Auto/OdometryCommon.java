@@ -42,7 +42,7 @@ public class OdometryCommon extends LinearOpMode{
     /*
         Road Runner Variables; vectors, poses, etc.
      */
-    Pose2d startPose = new Pose2d(12, 72, Math.toRadians(90));
+    Pose2d startPose;
     Trajectory avoidPerimeter;
     Trajectory goToOutake;
     Trajectory outtake_2_5;
@@ -61,7 +61,7 @@ public class OdometryCommon extends LinearOpMode{
     public void setUniqueParameters() {
         vision.RED_APRILTAG_OFFSET = 0;
         vision.CENTER_TAG_ID = 5;
-
+        startPose = new Pose2d(12, 72, Math.toRadians(90));
         avoidPerimeterPosition = new Vector2d(12, 62);
         outtakeCommonPosition = new Vector2d(36, 45);
         outtake25Position = new Vector2d(17, 30);
