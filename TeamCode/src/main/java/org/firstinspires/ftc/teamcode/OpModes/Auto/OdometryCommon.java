@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @Autonomous(name = "OdometryCommon", group = "Auto")
 
@@ -255,6 +256,8 @@ public class OdometryCommon extends LinearOpMode{
 
 
     }
+
+
     public void outtake_3_6() {
         outtake_3_6 = drive.trajectoryBuilder(goToFrontOutake.end())
                 .lineTo(outtake36Pose)
@@ -297,23 +300,49 @@ public class OdometryCommon extends LinearOpMode{
                 .build();
         drive.followTrajectory(FrontSideBackboard);
     }
+
+    public double getRangeError() {
+
+        AprilTagDetection tempTag = null;
+        double rangeError = 0;
+
+        tempTag = vision.detect_apriltag(vision.CENTER_TAG_ID);
+        if (tempTag != null) {
+            rangeError = (tempTag.ftcPose.range / 2.54) - vision.DELIVERY_DISTANCE;
+            telemetry.addData("range error", rangeError);
+
+        }
+        return rangeError;
+    }
+
     public void deliver() {
         telemetry.addData("CentertagID", vision.CENTER_TAG_ID);
         telemetry.addData("TargetTagID", vision.TARGET_TAG_ID);
         telemetry.update();
+        double rangeError = getRangeError();
+        double adjustedRangeX = BackSideBackboard.end().getX() + rangeError;
         if(vision.TARGET_TAG_ID < vision.CENTER_TAG_ID) {
             moveToDeliveryTag = drive.trajectoryBuilder(BackSideBackboard.end())
-                    .lineTo(new Vector2d(BackSideBackboard.end().getX(), (BackSideBackboard.end().getY() + 7)))
+                    .lineTo(new Vector2d(adjustedRangeX , (BackSideBackboard.end().getY() + 7)))
                     .build();
 
             drive.followTrajectory(moveToDeliveryTag);
         }
-        if(vision.TARGET_TAG_ID > vision.CENTER_TAG_ID) {
+        else if(vision.TARGET_TAG_ID > vision.CENTER_TAG_ID) {
             moveToDeliveryTag = drive.trajectoryBuilder(BackSideBackboard.end())
-                    .lineTo(new Vector2d(BackSideBackboard.end().getX(), (BackSideBackboard.end().getY() - 7)))
+                    .lineTo(new Vector2d(adjustedRangeX, (BackSideBackboard.end().getY() - 7)))
                     .build();
 
             drive.followTrajectory(moveToDeliveryTag);
+        }
+        else{
+            if (rangeError != 0){
+                moveToDeliveryTag = drive.trajectoryBuilder(BackSideBackboard.end())
+                        .lineTo(new Vector2d(adjustedRangeX, (BackSideBackboard.end().getY())))
+                        .build();
+
+                drive.followTrajectory(moveToDeliveryTag);
+            }
         }
 
         robot.arm.gotoAutoPosition();
