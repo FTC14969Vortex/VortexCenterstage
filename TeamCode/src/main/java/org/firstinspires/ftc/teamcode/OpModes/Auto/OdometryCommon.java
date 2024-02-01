@@ -21,7 +21,6 @@ public class OdometryCommon extends LinearOpMode{
      */
 
     //For centering on the AprilTag
-    public int TARGET_TAG_ID = 2;            // Start ID as -1, will be updated in the function.
     // X-coordinate of team element at the start of auto.
 
     public int RED_APRILTAG_OFFSET;
@@ -36,40 +35,54 @@ public class OdometryCommon extends LinearOpMode{
     SampleMecanumDrive drive;
 
 
-    enum AutoStages {DETECT_TE, GOTOOUTTAKE, OUTTAKE, GO_TO_BACKBOARD, DELVER_BACKBOARD, INTAKE_STACK, RETURN_BACKBOARD, PARK, END_AUTO}
+    enum AutoStages {DETECT_TE, GOTOOUTTAKE, OUTTAKE, GO_TO_BACKBOARD, DELIVER_BACKBOARD, INTAKE_STACK, RETURN_BACKBOARD, PARK, END_AUTO}
     AutoStages currentStage = AutoStages.DETECT_TE;
 
     /*
         Road Runner Variables; vectors, poses, etc.
      */
-    Pose2d startPose;
+    boolean IS_AUTO_FRONT;
+
+    //Trajectories
     Trajectory avoidPerimeter;
-    Trajectory goToOutake;
+    Trajectory goToBackOutake;
+    Trajectory goToFrontOutake;
     Trajectory outtake_2_5;
     Trajectory outtake_3_6;
-    Trajectory goToBackboard;
+    Trajectory startBackboard;
+    Trajectory FrontSideBackboard;
+    Trajectory BackSideBackboard;
     Trajectory park;
+    Trajectory moveToDeliveryTag;
 
+    //Positions and Vectors
+    Pose2d startPose;
     Vector2d avoidPerimeterPosition;
-    Vector2d outtakeCommonPosition;
-    Vector2d outtake25Position;
-    Vector2d outtake36Position;
+    Vector2d outtakeBackCommonPose;
+    Vector2d outtake25Pose;
+    Vector2d outtake36Pose;
+    Vector2d outtakeFrontCommonPose;
+    Vector2d startBackboardPose;
     Vector2d backboardPosition;
     Vector2d parkPosition;
-    Vector2d centerTagPosition;
 
     public void setUniqueParameters() {
+        IS_AUTO_FRONT = false;
         vision.RED_APRILTAG_OFFSET = 0;
+
+        //Center Tag is 5 for Red, 2 for Blue
         vision.CENTER_TAG_ID = 5;
+
+        //Coordinates for where the robot is initialized
         startPose = new Pose2d(12, 72, Math.toRadians(90));
         avoidPerimeterPosition = new Vector2d(12, 62);
-        outtakeCommonPosition = new Vector2d(36, 45);
-        outtake25Position = new Vector2d(17, 30);
-        outtake36Position = new Vector2d(12,45);
+        outtakeBackCommonPose = new Vector2d(36, 45);
+        outtakeFrontCommonPose = new Vector2d(-60, 48);
+        outtake25Pose = new Vector2d(20, 36);
+        outtake36Pose = new Vector2d(12,45);
+        startBackboardPose = new Vector2d(-12,12);
         backboardPosition = new Vector2d(45, 48);
         parkPosition = new Vector2d(50, 72);
-        centerTagPosition = new Vector2d(60, 65);
-
     }
     
     @Override
@@ -94,8 +107,9 @@ public class OdometryCommon extends LinearOpMode{
         while (!isStarted()) {
             if (opModeInInit()) {
                 vision.detectTeamElement(); // run detections continuously.
-                telemetry.addData("Target Tag ID", TARGET_TAG_ID);
+                telemetry.addData("Target Tag ID", vision.TARGET_TAG_ID);
                 telemetry.update();
+                robot.gate.close();
             }
         }
 
@@ -112,7 +126,13 @@ public class OdometryCommon extends LinearOpMode{
                     currentStage = AutoStages.GOTOOUTTAKE;
                     break;
                 case GOTOOUTTAKE:
-                    outakeCommon();
+                    if (!IS_AUTO_FRONT) {
+                        outakeBackCommon();
+                    }
+                    else {
+                        outakeFrontCommon();
+                    }
+
                     currentStage = AutoStages.OUTTAKE;
                     break;
                 case OUTTAKE:
@@ -138,10 +158,15 @@ public class OdometryCommon extends LinearOpMode{
                     currentStage = AutoStages.GO_TO_BACKBOARD;
                     break;
                 case GO_TO_BACKBOARD:
-                    goToBackboard();
-                    currentStage = AutoStages.DELVER_BACKBOARD;
+                    if (!IS_AUTO_FRONT) {
+                        BackboardBack();
+                    }
+                    else {
+                        BackboardFront();
+                    }
+                    currentStage = AutoStages.DELIVER_BACKBOARD;
                     break;
-                case DELVER_BACKBOARD:
+                case DELIVER_BACKBOARD:
                     deliver();
                     currentStage = AutoStages.PARK;
                     break;
@@ -157,7 +182,7 @@ public class OdometryCommon extends LinearOpMode{
         }
     }
 
-    public void outakeCommon() throws InterruptedException {
+    public void outakeBackCommon() throws InterruptedException {
 
         drive.setPoseEstimate(startPose);
 
@@ -165,16 +190,34 @@ public class OdometryCommon extends LinearOpMode{
                 .lineTo(avoidPerimeterPosition)
                 .build();
 
-        goToOutake = drive.trajectoryBuilder(avoidPerimeter.end())
-                .splineTo(outtakeCommonPosition, Math.toRadians(180))
+        goToBackOutake = drive.trajectoryBuilder(avoidPerimeter.end())
+                .splineTo(outtakeBackCommonPose, Math.toRadians(180))
                 .build();
-
 
         //Move away so we don't hit the perimeter.
         drive.followTrajectory(avoidPerimeter);
 
         //Drive to spikemark
-        drive.followTrajectory(goToOutake);
+        drive.followTrajectory(goToBackOutake);
+
+    }
+    public void outakeFrontCommon() throws InterruptedException {
+
+        drive.setPoseEstimate(startPose);
+
+        avoidPerimeter = drive.trajectoryBuilder(startPose)
+                .lineTo(avoidPerimeterPosition)
+                .build();
+
+        goToFrontOutake = drive.trajectoryBuilder(avoidPerimeter.end())
+                .splineTo(outtakeFrontCommonPose, Math.toRadians(0))
+                .build();
+
+        //Move away so we don't hit the perimeter.
+        drive.followTrajectory(avoidPerimeter);
+
+        //Drive to spikemark
+        drive.followTrajectory(goToFrontOutake);
 
     }
     public void outtake_1_4() {
@@ -185,8 +228,8 @@ public class OdometryCommon extends LinearOpMode{
         robot.intake.MoveIntake(0, false);
     }
     public void outtake_2_5() {
-        outtake_2_5 = drive.trajectoryBuilder(goToOutake.end())
-                .lineTo(outtake25Position)
+        outtake_2_5 = drive.trajectoryBuilder(goToFrontOutake.end())
+                .lineTo(outtake25Pose)
                 .build();
 
         drive.followTrajectory(outtake_2_5);
@@ -198,15 +241,23 @@ public class OdometryCommon extends LinearOpMode{
         robot.intake.MoveIntake(0, false);
 
         //Come Back
-        Trajectory comeBack = drive.trajectoryBuilder(outtake_2_5.end())
-                .lineTo(outtakeCommonPosition)
-                .build();
-        drive.followTrajectory(comeBack);
+        if (!IS_AUTO_FRONT){
+            Trajectory comeBack = drive.trajectoryBuilder(outtake_2_5.end())
+                    .lineTo(outtakeBackCommonPose)
+                    .build();
+            drive.followTrajectory(comeBack);
+        } else {
+            Trajectory comeBack = drive.trajectoryBuilder(outtake_2_5.end())
+                    .lineTo(outtakeFrontCommonPose)
+                    .build();
+            drive.followTrajectory(comeBack);
+        }
+
 
     }
     public void outtake_3_6() {
-        outtake_3_6 = drive.trajectoryBuilder(goToOutake.end())
-                .lineTo(outtake36Position)
+        outtake_3_6 = drive.trajectoryBuilder(goToFrontOutake.end())
+                .lineTo(outtake36Pose)
                 .build();
 
         drive.followTrajectory(outtake_3_6);
@@ -218,19 +269,53 @@ public class OdometryCommon extends LinearOpMode{
         robot.intake.MoveIntake(0, false);
 
         //Come back
-        Trajectory comeBack = drive.trajectoryBuilder(outtake_3_6.end())
-                .lineTo(outtakeCommonPosition)
-                .build();
-        drive.followTrajectory(comeBack);
+        if (!IS_AUTO_FRONT){
+            Trajectory comeBack = drive.trajectoryBuilder(outtake_3_6.end())
+                    .lineTo(outtakeBackCommonPose)
+                    .build();
+            drive.followTrajectory(comeBack);
+        } else {
+            Trajectory comeBack = drive.trajectoryBuilder(outtake_3_6.end())
+                    .lineTo(outtakeFrontCommonPose)
+                    .build();
+            drive.followTrajectory(comeBack);
+        }
     }
 
-    public void goToBackboard() {
-        goToBackboard = drive.trajectoryBuilder(goToOutake.end())
+    public void BackboardBack() {
+        BackSideBackboard = drive.trajectoryBuilder(goToBackOutake.end())
                 .lineTo(backboardPosition)
                 .build();
-        drive.followTrajectory(goToBackboard);
+        drive.followTrajectory(BackSideBackboard);
+    }
+    public void BackboardFront() {
+        startBackboard = drive.trajectoryBuilder(goToFrontOutake.end())
+                .lineTo(startBackboardPose)
+                .build();
+        FrontSideBackboard = drive.trajectoryBuilder(startBackboard.end())
+                .lineTo(backboardPosition)
+                .build();
+        drive.followTrajectory(FrontSideBackboard);
     }
     public void deliver() {
+        telemetry.addData("CentertagID", vision.CENTER_TAG_ID);
+        telemetry.addData("TargetTagID", vision.TARGET_TAG_ID);
+        telemetry.update();
+        if(vision.TARGET_TAG_ID < vision.CENTER_TAG_ID) {
+            moveToDeliveryTag = drive.trajectoryBuilder(BackSideBackboard.end())
+                    .lineTo(new Vector2d(BackSideBackboard.end().getX(), (BackSideBackboard.end().getY() + 7)))
+                    .build();
+
+            drive.followTrajectory(moveToDeliveryTag);
+        }
+        if(vision.TARGET_TAG_ID > vision.CENTER_TAG_ID) {
+            moveToDeliveryTag = drive.trajectoryBuilder(BackSideBackboard.end())
+                    .lineTo(new Vector2d(BackSideBackboard.end().getX(), (BackSideBackboard.end().getY() - 7)))
+                    .build();
+
+            drive.followTrajectory(moveToDeliveryTag);
+        }
+
         robot.arm.gotoAutoPosition();
         sleep(2000);
         robot.wrist.gotoAutoPosition();
@@ -241,10 +326,11 @@ public class OdometryCommon extends LinearOpMode{
         sleep(1000);
         robot.arm.gotoPickupPosition();
         sleep(1000);
+
     }
     public void park() {
-        park = drive.trajectoryBuilder(goToBackboard.end())
-                .splineTo(parkPosition, Math.toRadians(180))
+        park = drive.trajectoryBuilder(BackSideBackboard.end())
+                .lineTo(parkPosition)
                 .build();
         drive.followTrajectory(park);
 

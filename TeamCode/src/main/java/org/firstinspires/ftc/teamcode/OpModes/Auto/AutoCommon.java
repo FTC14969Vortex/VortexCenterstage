@@ -31,13 +31,14 @@ package org.firstinspires.ftc.teamcode.OpModes.Auto;
 
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 
 import org.firstinspires.ftc.teamcode.Helper.Robot;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-
+@Disabled
 
 @Autonomous(name = "AutoCommon", group = "Auto")
 public class AutoCommon extends LinearOpMode {

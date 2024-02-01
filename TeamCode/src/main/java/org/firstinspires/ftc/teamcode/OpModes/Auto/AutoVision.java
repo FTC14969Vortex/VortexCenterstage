@@ -107,7 +107,7 @@ public class AutoVision extends LinearOpMode {
     public int RED_APRILTAG_OFFSET; // 0 for Blue side and 3 for Red side.
 
     //ID of the center AprilTag
-    public int CENTER_TAG_ID;    //2 for blue, 5 for red
+    public int CENTER_TAG_ID = 2;    //2 for blue, 5 for red
 
     /**
      * Initialize AprilTag and TFOD.

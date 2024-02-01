@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.OpModes.Auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 @Autonomous(name = "AutoBlueBackNew", group = "Auto")
-
+@Disabled
 public class AutoBlueBackNew extends AutoCommon{
 
     @Override
