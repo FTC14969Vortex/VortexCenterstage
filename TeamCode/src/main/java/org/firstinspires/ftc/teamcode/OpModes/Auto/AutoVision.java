@@ -81,7 +81,7 @@ public class AutoVision extends LinearOpMode {
             "Red"
     };
 
-    double DELIVERY_DISTANCE = 18.5; //  This is how close the camera should get to the target (inches)
+    double DELIVERY_DISTANCE = 18; //  This is how close the camera should get to the target (inches)
     //For centering on the AprilTag
     public int TARGET_TAG_ID = -1;            // Start ID as -1, will be updated in the function.
     // X-coordinate of team element at the start of auto.
@@ -96,7 +96,7 @@ public class AutoVision extends LinearOpMode {
 
     // Robot control parameters
     double DRIVE_SPEED = 0.7;
-
+    public int CENTER_TAG_ID;
     //------------------------------------------------------------------
 
     /**
@@ -105,9 +105,6 @@ public class AutoVision extends LinearOpMode {
      */
 
     public int RED_APRILTAG_OFFSET; // 0 for Blue side and 3 for Red side.
-
-    //ID of the center AprilTag
-    public int CENTER_TAG_ID = 2;    //2 for blue, 5 for red
 
     /**
      * Initialize AprilTag and TFOD.
@@ -246,6 +243,7 @@ public class AutoVision extends LinearOpMode {
         }
 
         if (RED_APRILTAG_OFFSET == 0){
+            CENTER_TAG_ID = 2;
             if (XPOS_OF_TEAM_ELEMENT < 120) {
                 TARGET_SPIKE_MARK = 1; //Left
                 TARGET_TAG_ID = 1;
@@ -261,6 +259,7 @@ public class AutoVision extends LinearOpMode {
 
             }
         } else {
+            CENTER_TAG_ID = 5;
             if (XPOS_OF_TEAM_ELEMENT < 120) {
                 TARGET_SPIKE_MARK = 3; //Left
                 TARGET_TAG_ID = 4;

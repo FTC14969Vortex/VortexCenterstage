@@ -56,6 +56,7 @@ public class OdometryCommon extends LinearOpMode{
     Trajectory startBackboard;
     Trajectory FrontSideBackboard;
     Trajectory BackSideBackboard;
+    Trajectory backintoBoard;
     Trajectory park;
     Trajectory moveToDeliveryTag;
 
@@ -199,7 +200,7 @@ public class OdometryCommon extends LinearOpMode{
                 .build();
 
         goToBackOutake = drive.trajectoryBuilder(avoidPerimeter.end())
-                .splineTo(outtakeCommonPose, Math.toRadians(180))
+                .lineToLinearHeading(new Pose2d(outtakeCommonPose.getX(),outtakeCommonPose.getY(), Math.toRadians(180)))
                 .build();
 
         //Move away so we don't hit the perimeter.
@@ -344,7 +345,7 @@ public class OdometryCommon extends LinearOpMode{
         drive.followTrajectory(BackSideBackboard);
     }
     public void BackboardFront() {
-        startBackboard = drive.trajectoryBuilder(comeBack.end())
+        startBackboard = drive.trajectoryBuilder(goToFrontOutake.end())
                 .lineTo(startBackboardPose)
                 .build();
         FrontSideBackboard = drive.trajectoryBuilder(startBackboard.end())
@@ -398,10 +399,20 @@ public class OdometryCommon extends LinearOpMode{
             }
         }
 
+        backintoBoard = drive.trajectoryBuilder(moveToDeliveryTag.end())
+                .lineTo(
+                        new Vector2d(moveToDeliveryTag.end().getX()+1, moveToDeliveryTag.end().getY()),
+                        SampleMecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL)
+                )
+                .build();
+
+
         robot.arm.gotoAutoPosition();
         sleep(2000);
         robot.wrist.gotoAutoPosition();
         sleep(1500);
+        drive.followTrajectory(backintoBoard);
         robot.gate.open();
         sleep(2000);
         robot.wrist.gotoPickupPosition();
@@ -439,10 +450,18 @@ public class OdometryCommon extends LinearOpMode{
                 drive.followTrajectory(moveToDeliveryTag);
             }
         }
+        backintoBoard = drive.trajectoryBuilder(moveToDeliveryTag.end())
+                .lineTo(
+                        new Vector2d(moveToDeliveryTag.end().getX()+1, moveToDeliveryTag.end().getY()),
+                        SampleMecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL)
+                )
+                .build();
 
         robot.arm.gotoAutoPosition();
         sleep(500);
         robot.wrist.gotoAutoPosition();
+        drive.followTrajectory(backintoBoard);
         sleep(500);
         robot.gate.open();
         sleep(500);
@@ -453,12 +472,12 @@ public class OdometryCommon extends LinearOpMode{
     }
     public void park() {
         if (!IS_AUTO_FRONT) {
-            park = drive.trajectoryBuilder(BackSideBackboard.end())
+            park = drive.trajectoryBuilder(backintoBoard.end())
                     .lineTo(parkPosition)
                     .build();
             drive.followTrajectory(park);
         } else {
-            park = drive.trajectoryBuilder(FrontSideBackboard.end())
+            park = drive.trajectoryBuilder(backintoBoard.end())
                     .lineTo(parkPosition)
                     .build();
             drive.followTrajectory(park);
