@@ -218,8 +218,7 @@ public class OdometryCommon extends LinearOpMode{
                 .build();
 
         goToFrontOutake = drive.trajectoryBuilder(avoidPerimeter.end())
-                .splineTo(outtakeCommonPose, Math.toRadians(0))
-                .build();
+                .lineToLinearHeading(new Pose2d(outtakeCommonPose.getX(),outtakeCommonPose.getY(), Math.toRadians(0))).build();
 
         //Move away so we don't hit the perimeter.
         drive.followTrajectory(avoidPerimeter);
@@ -442,15 +441,14 @@ public class OdometryCommon extends LinearOpMode{
         }
 
         robot.arm.gotoAutoPosition();
-        sleep(2000);
+        sleep(500);
         robot.wrist.gotoAutoPosition();
-        sleep(1500);
+        sleep(500);
         robot.gate.open();
-        sleep(2000);
+        sleep(500);
         robot.wrist.gotoPickupPosition();
-        sleep(1000);
+        sleep(500);
         robot.arm.gotoPickupPosition();
-        sleep(1000);
 
     }
     public void park() {

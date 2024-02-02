@@ -13,7 +13,7 @@ public class OdoBlueBack extends OdometryCommon{
         vision.RED_APRILTAG_OFFSET = 0;
 
         //Center Tag is 5 for Red, 2 for Blue
-        vision.CENTER_TAG_ID = 5;
+        vision.CENTER_TAG_ID = 2;
 
         //Coordinates for where the robot is initialized
         startPose = new Pose2d(12, 72, Math.toRadians(90));
@@ -21,7 +21,7 @@ public class OdoBlueBack extends OdometryCommon{
         outtakeCommonPose = new Vector2d(36, 45);
 
         //Outake Coordinates for Autos
-        outtake25Pose = new Vector2d(20, 36);
+        outtake25Pose = new Vector2d(20, 33);
         outtake36Pose = new Vector2d(12,45);
 
         backboardPosition = new Vector2d(45, 48);
