@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.Helper.Robot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
@@ -48,8 +49,10 @@ public class OdometryCommon extends LinearOpMode{
     Trajectory avoidPerimeter;
     Trajectory goToBackOutake;
     Trajectory goToFrontOutake;
+    Trajectory outtake_1_4;
     Trajectory outtake_2_5;
     Trajectory outtake_3_6;
+    Trajectory comeBack;
     Trajectory startBackboard;
     Trajectory FrontSideBackboard;
     Trajectory BackSideBackboard;
@@ -59,10 +62,10 @@ public class OdometryCommon extends LinearOpMode{
     //Positions and Vectors
     Pose2d startPose;
     Vector2d avoidPerimeterPosition;
-    Vector2d outtakeBackCommonPose;
+    Vector2d outtakeCommonPose;
+    Vector2d outtake14pose;
     Vector2d outtake25Pose;
     Vector2d outtake36Pose;
-    Vector2d outtakeFrontCommonPose;
     Vector2d startBackboardPose;
     Vector2d backboardPosition;
     Vector2d parkPosition;
@@ -77,13 +80,13 @@ public class OdometryCommon extends LinearOpMode{
         //Coordinates for where the robot is initialized
         startPose = new Pose2d(12, 72, Math.toRadians(90));
         avoidPerimeterPosition = new Vector2d(12, 62);
-        outtakeBackCommonPose = new Vector2d(36, 45);
-        outtakeFrontCommonPose = new Vector2d(-60, 48);
+        outtakeCommonPose = new Vector2d(36, 45);
+        outtake14pose = new Vector2d(-55, 45);
         outtake25Pose = new Vector2d(20, 36);
         outtake36Pose = new Vector2d(12,45);
         startBackboardPose = new Vector2d(-12,12);
         backboardPosition = new Vector2d(45, 48);
-        parkPosition = new Vector2d(50, 72);
+        parkPosition = new Vector2d(48, 72);
     }
     
     @Override
@@ -168,7 +171,11 @@ public class OdometryCommon extends LinearOpMode{
                     currentStage = AutoStages.DELIVER_BACKBOARD;
                     break;
                 case DELIVER_BACKBOARD:
-                    deliver();
+                    if (!IS_AUTO_FRONT) {
+                        deliverBack();
+                    } else {
+                        deliverFront();
+                    }
                     currentStage = AutoStages.PARK;
                     break;
                 case PARK:
@@ -192,7 +199,7 @@ public class OdometryCommon extends LinearOpMode{
                 .build();
 
         goToBackOutake = drive.trajectoryBuilder(avoidPerimeter.end())
-                .splineTo(outtakeBackCommonPose, Math.toRadians(180))
+                .splineTo(outtakeCommonPose, Math.toRadians(180))
                 .build();
 
         //Move away so we don't hit the perimeter.
@@ -211,7 +218,7 @@ public class OdometryCommon extends LinearOpMode{
                 .build();
 
         goToFrontOutake = drive.trajectoryBuilder(avoidPerimeter.end())
-                .splineTo(outtakeFrontCommonPose, Math.toRadians(0))
+                .splineTo(outtakeCommonPose, Math.toRadians(0))
                 .build();
 
         //Move away so we don't hit the perimeter.
@@ -222,35 +229,73 @@ public class OdometryCommon extends LinearOpMode{
 
     }
     public void outtake_1_4() {
-        //Outtake at spike mark
-        robot.intake.motor.setPower(0.5);
-        robot.intake.MoveIntake(0.6, true);
-        sleep(2000);
-        robot.intake.MoveIntake(0, false);
+        if (!IS_AUTO_FRONT) {
+            //Outtake at spike mark
+            robot.intake.motor.setPower(0.5);
+            robot.intake.MoveIntake(0.6, true);
+            sleep(2000);
+            robot.intake.MoveIntake(0, false);
+        } else {
+            outtake_1_4 = drive.trajectoryBuilder(goToFrontOutake.end())
+                    .lineTo(
+                            outtake14pose,
+                            SampleMecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                            SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL)
+                    )
+                    .build();
+            comeBack = drive.trajectoryBuilder(outtake_1_4.end())
+                    .lineTo(outtakeCommonPose)
+                    .build();
+            drive.followTrajectory(outtake_1_4);
+
+            //Outtake at spike mark
+            robot.intake.motor.setPower(0.5);
+            robot.intake.MoveIntake(0.5, true);
+            sleep(2000);
+            robot.intake.MoveIntake(0, false);
+
+            //Return to Outtake common position
+            drive.followTrajectory(comeBack);
+        }
     }
     public void outtake_2_5() {
-        outtake_2_5 = drive.trajectoryBuilder(goToFrontOutake.end())
-                .lineTo(outtake25Pose)
-                .build();
 
-        drive.followTrajectory(outtake_2_5);
-
-        //Outtake at spike mark
-        robot.intake.motor.setPower(0.5);
-        robot.intake.MoveIntake(0.5, true);
-        sleep(2000);
-        robot.intake.MoveIntake(0, false);
-
-        //Come Back
         if (!IS_AUTO_FRONT){
-            Trajectory comeBack = drive.trajectoryBuilder(outtake_2_5.end())
-                    .lineTo(outtakeBackCommonPose)
+            outtake_2_5 = drive.trajectoryBuilder(goToBackOutake.end())
+                    .lineTo(outtake25Pose)
                     .build();
+
+            comeBack = drive.trajectoryBuilder(outtake_2_5.end())
+                    .lineTo(outtakeCommonPose)
+                    .build();
+
+            drive.followTrajectory(outtake_2_5);
+
+            //Outtake at spike mark
+            robot.intake.motor.setPower(0.5);
+            robot.intake.MoveIntake(0.5, true);
+            sleep(2000);
+            robot.intake.MoveIntake(0, false);
+
+            //Return to Outtake common position
             drive.followTrajectory(comeBack);
         } else {
-            Trajectory comeBack = drive.trajectoryBuilder(outtake_2_5.end())
-                    .lineTo(outtakeFrontCommonPose)
+            outtake_2_5 = drive.trajectoryBuilder(goToFrontOutake.end())
+                    .lineTo(outtake25Pose)
                     .build();
+            comeBack = drive.trajectoryBuilder(outtake_2_5.end())
+                    .lineTo(outtakeCommonPose)
+                    .build();
+
+            drive.followTrajectory(outtake_2_5);
+
+            //Outtake at spike mark
+            robot.intake.motor.setPower(0.5);
+            robot.intake.MoveIntake(0.5, true);
+            sleep(2000);
+            robot.intake.MoveIntake(0, false);
+
+            //Return to Outtake common position
             drive.followTrajectory(comeBack);
         }
 
@@ -259,29 +304,37 @@ public class OdometryCommon extends LinearOpMode{
 
 
     public void outtake_3_6() {
-        outtake_3_6 = drive.trajectoryBuilder(goToFrontOutake.end())
-                .lineTo(outtake36Pose)
-                .build();
-
-        drive.followTrajectory(outtake_3_6);
-
-        //Outtake at spike mark
-        robot.intake.motor.setPower(0.5);
-        robot.intake.MoveIntake(0.5, true);
-        sleep(2000);
-        robot.intake.MoveIntake(0, false);
-
-        //Come back
         if (!IS_AUTO_FRONT){
-            Trajectory comeBack = drive.trajectoryBuilder(outtake_3_6.end())
-                    .lineTo(outtakeBackCommonPose)
+            outtake_3_6 = drive.trajectoryBuilder(goToBackOutake.end())
+                    .lineTo(
+                            outtake36Pose,
+                            SampleMecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                            SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL)
+                            )
                     .build();
+
+            comeBack = drive.trajectoryBuilder(outtake_3_6.end())
+                    .lineTo(outtakeCommonPose)
+                    .build();
+
+            drive.followTrajectory(outtake_3_6);
+
+            //Outtake at spike mark
+            robot.intake.motor.setPower(0.5);
+            robot.intake.MoveIntake(0.5, true);
+            sleep(2000);
+            robot.intake.MoveIntake(0, false);
+
+            //Return to Outtake common position
             drive.followTrajectory(comeBack);
         } else {
-            Trajectory comeBack = drive.trajectoryBuilder(outtake_3_6.end())
-                    .lineTo(outtakeFrontCommonPose)
-                    .build();
-            drive.followTrajectory(comeBack);
+
+            //Outtake at spike mark
+            robot.intake.motor.setPower(0.5);
+            robot.intake.MoveIntake(0.5, true);
+            sleep(2000);
+            robot.intake.MoveIntake(0, false);
+
         }
     }
 
@@ -292,12 +345,13 @@ public class OdometryCommon extends LinearOpMode{
         drive.followTrajectory(BackSideBackboard);
     }
     public void BackboardFront() {
-        startBackboard = drive.trajectoryBuilder(goToFrontOutake.end())
+        startBackboard = drive.trajectoryBuilder(comeBack.end())
                 .lineTo(startBackboardPose)
                 .build();
         FrontSideBackboard = drive.trajectoryBuilder(startBackboard.end())
-                .lineTo(backboardPosition)
+                .splineTo(backboardPosition, Math.toRadians(180))
                 .build();
+        drive.followTrajectory(startBackboard);
         drive.followTrajectory(FrontSideBackboard);
     }
 
@@ -315,7 +369,7 @@ public class OdometryCommon extends LinearOpMode{
         return rangeError;
     }
 
-    public void deliver() {
+    public void deliverBack() {
         telemetry.addData("CentertagID", vision.CENTER_TAG_ID);
         telemetry.addData("TargetTagID", vision.TARGET_TAG_ID);
         telemetry.update();
@@ -357,11 +411,60 @@ public class OdometryCommon extends LinearOpMode{
         sleep(1000);
 
     }
+    public void deliverFront() {
+        telemetry.addData("CentertagID", vision.CENTER_TAG_ID);
+        telemetry.addData("TargetTagID", vision.TARGET_TAG_ID);
+        telemetry.update();
+        double rangeError = getRangeError();
+        double adjustedRangeX = FrontSideBackboard.end().getX() + rangeError;
+        if(vision.TARGET_TAG_ID < vision.CENTER_TAG_ID) {
+            moveToDeliveryTag = drive.trajectoryBuilder(FrontSideBackboard.end())
+                    .lineTo(new Vector2d(adjustedRangeX , (FrontSideBackboard.end().getY() + 7)))
+                    .build();
+
+            drive.followTrajectory(moveToDeliveryTag);
+        }
+        else if(vision.TARGET_TAG_ID > vision.CENTER_TAG_ID) {
+            moveToDeliveryTag = drive.trajectoryBuilder(FrontSideBackboard.end())
+                    .lineTo(new Vector2d(adjustedRangeX, (FrontSideBackboard.end().getY() - 7)))
+                    .build();
+
+            drive.followTrajectory(moveToDeliveryTag);
+        }
+        else{
+            if (rangeError != 0){
+                moveToDeliveryTag = drive.trajectoryBuilder(FrontSideBackboard.end())
+                        .lineTo(new Vector2d(adjustedRangeX, (FrontSideBackboard.end().getY())))
+                        .build();
+
+                drive.followTrajectory(moveToDeliveryTag);
+            }
+        }
+
+        robot.arm.gotoAutoPosition();
+        sleep(2000);
+        robot.wrist.gotoAutoPosition();
+        sleep(1500);
+        robot.gate.open();
+        sleep(2000);
+        robot.wrist.gotoPickupPosition();
+        sleep(1000);
+        robot.arm.gotoPickupPosition();
+        sleep(1000);
+
+    }
     public void park() {
-        park = drive.trajectoryBuilder(BackSideBackboard.end())
-                .lineTo(parkPosition)
-                .build();
-        drive.followTrajectory(park);
+        if (!IS_AUTO_FRONT) {
+            park = drive.trajectoryBuilder(BackSideBackboard.end())
+                    .lineTo(parkPosition)
+                    .build();
+            drive.followTrajectory(park);
+        } else {
+            park = drive.trajectoryBuilder(FrontSideBackboard.end())
+                    .lineTo(parkPosition)
+                    .build();
+            drive.followTrajectory(park);
+        }
 
     }
 

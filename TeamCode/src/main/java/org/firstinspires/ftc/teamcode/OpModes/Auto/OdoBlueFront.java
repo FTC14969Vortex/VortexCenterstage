@@ -18,14 +18,16 @@ public class OdoBlueFront extends OdometryCommon{
         startPose = new Pose2d(-36, 72, Math.toRadians(90));
 
         avoidPerimeterPosition = new Vector2d(-36, 62);
-        outtakeBackCommonPose = new Vector2d(36, 45);
-        outtakeFrontCommonPose = new Vector2d(-60, 48);
+        outtakeCommonPose = new Vector2d(-60, 48);
 
         //Outake Coordinates for Autos
+        outtake14pose = new Vector2d(-42, 45);
         outtake25Pose = new Vector2d(-48, 36);
-        outtake36Pose = new Vector2d(-48,45);
+        outtake36Pose = new Vector2d(-63,48);
 
-        backboardPosition = new Vector2d(45, 48);
+        startBackboardPose = new Vector2d(-36,12);
+
+        backboardPosition = new Vector2d(35, 42);
         parkPosition = new Vector2d(50, 72);
 
     }

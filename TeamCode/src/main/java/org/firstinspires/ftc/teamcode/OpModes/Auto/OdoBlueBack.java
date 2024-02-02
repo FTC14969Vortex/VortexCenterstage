@@ -18,8 +18,7 @@ public class OdoBlueBack extends OdometryCommon{
         //Coordinates for where the robot is initialized
         startPose = new Pose2d(12, 72, Math.toRadians(90));
         avoidPerimeterPosition = new Vector2d(12, 62);
-        outtakeBackCommonPose = new Vector2d(36, 45);
-        outtakeFrontCommonPose = new Vector2d(-60, 48);
+        outtakeCommonPose = new Vector2d(36, 45);
 
         //Outake Coordinates for Autos
         outtake25Pose = new Vector2d(20, 36);
