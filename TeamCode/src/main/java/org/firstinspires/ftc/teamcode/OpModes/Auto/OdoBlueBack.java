@@ -21,8 +21,8 @@ public class OdoBlueBack extends OdometryCommon{
         outtakeCommonPose = new Vector2d(36, 45);
 
         //Outake Coordinates for Autos
-        outtake25Pose = new Vector2d(20, 33);
-        outtake34Pose = new Vector2d(12,45);
+        outtake25Pose = new Vector2d(24, 32.5);
+        outtake34Pose = new Vector2d(14,45);
 
         backboardPosition = new Vector2d(45, 48);
         parkPosition = new Vector2d(50, 72);

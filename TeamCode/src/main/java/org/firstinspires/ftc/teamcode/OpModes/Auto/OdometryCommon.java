@@ -81,7 +81,7 @@ public class OdometryCommon extends LinearOpMode{
         //Coordinates for where the robot is initialized
         startPose = new Pose2d(12, 72, Math.toRadians(90));
         avoidPerimeterPosition = new Vector2d(12, 62);
-        outtakeCommonPose = new Vector2d(36, 45);
+        outtakeCommonPose = new Vector2d(37, 45);
         outtake16pose = new Vector2d(-55, 45);
         outtake25Pose = new Vector2d(20, 36);
         outtake34Pose = new Vector2d(12,45);
@@ -377,14 +377,14 @@ public class OdometryCommon extends LinearOpMode{
         double adjustedRangeX = BackSideBackboard.end().getX() + rangeError;
         if(vision.TARGET_TAG_ID < vision.CENTER_TAG_ID) {
             moveToDeliveryTag = drive.trajectoryBuilder(BackSideBackboard.end())
-                    .lineTo(new Vector2d(adjustedRangeX , (BackSideBackboard.end().getY() + 7)))
+                    .lineTo(new Vector2d(adjustedRangeX , (BackSideBackboard.end().getY() + 7.5)))
                     .build();
 
             drive.followTrajectory(moveToDeliveryTag);
         }
         else if(vision.TARGET_TAG_ID > vision.CENTER_TAG_ID) {
             moveToDeliveryTag = drive.trajectoryBuilder(BackSideBackboard.end())
-                    .lineTo(new Vector2d(adjustedRangeX, (BackSideBackboard.end().getY() - 7)))
+                    .lineTo(new Vector2d(adjustedRangeX, (BackSideBackboard.end().getY() - 8)))
                     .build();
 
             drive.followTrajectory(moveToDeliveryTag);
@@ -401,24 +401,27 @@ public class OdometryCommon extends LinearOpMode{
 
         backintoBoard = drive.trajectoryBuilder(moveToDeliveryTag.end())
                 .lineTo(
-                        new Vector2d(moveToDeliveryTag.end().getX()+1, moveToDeliveryTag.end().getY()),
+                        new Vector2d(moveToDeliveryTag.end().getX()+ 4, moveToDeliveryTag.end().getY()),
                         SampleMecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL)
                 )
                 .build();
 
 
+        robot.gate.close();
+        sleep(300);
         robot.arm.gotoAutoPosition();
-        sleep(2000);
+        sleep(600);
         robot.wrist.gotoAutoPosition();
-        sleep(1500);
+        sleep(600);
         drive.followTrajectory(backintoBoard);
+        sleep(1100);
         robot.gate.open();
-        sleep(2000);
+        sleep(700);
         robot.wrist.gotoPickupPosition();
-        sleep(1000);
+        sleep(500);
         robot.arm.gotoPickupPosition();
-        sleep(1000);
+        sleep(500);
 
     }
     public void deliverFront() {
@@ -429,14 +432,14 @@ public class OdometryCommon extends LinearOpMode{
         double adjustedRangeX = FrontSideBackboard.end().getX() + rangeError;
         if(vision.TARGET_TAG_ID < vision.CENTER_TAG_ID) {
             moveToDeliveryTag = drive.trajectoryBuilder(FrontSideBackboard.end())
-                    .lineTo(new Vector2d(adjustedRangeX , (FrontSideBackboard.end().getY() + 7)))
+                    .lineTo(new Vector2d(adjustedRangeX , (FrontSideBackboard.end().getY() + 7.5)))
                     .build();
 
             drive.followTrajectory(moveToDeliveryTag);
         }
         else if(vision.TARGET_TAG_ID > vision.CENTER_TAG_ID) {
             moveToDeliveryTag = drive.trajectoryBuilder(FrontSideBackboard.end())
-                    .lineTo(new Vector2d(adjustedRangeX, (FrontSideBackboard.end().getY() - 7)))
+                    .lineTo(new Vector2d(adjustedRangeX, (FrontSideBackboard.end().getY() - 8)))
                     .build();
 
             drive.followTrajectory(moveToDeliveryTag);
@@ -452,17 +455,19 @@ public class OdometryCommon extends LinearOpMode{
         }
         backintoBoard = drive.trajectoryBuilder(moveToDeliveryTag.end())
                 .lineTo(
-                        new Vector2d(moveToDeliveryTag.end().getX()+1, moveToDeliveryTag.end().getY()),
+                        new Vector2d(moveToDeliveryTag.end().getX()+2.5, moveToDeliveryTag.end().getY()),
                         SampleMecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL)
                 )
                 .build();
 
+        robot.gate.close();
+        sleep(300);
         robot.arm.gotoAutoPosition();
         sleep(500);
         robot.wrist.gotoAutoPosition();
         drive.followTrajectory(backintoBoard);
-        sleep(500);
+        sleep(1000);
         robot.gate.open();
         sleep(500);
         robot.wrist.gotoPickupPosition();

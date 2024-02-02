@@ -81,7 +81,7 @@ public class AutoVision extends LinearOpMode {
             "Red"
     };
 
-    double DELIVERY_DISTANCE = 18; //  This is how close the camera should get to the target (inches)
+    double DELIVERY_DISTANCE = 22; //  This is how close the camera should get to the target (inches)
     //For centering on the AprilTag
     public int TARGET_TAG_ID = -1;            // Start ID as -1, will be updated in the function.
     // X-coordinate of team element at the start of auto.
