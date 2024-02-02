@@ -245,18 +245,39 @@ public class AutoVision extends LinearOpMode {
             break;
         }
 
+        if (RED_APRILTAG_OFFSET == 0){
+            if (XPOS_OF_TEAM_ELEMENT < 120) {
+                TARGET_SPIKE_MARK = 1; //Left
+                TARGET_TAG_ID = 1;
 
-        if (XPOS_OF_TEAM_ELEMENT < 120) {
-            TARGET_SPIKE_MARK = 1; //Left
-        } else if (XPOS_OF_TEAM_ELEMENT > 440) {
-            TARGET_SPIKE_MARK = 3; //Right
+
+            } else if (XPOS_OF_TEAM_ELEMENT > 440) {
+                TARGET_SPIKE_MARK = 3; //Right
+                TARGET_TAG_ID = 3;
+
+            } else {
+                TARGET_SPIKE_MARK = 2; //Center
+                TARGET_TAG_ID = 2;
+
+            }
         } else {
-            TARGET_SPIKE_MARK = 2; //Center
+            if (XPOS_OF_TEAM_ELEMENT < 120) {
+                TARGET_SPIKE_MARK = 3; //Left
+                TARGET_TAG_ID = 4;
+
+            } else if (XPOS_OF_TEAM_ELEMENT > 440) {
+                TARGET_SPIKE_MARK = 1; //Right
+                TARGET_TAG_ID = 6;
+            } else {
+                TARGET_SPIKE_MARK = 2; //Center
+                TARGET_TAG_ID = 5;
+            }
         }
 
 
+
         // Add offset to account for blue or red side.
-        TARGET_TAG_ID = TARGET_SPIKE_MARK + RED_APRILTAG_OFFSET;
+
         // Push telemetry to the Driver Station.
 
 

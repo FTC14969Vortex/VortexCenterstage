@@ -49,9 +49,9 @@ public class OdometryCommon extends LinearOpMode{
     Trajectory avoidPerimeter;
     Trajectory goToBackOutake;
     Trajectory goToFrontOutake;
-    Trajectory outtake_1_4;
+    Trajectory outtake_1_6;
     Trajectory outtake_2_5;
-    Trajectory outtake_3_6;
+    Trajectory outtake_3_4;
     Trajectory comeBack;
     Trajectory startBackboard;
     Trajectory FrontSideBackboard;
@@ -63,9 +63,9 @@ public class OdometryCommon extends LinearOpMode{
     Pose2d startPose;
     Vector2d avoidPerimeterPosition;
     Vector2d outtakeCommonPose;
-    Vector2d outtake14pose;
+    Vector2d outtake16pose;
     Vector2d outtake25Pose;
-    Vector2d outtake36Pose;
+    Vector2d outtake34Pose;
     Vector2d startBackboardPose;
     Vector2d backboardPosition;
     Vector2d parkPosition;
@@ -81,9 +81,9 @@ public class OdometryCommon extends LinearOpMode{
         startPose = new Pose2d(12, 72, Math.toRadians(90));
         avoidPerimeterPosition = new Vector2d(12, 62);
         outtakeCommonPose = new Vector2d(36, 45);
-        outtake14pose = new Vector2d(-55, 45);
+        outtake16pose = new Vector2d(-55, 45);
         outtake25Pose = new Vector2d(20, 36);
-        outtake36Pose = new Vector2d(12,45);
+        outtake34Pose = new Vector2d(12,45);
         startBackboardPose = new Vector2d(-12,12);
         backboardPosition = new Vector2d(45, 48);
         parkPosition = new Vector2d(48, 72);
@@ -147,7 +147,7 @@ public class OdometryCommon extends LinearOpMode{
 
                     switch (vision.TARGET_SPIKE_MARK) {
                         case 1:
-                            outtake_1_4();
+                            outtake_1_6();
                             telemetry.addLine("Case 1");
                             break;
                         case 2:
@@ -155,7 +155,7 @@ public class OdometryCommon extends LinearOpMode{
                             telemetry.addLine("Case 2");
                             break;
                         case 3:
-                            outtake_3_6();
+                            outtake_3_4();
                             telemetry.addLine("Case 3");
                             break;
                     }
@@ -227,7 +227,7 @@ public class OdometryCommon extends LinearOpMode{
         drive.followTrajectory(goToFrontOutake);
 
     }
-    public void outtake_1_4() {
+    public void outtake_1_6() {
         if (!IS_AUTO_FRONT) {
             //Outtake at spike mark
             robot.intake.motor.setPower(0.5);
@@ -235,17 +235,17 @@ public class OdometryCommon extends LinearOpMode{
             sleep(2000);
             robot.intake.MoveIntake(0, false);
         } else {
-            outtake_1_4 = drive.trajectoryBuilder(goToFrontOutake.end())
+            outtake_1_6 = drive.trajectoryBuilder(goToFrontOutake.end())
                     .lineTo(
-                            outtake14pose,
+                            outtake16pose,
                             SampleMecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                             SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL)
                     )
                     .build();
-            comeBack = drive.trajectoryBuilder(outtake_1_4.end())
+            comeBack = drive.trajectoryBuilder(outtake_1_6.end())
                     .lineTo(outtakeCommonPose)
                     .build();
-            drive.followTrajectory(outtake_1_4);
+            drive.followTrajectory(outtake_1_6);
 
             //Outtake at spike mark
             robot.intake.motor.setPower(0.5);
@@ -302,21 +302,21 @@ public class OdometryCommon extends LinearOpMode{
     }
 
 
-    public void outtake_3_6() {
+    public void outtake_3_4() {
         if (!IS_AUTO_FRONT){
-            outtake_3_6 = drive.trajectoryBuilder(goToBackOutake.end())
+            outtake_3_4 = drive.trajectoryBuilder(goToBackOutake.end())
                     .lineTo(
-                            outtake36Pose,
+                            outtake34Pose,
                             SampleMecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                             SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL)
                             )
                     .build();
 
-            comeBack = drive.trajectoryBuilder(outtake_3_6.end())
+            comeBack = drive.trajectoryBuilder(outtake_3_4.end())
                     .lineTo(outtakeCommonPose)
                     .build();
 
-            drive.followTrajectory(outtake_3_6);
+            drive.followTrajectory(outtake_3_4);
 
             //Outtake at spike mark
             robot.intake.motor.setPower(0.5);

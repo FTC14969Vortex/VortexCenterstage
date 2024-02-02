@@ -22,7 +22,7 @@ public class OdoRedBack extends OdometryCommon{
 
         //Outake Coordinates for Autos
         outtake25Pose = new Vector2d(20, -33);
-        outtake36Pose = new Vector2d(12,-45);
+        outtake34Pose = new Vector2d(12,-45);
 
         backboardPosition = new Vector2d(45, -48);
         parkPosition = new Vector2d(50, -72);
