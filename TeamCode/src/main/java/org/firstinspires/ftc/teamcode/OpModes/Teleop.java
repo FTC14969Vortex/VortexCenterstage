@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.tfod.TfodParameters;
 import org.firstinspires.ftc.teamcode.Helper.Robot;
 
 @TeleOp(name = "CenterStageTeleOp", group = "TeleOp")
@@ -219,11 +220,10 @@ public class Teleop extends LinearOpMode {
                 }
             }
 
-            if(gamepad2.left_bumper){
-                robot.drone.Unlatched();
-            }
-            if(gamepad2.right_bumper) {
+            if(gamepad2.right_bumper && gamepad2.left_bumper) {
                 robot.drone.Latched();
+                sleep(500);
+                robot.drone.Unlatched();
             }
             if(gamepad2.y) {
                 robot.wrist.gotoPosition(robot.wrist.WRIST_PICKUP_POSITION);

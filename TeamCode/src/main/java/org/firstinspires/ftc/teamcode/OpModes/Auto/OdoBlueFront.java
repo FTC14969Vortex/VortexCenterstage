@@ -15,19 +15,19 @@ public class OdoBlueFront extends OdometryCommon{
         vision.CENTER_TAG_ID = 2;
 
         //Coordinates for where the robot is initialized
-        startPose = new Pose2d(-36, 72, Math.toRadians(90));
+        startPose = new Pose2d(-36, 68, Math.toRadians(90));
 
         avoidPerimeterPosition = new Vector2d(-36, 62).plus(robotLocalOffset);
         comeBack2_5Pose = new Vector2d(-60, 25).plus(robotLocalOffset);
-        comeBack3_4Pose = new Vector2d(-60, 25).plus(robotLocalOffset);
+        comeBack3_4Pose = new Vector2d(-58, 22).plus(robotLocalOffset);
         outtakeCommonPose = new Vector2d(-60, 48).plus(robotLocalOffset);
 
 
 
         //Outake Coordinates for Autos
-        outtake16pose = new Vector2d(-38, 45).plus(robotLocalOffset);
-        outtake25Pose = new Vector2d(-48, 33).plus(robotLocalOffset);
-        outtake34Pose = new Vector2d(-63,48).plus(robotLocalOffset);
+        outtake16pose = new Vector2d(-38, 43).plus(robotLocalOffset);
+        outtake25Pose = new Vector2d(-50, 31).plus(robotLocalOffset);
+        outtake34Pose = new Vector2d(-63,43).plus(robotLocalOffset);
 
         startBackboardPose = new Vector2d(-36,12).plus(robotLocalOffset);
 
