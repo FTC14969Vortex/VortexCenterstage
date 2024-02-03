@@ -16,16 +16,17 @@ public class OdoBlueBack extends OdometryCommon{
         vision.CENTER_TAG_ID = 2;
 
         //Coordinates for where the robot is initialized
-        startPose = new Pose2d(12, 72, Math.toRadians(90));
-        avoidPerimeterPosition = new Vector2d(12, 62);
-        outtakeCommonPose = new Vector2d(36, 45);
+        startPose = new Pose2d(12, 62, Math.toRadians(90));
+        avoidPerimeterPosition = new Vector2d(12, 62).plus(robotLocalOffset);
+        outtakeCommonPose = new Vector2d(39, 45).plus(robotLocalOffset);
 
         //Outake Coordinates for Autos
-        outtake25Pose = new Vector2d(24, 32.5);
-        outtake34Pose = new Vector2d(14,45);
+        outtake16pose = new Vector2d(-38, 45).plus(robotLocalOffset);
+        outtake25Pose = new Vector2d(24, 32.5).plus(robotLocalOffset);
+        outtake34Pose = new Vector2d(16,47).plus(robotLocalOffset);
 
-        backboardPosition = new Vector2d(45, 48);
-        parkPosition = new Vector2d(50, 72);
+        backboardPose = new Vector2d(45, 42).plus(robotLocalOffset);
+        parkPose = new Vector2d(50, 72).plus(robotLocalOffset);
 
     }
 }
