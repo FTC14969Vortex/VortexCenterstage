@@ -37,7 +37,7 @@ public class OdometryCommon extends LinearOpMode{
     SampleMecanumDrive drive;
 
 
-    enum AutoStages {DETECT_TE, GOTOOUTTAKE, OUTTAKE, GO_TO_BACKBOARD, DELIVER_BACKBOARD, INTAKE_STACK, RETURN_BACKBOARD, PARK, END_AUTO}
+    enum AutoStages {DETECT_TE, OUTTAKE, GOTOOUTTAKE, GO_TO_BACKBOARD, DELIVER_BACKBOARD, INTAKE_STACK, RETURN_BACKBOARD, PARK, END_AUTO}
     AutoStages currentStage = AutoStages.DETECT_TE;
 
     /*
@@ -59,12 +59,12 @@ public class OdometryCommon extends LinearOpMode{
     Trajectory backintoBoard;
     Trajectory park;
     Trajectory moveToDeliveryTag;
+    Trajectory startBackboard2;
 
     //Positions and Vectors
     Pose2d startPose;
     Vector2d avoidPerimeterPosition;
-    Vector2d outtakeCommonPose;
-    Vector2d outtake16pose;
+    Vector2d outtake16Pose;
     Vector2d outtake25Pose;
     Vector2d outtake34Pose;
     Vector2d comeBack2_5Pose;
@@ -72,6 +72,7 @@ public class OdometryCommon extends LinearOpMode{
     Vector2d startBackboardPose;
     Vector2d backboardPose;
     Vector2d parkPose;
+    Vector2d cyclePoint;
     Vector2d robotLocalOffset = new Vector2d(0,-6.5);
 
     public void setUniqueParameters() {
@@ -83,12 +84,11 @@ public class OdometryCommon extends LinearOpMode{
 
         //Coordinates for where the robot is initialized
         startPose = new Pose2d(12, 72, Math.toRadians(90));
-        avoidPerimeterPosition = new Vector2d(12, 62);
-        outtakeCommonPose = new Vector2d(37, 45);
-        outtake16pose = new Vector2d(-55, 45);
+        outtake16Pose = new Vector2d(37, 45);
         outtake25Pose = new Vector2d(20, 36);
         outtake34Pose = new Vector2d(12,45);
         startBackboardPose = new Vector2d(-12,12);
+        cyclePoint = new Vector2d(0,0);
         backboardPose = new Vector2d(45, 48);
         parkPose = new Vector2d(48, 72);
     }
@@ -124,31 +124,20 @@ public class OdometryCommon extends LinearOpMode{
         waitForStart();
 
 
-
         while (opModeIsActive()) {
             switch (currentStage) {
                 case DETECT_TE:
                     vision.detectTeamElement();
                     telemetry.addData("Target Tag ID", vision.TARGET_TAG_ID);
                     telemetry.update();
-                    currentStage = AutoStages.GOTOOUTTAKE;
-                    break;
-                case GOTOOUTTAKE:
-                    if (!IS_AUTO_FRONT) {
-                        outakeBackCommon();
-                    }
-                    else {
-                        outakeFrontCommon();
-                    }
-
                     currentStage = AutoStages.OUTTAKE;
                     break;
+
                 case OUTTAKE:
                     /**
                      * Step 2: Deliver purple pixel to the detected Position.
                      * (common to all auto)
                      */
-
                     switch (vision.TARGET_SPIKE_MARK) {
                         case 1:
                             outtake_1_6();
@@ -163,19 +152,28 @@ public class OdometryCommon extends LinearOpMode{
                             telemetry.addLine("Case 3");
                             break;
                     }
+                    sleep(2000);
+                    currentStage = AutoStages.GOTOOUTTAKE;
+                    break;
+
+                case GOTOOUTTAKE:
+
                     currentStage = AutoStages.GO_TO_BACKBOARD;
                     break;
+
                 case GO_TO_BACKBOARD:
-                    if (!IS_AUTO_FRONT) {
-                        BackboardBack();
-                    }
-                    else {
-                        BackboardFront();
-                    }
+//                    if (!IS_AUTO_FRONT) {
+//                        BackboardBack();
+//                    }
+//                    else {
+//                        BackboardFront();
+//                    }
                     currentStage = AutoStages.DELIVER_BACKBOARD;
                     break;
+
                 case DELIVER_BACKBOARD:
                     if (!IS_AUTO_FRONT) {
+                        BackboardBack();
                         deliverBack();
                     } else {
                         deliverFront();
@@ -194,110 +192,77 @@ public class OdometryCommon extends LinearOpMode{
         }
     }
 
-    public void outakeBackCommon() throws InterruptedException {
-
-        drive.setPoseEstimate(startPose);
-
-        avoidPerimeter = drive.trajectoryBuilder(startPose)
-                .lineTo(avoidPerimeterPosition)
-                .build();
-
-        goToBackOutake = drive.trajectoryBuilder(avoidPerimeter.end())
-                .lineToLinearHeading(new Pose2d(outtakeCommonPose.getX(),outtakeCommonPose.getY(), Math.toRadians(180)))
-                .build();
-
-        //Move away so we don't hit the perimeter.
-        drive.followTrajectory(avoidPerimeter);
-
-        //Drive to spikemark
-        drive.followTrajectory(goToBackOutake);
-
+    public  void outtake(){
+        robot.intake.motor.setPower(0.5);
+        robot.intake.MoveIntake(0.5, false);
+        sleep(2000);
+        robot.intake.MoveIntake(0, false);
     }
-    public void outakeFrontCommon() throws InterruptedException {
-
-        drive.setPoseEstimate(startPose);
-
-        avoidPerimeter = drive.trajectoryBuilder(startPose)
-                .lineTo(avoidPerimeterPosition)
-                .build();
-
-        goToFrontOutake = drive.trajectoryBuilder(avoidPerimeter.end())
-                .lineToLinearHeading(new Pose2d(outtakeCommonPose.getX(),outtakeCommonPose.getY(), Math.toRadians(0))).build();
-
-        //Move away so we don't hit the perimeter.
-        drive.followTrajectory(avoidPerimeter);
-
-        //Drive to spikemark
-        drive.followTrajectory(goToFrontOutake);
-
-    }
-    public void outtake_1_6() {
+    public void outtake_1_6() throws InterruptedException{
         if (!IS_AUTO_FRONT) {
+            drive.setPoseEstimate(startPose);
+            outtake_1_6 = drive.trajectoryBuilder(startPose)
+                    .lineToLinearHeading(
+                            new Pose2d(outtake16Pose.getX(),outtake16Pose.getY(),Math.toRadians(180))
+                    )
+                    .build();
+
+            comeBack = drive.trajectoryBuilder(outtake_1_6.end())
+                    .lineTo(outtake16Pose)
+                    .build();
+
+            drive.followTrajectory(outtake_1_6);
             //Outtake at spike mark
-            robot.intake.motor.setPower(0.5);
-            robot.intake.MoveIntake(0.6, true);
-            sleep(2000);
-            robot.intake.MoveIntake(0, false);
+            outtake();
+
+            drive.followTrajectory(comeBack);
         } else {
-            outtake_1_6 = drive.trajectoryBuilder(goToFrontOutake.end())
-                    .lineTo(
-                            outtake16pose,
-                            SampleMecanumDrive.getVelocityConstraint(7, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                            SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL)
+            outtake_1_6 = drive.trajectoryBuilder(startPose)
+                    .lineToLinearHeading(
+                            new Pose2d(outtake16Pose.getX(),outtake16Pose.getY(),Math.toRadians(0))
                     )
                     .build();
             comeBack = drive.trajectoryBuilder(outtake_1_6.end())
-                    .lineTo(outtakeCommonPose)
+                    .lineTo(outtake16Pose)
                     .build();
+
+
+            outtake();
             drive.followTrajectory(outtake_1_6);
-
-            //Outtake at spike mark
-            robot.intake.motor.setPower(0.5);
-            robot.intake.MoveIntake(0.5, true);
-            sleep(2000);
-            robot.intake.MoveIntake(0, false);
-
-            //Return to Outtake common position
+            outtake();
             drive.followTrajectory(comeBack);
         }
     }
     public void outtake_2_5() {
-
+        drive.setPoseEstimate(startPose);
         if (!IS_AUTO_FRONT){
-            outtake_2_5 = drive.trajectoryBuilder(goToBackOutake.end())
+            outtake_2_5 = drive.trajectoryBuilder(startPose)
                     .lineTo(outtake25Pose)
                     .build();
 
             comeBack = drive.trajectoryBuilder(outtake_2_5.end())
-                    .lineTo(outtakeCommonPose)
+                    .lineToLinearHeading(new Pose2d(outtake16Pose.getX(),outtake16Pose.getY(),Math.toRadians(180)))
                     .build();
 
             drive.followTrajectory(outtake_2_5);
 
             //Outtake at spike mark
-            robot.intake.motor.setPower(0.5);
-            robot.intake.MoveIntake(0.5, true);
-            sleep(2000);
-            robot.intake.MoveIntake(0, false);
-
+            outtake();
             //Return to Outtake common position
             drive.followTrajectory(comeBack);
+
         } else {
-            outtake_2_5 = drive.trajectoryBuilder(goToFrontOutake.end())
+            outtake_2_5 = drive.trajectoryBuilder(startPose)
                     .lineTo(outtake25Pose)
                     .build();
             comeBack = drive.trajectoryBuilder(outtake_2_5.end())
-                    .lineTo(comeBack2_5Pose)
+                    .lineToLinearHeading(new Pose2d(outtake16Pose.getX(),outtake16Pose.getY(),Math.toRadians(180)))
                     .build();
 
             drive.followTrajectory(outtake_2_5);
 
             //Outtake at spike mark
-            robot.intake.motor.setPower(0.5);
-            robot.intake.MoveIntake(0.5, true);
-            sleep(2000);
-            robot.intake.MoveIntake(0, false);
-
+            outtake();
             //Return to Outtake common position
             drive.followTrajectory(comeBack);
         }
@@ -305,31 +270,25 @@ public class OdometryCommon extends LinearOpMode{
 
     }
     public void outtake_3_4() {
+        drive.setPoseEstimate(startPose);
         if (!IS_AUTO_FRONT){
-            outtake_3_4 = drive.trajectoryBuilder(goToBackOutake.end())
-                    .lineTo(
-                            outtake34Pose,
-                            SampleMecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                            SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL)
-                            )
+            outtake_3_4 = drive.trajectoryBuilder(startPose)
+                    .lineToLinearHeading(new Pose2d(outtake34Pose.getX(),outtake34Pose.getY(),Math.toRadians(180)))
                     .build();
 
             comeBack = drive.trajectoryBuilder(outtake_3_4.end())
-                    .lineTo(outtakeCommonPose)
+                    .lineTo(outtake16Pose)
                     .build();
 
             drive.followTrajectory(outtake_3_4);
 
             //Outtake at spike mark
-            robot.intake.motor.setPower(0.5);
-            robot.intake.MoveIntake(0.5, true);
-            sleep(2000);
-            robot.intake.MoveIntake(0, false);
+            outtake();
 
             //Return to Outtake common position
             drive.followTrajectory(comeBack);
         } else {
-            outtake_3_4 = drive.trajectoryBuilder(goToFrontOutake.end())
+            outtake_3_4 = drive.trajectoryBuilder(startPose)
                     .lineTo(
                             outtake34Pose,
                             SampleMecanumDrive.getVelocityConstraint(7, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
@@ -338,25 +297,20 @@ public class OdometryCommon extends LinearOpMode{
                     .build();
 
             comeBack = drive.trajectoryBuilder(outtake_3_4.end())
-                    .lineTo(comeBack3_4Pose)
+                    .lineTo(outtake16Pose)
                     .build();
 
             drive.followTrajectory(outtake_3_4);
 
             //Outtake at spike mark
-            robot.intake.motor.setPower(0.5);
-            robot.intake.MoveIntake(0.5, true);
-            sleep(2000);
-            robot.intake.MoveIntake(0, false);
+            outtake();
 
             //Return to Outtake common position
             drive.followTrajectory(comeBack);
-
-
         }
     }
     public void BackboardBack() {
-        BackSideBackboard = drive.trajectoryBuilder(goToBackOutake.end())
+        BackSideBackboard = drive.trajectoryBuilder(comeBack.end())
                 .lineTo(backboardPose)
                 .build();
         drive.followTrajectory(BackSideBackboard);
@@ -365,10 +319,14 @@ public class OdometryCommon extends LinearOpMode{
         startBackboard = drive.trajectoryBuilder(comeBack.end())
                 .lineTo(startBackboardPose)
                 .build();
-        FrontSideBackboard = drive.trajectoryBuilder(startBackboard.end())
+        startBackboard2 = drive.trajectoryBuilder(startBackboard.end())
+                .lineTo(cyclePoint)
+                .build();
+        FrontSideBackboard = drive.trajectoryBuilder(startBackboard2.end())
                 .splineTo(backboardPose, Math.toRadians(180))
                 .build();
         drive.followTrajectory(startBackboard);
+        drive.followTrajectory(startBackboard2);
         drive.followTrajectory(FrontSideBackboard);
     }
     public double getRangeError() {
@@ -400,7 +358,7 @@ public class OdometryCommon extends LinearOpMode{
         }
         else if(vision.TARGET_TAG_ID > vision.CENTER_TAG_ID) {
             moveToDeliveryTag = drive.trajectoryBuilder(BackSideBackboard.end())
-                    .lineTo(new Vector2d(adjustedRangeX, (BackSideBackboard.end().getY() - 7.5  )))
+                    .lineTo(new Vector2d(adjustedRangeX, (BackSideBackboard.end().getY() - 8)))
                     .build();
 
             drive.followTrajectory(moveToDeliveryTag);
@@ -417,27 +375,13 @@ public class OdometryCommon extends LinearOpMode{
 
         backintoBoard = drive.trajectoryBuilder(moveToDeliveryTag.end())
                 .lineTo(
-                        new Vector2d(moveToDeliveryTag.end().getX()+ 3.75, moveToDeliveryTag.end().getY()),
+                        new Vector2d(moveToDeliveryTag.end().getX()+ 4.5, moveToDeliveryTag.end().getY()),
                         SampleMecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL)
                 )
                 .build();
 
-
-        robot.gate.close();
-        sleep(300);
-        robot.arm.gotoAutoPosition();
-        sleep(600);
-        robot.wrist.gotoAutoPosition();
-        sleep(1000);
-        drive.followTrajectory(backintoBoard);
-        sleep(1100);
-        robot.gate.open();
-        sleep(700);
-        robot.wrist.gotoPickupPosition();
-        sleep(500);
-        robot.arm.gotoPickupPosition();
-        sleep(500);
+        delivery();
 
     }
     public void deliverFront() {
@@ -477,19 +421,7 @@ public class OdometryCommon extends LinearOpMode{
                 )
                 .build();
 
-        robot.gate.close();
-        sleep(300);
-        robot.arm.gotoAutoPosition();
-        sleep(500);
-        robot.wrist.gotoAutoPosition();
-        sleep(2000);
-        drive.followTrajectory(backintoBoard);
-        sleep(1000);
-        robot.gate.open();
-        sleep(500);
-        robot.wrist.gotoPickupPosition();
-        sleep(500);
-        robot.arm.gotoPickupPosition();
+        delivery();
 
     }
     public void park() {
@@ -507,7 +439,21 @@ public class OdometryCommon extends LinearOpMode{
 
     }
 
+    public void delivery() {
+        robot.arm.gotoAutoPosition();
+        sleep(2500);
+        robot.gate.close();
+        sleep(300);
+        robot.wrist.gotoAutoPosition();
+        sleep(1000);
+        drive.followTrajectory(backintoBoard);
+        sleep(1100);
+        robot.gate.open();
+        sleep(700);
+        robot.wrist.gotoPickupPosition();
+        sleep(500);
+        robot.arm.gotoPickupPosition();
+        sleep(500);
+    }
+
 }
-
-
-
