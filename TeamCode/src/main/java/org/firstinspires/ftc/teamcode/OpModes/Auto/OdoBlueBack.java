@@ -22,6 +22,9 @@ public class OdoBlueBack extends OdometryCommon{
         outtake16Pose = new Vector2d(37, 40).plus(robotLocalOffset);
         outtake25Pose = new Vector2d(12, 20).plus(robotLocalOffset);
         outtake34Pose = new Vector2d(12,45).plus(robotLocalOffset);
+
+        comeBackPose = new Vector2d(37,40);
+
         backboardPose = new Vector2d(45, 42).plus(robotLocalOffset);
 
         //edge park

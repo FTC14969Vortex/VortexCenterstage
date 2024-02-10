@@ -67,7 +67,7 @@ public class OdometryCommon extends LinearOpMode{
     Vector2d outtake16Pose;
     Vector2d outtake25Pose;
     Vector2d outtake34Pose;
-    Vector2d comeBack2_5Pose;
+    Vector2d comeBackPose;
     Vector2d comeBack3_4Pose;
     Vector2d startBackboardPose;
     Vector2d backboardPose;
@@ -152,7 +152,7 @@ public class OdometryCommon extends LinearOpMode{
                             telemetry.addLine("Case 3");
                             break;
                     }
-                    sleep(2000);
+//                    sleep(2000);
                     currentStage = AutoStages.GOTOOUTTAKE;
                     break;
 
@@ -176,6 +176,7 @@ public class OdometryCommon extends LinearOpMode{
                         BackboardBack();
                         deliverBack();
                     } else {
+                        BackboardFront();
                         deliverFront();
                     }
                     currentStage = AutoStages.PARK;
@@ -208,7 +209,7 @@ public class OdometryCommon extends LinearOpMode{
                     .build();
 
             comeBack = drive.trajectoryBuilder(outtake_1_6.end())
-                    .lineTo(outtake16Pose)
+                    .lineTo(comeBackPose)
                     .build();
 
             drive.followTrajectory(outtake_1_6);
@@ -217,17 +218,16 @@ public class OdometryCommon extends LinearOpMode{
 
             drive.followTrajectory(comeBack);
         } else {
+            drive.setPoseEstimate(startPose);
             outtake_1_6 = drive.trajectoryBuilder(startPose)
                     .lineToLinearHeading(
                             new Pose2d(outtake16Pose.getX(),outtake16Pose.getY(),Math.toRadians(0))
                     )
                     .build();
             comeBack = drive.trajectoryBuilder(outtake_1_6.end())
-                    .lineTo(outtake16Pose)
+                    .lineTo(comeBackPose)
                     .build();
 
-
-            outtake();
             drive.followTrajectory(outtake_1_6);
             outtake();
             drive.followTrajectory(comeBack);
@@ -256,7 +256,7 @@ public class OdometryCommon extends LinearOpMode{
                     .lineTo(outtake25Pose)
                     .build();
             comeBack = drive.trajectoryBuilder(outtake_2_5.end())
-                    .lineToLinearHeading(new Pose2d(outtake16Pose.getX(),outtake16Pose.getY(),Math.toRadians(180)))
+                    .lineToLinearHeading(new Pose2d(comeBackPose.getX(),comeBackPose.getY(),Math.toRadians(180)))
                     .build();
 
             drive.followTrajectory(outtake_2_5);
@@ -277,7 +277,7 @@ public class OdometryCommon extends LinearOpMode{
                     .build();
 
             comeBack = drive.trajectoryBuilder(outtake_3_4.end())
-                    .lineTo(outtake16Pose)
+                    .lineTo(comeBackPose)
                     .build();
 
             drive.followTrajectory(outtake_3_4);
@@ -289,15 +289,11 @@ public class OdometryCommon extends LinearOpMode{
             drive.followTrajectory(comeBack);
         } else {
             outtake_3_4 = drive.trajectoryBuilder(startPose)
-                    .lineTo(
-                            outtake34Pose,
-                            SampleMecanumDrive.getVelocityConstraint(7, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                            SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL)
-                    )
+                    .lineToLinearHeading(new Pose2d(outtake34Pose.getX(),outtake34Pose.getY(),Math.toRadians(0)))
                     .build();
 
             comeBack = drive.trajectoryBuilder(outtake_3_4.end())
-                    .lineTo(outtake16Pose)
+                    .lineTo(comeBackPose)
                     .build();
 
             drive.followTrajectory(outtake_3_4);
@@ -323,7 +319,7 @@ public class OdometryCommon extends LinearOpMode{
                 .lineTo(cyclePoint)
                 .build();
         FrontSideBackboard = drive.trajectoryBuilder(startBackboard2.end())
-                .splineTo(backboardPose, Math.toRadians(180))
+                .lineToLinearHeading(new Pose2d(backboardPose.getX(),backboardPose.getY(), Math.toRadians(180)))
                 .build();
         drive.followTrajectory(startBackboard);
         drive.followTrajectory(startBackboard2);
@@ -404,15 +400,22 @@ public class OdometryCommon extends LinearOpMode{
 
             drive.followTrajectory(moveToDeliveryTag);
         }
-        else{
-            if (rangeError != 0){
-                moveToDeliveryTag = drive.trajectoryBuilder(FrontSideBackboard.end())
-                        .lineTo(new Vector2d(adjustedRangeX, (FrontSideBackboard.end().getY())))
-                        .build();
+        else if (rangeError != 0){
+            moveToDeliveryTag = drive.trajectoryBuilder(FrontSideBackboard.end())
+                    .lineTo(new Vector2d(adjustedRangeX, (FrontSideBackboard.end().getY())))
+                    .build();
 
-                drive.followTrajectory(moveToDeliveryTag);
-            }
-        }
+            drive.followTrajectory(moveToDeliveryTag);
+
+        } else {
+            //Failsafe if Camera doesn't detect anything
+            moveToDeliveryTag = drive.trajectoryBuilder(FrontSideBackboard.end())
+                    .lineTo(new Vector2d(FrontSideBackboard.end().getX()-0.1, (FrontSideBackboard.end().getY()-0.1)))
+                    .build();
+
+            drive.followTrajectory(moveToDeliveryTag);
+    }
+
         backintoBoard = drive.trajectoryBuilder(moveToDeliveryTag.end())
                 .lineTo(
                         new Vector2d(moveToDeliveryTag.end().getX()+3, moveToDeliveryTag.end().getY()),
@@ -441,7 +444,7 @@ public class OdometryCommon extends LinearOpMode{
 
     public void delivery() {
         robot.arm.gotoAutoPosition();
-        sleep(2500);
+        sleep(2000);
         robot.gate.close();
         sleep(300);
         robot.wrist.gotoAutoPosition();
@@ -449,7 +452,7 @@ public class OdometryCommon extends LinearOpMode{
         drive.followTrajectory(backintoBoard);
         sleep(1100);
         robot.gate.open();
-        sleep(700);
+        sleep(550);
         robot.wrist.gotoPickupPosition();
         sleep(500);
         robot.arm.gotoPickupPosition();
