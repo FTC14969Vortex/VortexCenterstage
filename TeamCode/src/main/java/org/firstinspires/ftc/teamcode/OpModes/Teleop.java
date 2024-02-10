@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.tfod.TfodParameters;
 import org.firstinspires.ftc.teamcode.Helper.Robot;
 
@@ -77,10 +78,35 @@ public class Teleop extends LinearOpMode {
 
         while (opModeIsActive()) {
 
+            if(robot.chassis.isRobotStable()) {
+                double move_y_axis = gamepad1.left_stick_y;
+                //double move_x_axis = -gamepad1.left_stick_x
+                // double(gamepad1.dpad_right)-double(gamepad1.dpad_left)
+                double move_x_axis = 0;
+                double pivot_turn = -gamepad1.right_stick_x;
+
+                //Sets the target power
+                double target_fl_power = move_y_axis + move_x_axis + pivot_turn;
+                double target_bl_power = move_y_axis - move_x_axis + pivot_turn;
+                double target_fr_power = move_y_axis - move_x_axis - pivot_turn;
+                double target_br_power = move_y_axis + move_x_axis - pivot_turn;
+
+                //Adds how far you are from target power, times acceleration to the current power.
+                fl_power += ACCELERATION * (target_fl_power - fl_power);
+                bl_power += ACCELERATION * (target_bl_power - bl_power);
+                fr_power += ACCELERATION * (target_fr_power - fr_power);
+                br_power += ACCELERATION * (target_br_power - br_power);
+
+            }
             /**
              * Joystick controls for Drivetrain, Intake on GAMEPAD 1
              */
             //Drive train
+
+                robot.chassis.FLMotor.setPower(DRIVETRAIN_SPEED * fl_power);
+                robot.chassis.BLMotor.setPower(DRIVETRAIN_SPEED * bl_power);
+                robot.chassis.FRMotor.setPower(DRIVETRAIN_SPEED * fr_power);
+                robot.chassis.BRMotor.setPower(DRIVETRAIN_SPEED * br_power);
 
             //Speed Control
             if (gamepad1.a){
@@ -262,7 +288,7 @@ public class Teleop extends LinearOpMode {
             telemetry.addData("BL Motor Encoder", robot.chassis.BLMotor.getCurrentPosition());
             telemetry.addData("BR Motor Encoder", robot.chassis.BRMotor.getCurrentPosition());
             telemetry.addData("FR Motor Encoder", robot.chassis.FRMotor.getCurrentPosition());
-            org.firstinspires.ftc.robotcore.external.navigation.Orientation angle;
+            Orientation angle;
             angle = robot.chassis.imu.getAngularOrientation();
             telemetry.addData("Angular Orientation", angle);
             int angleFloat = (int) (robot.chassis.modAngle(angle.firstAngle));
