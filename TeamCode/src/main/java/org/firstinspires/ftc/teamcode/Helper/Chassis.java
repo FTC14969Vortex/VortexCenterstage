@@ -123,7 +123,7 @@ public class Chassis {
 
     public boolean isRobotStable(){
         angles = imu.getAngularOrientation();
-        if(Math.abs(angles.secondAngle) >= 5 || Math.abs(angles.thirdAngle) >= 5) {
+        if(Math.abs(angles.secondAngle) < 80 ){
             return false;
         } else {
             return true;
