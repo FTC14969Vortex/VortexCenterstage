@@ -17,9 +17,7 @@ public class OdoRedFront extends OdometryCommon{
         //Coordinates for where the robot is initialized
         startPose = new Pose2d(-36, -62, Math.toRadians(270));
 
-        avoidPerimeterPosition = new Vector2d(-36, -62).minus(robotLocalOffset);
         comeBackPose = new Vector2d(-60, -25).minus(robotLocalOffset);
-        comeBack3_4Pose = new Vector2d(-58, -22).minus(robotLocalOffset);
         outtake16Pose = new Vector2d(-60, -48).minus(robotLocalOffset);
 
 

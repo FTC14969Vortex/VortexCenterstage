@@ -17,7 +17,6 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 public class OdometryCommon extends LinearOpMode{
 
-
     /*
     Vision Variables
      */
@@ -45,34 +44,30 @@ public class OdometryCommon extends LinearOpMode{
      */
     boolean IS_AUTO_FRONT;
 
-    //Trajectories
-    Trajectory avoidPerimeter;
-    Trajectory goToBackOutake;
-    Trajectory goToFrontOutake;
+    //TRAJECTORIES
     Trajectory outtake_1_6;
     Trajectory outtake_2_5;
     Trajectory outtake_3_4;
     Trajectory comeBack;
     Trajectory startBackboard;
+    Trajectory extendToBackboard;
     Trajectory FrontSideBackboard;
     Trajectory BackSideBackboard;
     Trajectory backintoBoard;
     Trajectory park;
     Trajectory moveToDeliveryTag;
-    Trajectory startBackboard2;
 
-    //Positions and Vectors
+
+    //VECTORS AND POSITIONS
     Pose2d startPose;
-    Vector2d avoidPerimeterPosition;
     Vector2d outtake16Pose;
     Vector2d outtake25Pose;
     Vector2d outtake34Pose;
     Vector2d comeBackPose;
-    Vector2d comeBack3_4Pose;
     Vector2d startBackboardPose;
+    Vector2d cyclePoint;
     Vector2d backboardPose;
     Vector2d parkPose;
-    Vector2d cyclePoint;
     Vector2d robotLocalOffset = new Vector2d(0,-6.5);
 
     public void setUniqueParameters() {
@@ -92,7 +87,7 @@ public class OdometryCommon extends LinearOpMode{
         backboardPose = new Vector2d(45, 48);
         parkPose = new Vector2d(48, 72);
     }
-    
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -195,7 +190,7 @@ public class OdometryCommon extends LinearOpMode{
 
     public  void outtake(){
         robot.intake.motor.setPower(0.5);
-        robot.intake.MoveIntake(0.5, false);
+        robot.intake.MoveIntake(0.5, true);
         sleep(2000);
         robot.intake.MoveIntake(0, false);
     }
@@ -315,14 +310,14 @@ public class OdometryCommon extends LinearOpMode{
         startBackboard = drive.trajectoryBuilder(comeBack.end())
                 .lineTo(startBackboardPose)
                 .build();
-        startBackboard2 = drive.trajectoryBuilder(startBackboard.end())
+        extendToBackboard = drive.trajectoryBuilder(startBackboard.end())
                 .lineTo(cyclePoint)
                 .build();
-        FrontSideBackboard = drive.trajectoryBuilder(startBackboard2.end())
+        FrontSideBackboard = drive.trajectoryBuilder(extendToBackboard.end())
                 .lineToLinearHeading(new Pose2d(backboardPose.getX(),backboardPose.getY(), Math.toRadians(180)))
                 .build();
         drive.followTrajectory(startBackboard);
-        drive.followTrajectory(startBackboard2);
+        drive.followTrajectory(extendToBackboard);
         drive.followTrajectory(FrontSideBackboard);
     }
     public double getRangeError() {
@@ -414,7 +409,7 @@ public class OdometryCommon extends LinearOpMode{
                     .build();
 
             drive.followTrajectory(moveToDeliveryTag);
-    }
+        }
 
         backintoBoard = drive.trajectoryBuilder(moveToDeliveryTag.end())
                 .lineTo(

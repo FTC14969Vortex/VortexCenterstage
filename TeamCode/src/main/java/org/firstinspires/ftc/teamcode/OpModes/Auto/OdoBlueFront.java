@@ -17,11 +17,6 @@ public class OdoBlueFront extends OdometryCommon{
         //Coordinates for where the robot is initialized
         startPose = new Pose2d(-36, 68, Math.toRadians(90));
 
-        avoidPerimeterPosition = new Vector2d(-36, 62).plus(robotLocalOffset);
-        outtake16Pose = new Vector2d(-60, 48).plus(robotLocalOffset);
-
-
-
         //Outake Coordinates for Autos
         outtake16Pose = new Vector2d(-38, 43).plus(robotLocalOffset);
         outtake25Pose = new Vector2d(-40, 28).plus(robotLocalOffset);
