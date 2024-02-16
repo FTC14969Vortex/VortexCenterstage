@@ -78,7 +78,7 @@ public class Teleop extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            if(robot.chassis.isRobotStable()) {
+             {
                 double move_y_axis = gamepad1.left_stick_y;
                 //double move_x_axis = -gamepad1.left_stick_x
                 // double(gamepad1.dpad_right)-double(gamepad1.dpad_left)
@@ -101,12 +101,16 @@ public class Teleop extends LinearOpMode {
             /**
              * Joystick controls for Drivetrain, Intake on GAMEPAD 1
              */
-            //Drive train
 
+            //Drive Power
+            if(robot.chassis.isRobotStable()) {
                 robot.chassis.FLMotor.setPower(DRIVETRAIN_SPEED * fl_power);
                 robot.chassis.BLMotor.setPower(DRIVETRAIN_SPEED * bl_power);
                 robot.chassis.FRMotor.setPower(DRIVETRAIN_SPEED * fr_power);
                 robot.chassis.BRMotor.setPower(DRIVETRAIN_SPEED * br_power);
+            } else {
+                robot.chassis.stopDriveMotors();
+            }
 
             //Speed Control
             if (gamepad1.a){
@@ -135,11 +139,6 @@ public class Teleop extends LinearOpMode {
             fr_power += ACCELERATION * (target_fr_power - fr_power);
             br_power += ACCELERATION * (target_br_power - br_power);
 
-
-            robot.chassis.FLMotor.setPower(DRIVETRAIN_SPEED * fl_power);
-            robot.chassis.BLMotor.setPower(DRIVETRAIN_SPEED * bl_power);
-            robot.chassis.FRMotor.setPower(DRIVETRAIN_SPEED * fr_power);
-            robot.chassis.BRMotor.setPower(DRIVETRAIN_SPEED * br_power);
 
             //Intake
             if (gamepad1.left_bumper) {
