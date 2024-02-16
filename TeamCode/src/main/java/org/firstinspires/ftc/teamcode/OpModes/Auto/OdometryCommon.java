@@ -103,9 +103,6 @@ public class OdometryCommon extends LinearOpMode{
 
         vision.initDoubleVision(hardwareMap);
 
-        RED_APRILTAG_OFFSET = 0;
-        vision.CENTER_TAG_ID = 2;
-
 
         while (!isStarted()) {
             if (opModeInInit()) {
@@ -148,34 +145,17 @@ public class OdometryCommon extends LinearOpMode{
                             break;
                     }
 //                    sleep(2000);
-                    currentStage = AutoStages.GOTOOUTTAKE;
-                    break;
-
-                case GOTOOUTTAKE:
-
-                    currentStage = AutoStages.GO_TO_BACKBOARD;
-                    break;
-
-                case GO_TO_BACKBOARD:
-//                    if (!IS_AUTO_FRONT) {
-//                        BackboardBack();
-//                    }
-//                    else {
-//                        BackboardFront();
-//                    }
                     currentStage = AutoStages.DELIVER_BACKBOARD;
                     break;
 
+
                 case DELIVER_BACKBOARD:
-                    if (!IS_AUTO_FRONT) {
-                        BackboardBack();
-                        deliverBack();
-                    } else {
-                        BackboardFront();
-                        deliverFront();
-                    }
+                    gotoBackBoard();
+                    centerOnTarget();
+                    delivery();
                     currentStage = AutoStages.PARK;
                     break;
+
                 case PARK:
                     park();
                     currentStage = AutoStages.END_AUTO;
@@ -300,25 +280,27 @@ public class OdometryCommon extends LinearOpMode{
             drive.followTrajectory(comeBack);
         }
     }
-    public void BackboardBack() {
-        BackSideBackboard = drive.trajectoryBuilder(comeBack.end())
-                .lineTo(backboardPose)
-                .build();
-        drive.followTrajectory(BackSideBackboard);
-    }
-    public void BackboardFront() {
-        startBackboard = drive.trajectoryBuilder(comeBack.end())
-                .lineTo(startBackboardPose)
-                .build();
-        extendToBackboard = drive.trajectoryBuilder(startBackboard.end())
-                .lineTo(cyclePoint)
-                .build();
-        FrontSideBackboard = drive.trajectoryBuilder(extendToBackboard.end())
-                .lineToLinearHeading(new Pose2d(backboardPose.getX(),backboardPose.getY(), Math.toRadians(180)))
-                .build();
-        drive.followTrajectory(startBackboard);
-        drive.followTrajectory(extendToBackboard);
-        drive.followTrajectory(FrontSideBackboard);
+    public void gotoBackBoard() {
+
+        if (!IS_AUTO_FRONT) {
+            BackSideBackboard = drive.trajectoryBuilder(comeBack.end())
+                    .lineTo(backboardPose)
+                    .build();
+            drive.followTrajectory(BackSideBackboard);
+        } else {
+            startBackboard = drive.trajectoryBuilder(comeBack.end())
+                    .lineTo(startBackboardPose)
+                    .build();
+            extendToBackboard = drive.trajectoryBuilder(startBackboard.end())
+                    .lineTo(cyclePoint)
+                    .build();
+            FrontSideBackboard = drive.trajectoryBuilder(extendToBackboard.end())
+                    .lineToLinearHeading(new Pose2d(backboardPose.getX(), backboardPose.getY(), Math.toRadians(180)))
+                    .build();
+            drive.followTrajectory(startBackboard);
+            drive.followTrajectory(extendToBackboard);
+            drive.followTrajectory(FrontSideBackboard);
+        }
     }
     public double getRangeError() {
 
@@ -334,47 +316,89 @@ public class OdometryCommon extends LinearOpMode{
         return rangeError;
     }
 
-    public void deliverBack() {
+    public void centerOnTarget() {
         telemetry.addData("CentertagID", vision.CENTER_TAG_ID);
         telemetry.addData("TargetTagID", vision.TARGET_TAG_ID);
         telemetry.update();
         double rangeError = getRangeError();
-        double adjustedRangeX = BackSideBackboard.end().getX() + rangeError;
-        if(vision.TARGET_TAG_ID < vision.CENTER_TAG_ID) {
-            moveToDeliveryTag = drive.trajectoryBuilder(BackSideBackboard.end())
-                    .lineTo(new Vector2d(adjustedRangeX , (BackSideBackboard.end().getY() + 7.5)))
-                    .build();
-
-            drive.followTrajectory(moveToDeliveryTag);
-        }
-        else if(vision.TARGET_TAG_ID > vision.CENTER_TAG_ID) {
-            moveToDeliveryTag = drive.trajectoryBuilder(BackSideBackboard.end())
-                    .lineTo(new Vector2d(adjustedRangeX, (BackSideBackboard.end().getY() - 8)))
-                    .build();
-
-            drive.followTrajectory(moveToDeliveryTag);
-        }
-        else{
-            if (rangeError != 0){
+        if(!IS_AUTO_FRONT){
+            double adjustedRangeX = BackSideBackboard.end().getX() + rangeError;
+            if(vision.TARGET_TAG_ID < vision.CENTER_TAG_ID) {
                 moveToDeliveryTag = drive.trajectoryBuilder(BackSideBackboard.end())
-                        .lineTo(new Vector2d(adjustedRangeX, (BackSideBackboard.end().getY())))
+                        .lineTo(new Vector2d(adjustedRangeX , (BackSideBackboard.end().getY() + 7.5)))
                         .build();
 
                 drive.followTrajectory(moveToDeliveryTag);
             }
+            else if(vision.TARGET_TAG_ID > vision.CENTER_TAG_ID) {
+                moveToDeliveryTag = drive.trajectoryBuilder(BackSideBackboard.end())
+                        .lineTo(new Vector2d(adjustedRangeX, (BackSideBackboard.end().getY() - 8)))
+                        .build();
+
+                drive.followTrajectory(moveToDeliveryTag);
+            }
+            else{
+                if (rangeError != 0){
+                    moveToDeliveryTag = drive.trajectoryBuilder(BackSideBackboard.end())
+                            .lineTo(new Vector2d(adjustedRangeX, (BackSideBackboard.end().getY())))
+                            .build();
+
+                    drive.followTrajectory(moveToDeliveryTag);
+                }
+            }
+            backintoBoard = drive.trajectoryBuilder(moveToDeliveryTag.end())
+                    .lineTo(
+                            new Vector2d(moveToDeliveryTag.end().getX()+ 4.5, moveToDeliveryTag.end().getY()),
+                            SampleMecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                            SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL)
+                    )
+                    .build();
+        } else {
+            double adjustedRangeX = FrontSideBackboard.end().getX() + rangeError;
+            if(vision.TARGET_TAG_ID < vision.CENTER_TAG_ID) {
+                moveToDeliveryTag = drive.trajectoryBuilder(FrontSideBackboard.end())
+                        .lineTo(new Vector2d(adjustedRangeX , (FrontSideBackboard.end().getY() + 7)))
+                        .build();
+
+                drive.followTrajectory(moveToDeliveryTag);
+            }
+            else if(vision.TARGET_TAG_ID > vision.CENTER_TAG_ID) {
+                moveToDeliveryTag = drive.trajectoryBuilder(FrontSideBackboard.end())
+                        .lineTo(new Vector2d(adjustedRangeX, (FrontSideBackboard.end().getY() - 7)))
+                        .build();
+
+                drive.followTrajectory(moveToDeliveryTag);
+            }
+            else if (rangeError != 0){
+                moveToDeliveryTag = drive.trajectoryBuilder(FrontSideBackboard.end())
+                        .lineTo(new Vector2d(adjustedRangeX, (FrontSideBackboard.end().getY())))
+                        .build();
+
+                drive.followTrajectory(moveToDeliveryTag);
+
+            } else {
+                //Failsafe if Camera doesn't detect anything
+                moveToDeliveryTag = drive.trajectoryBuilder(FrontSideBackboard.end())
+                        .lineTo(new Vector2d(FrontSideBackboard.end().getX()-0.1, (FrontSideBackboard.end().getY()-0.1)))
+                        .build();
+
+                drive.followTrajectory(moveToDeliveryTag);
+
+
+            }
+            backintoBoard = drive.trajectoryBuilder(moveToDeliveryTag.end())
+                    .lineTo(
+                            new Vector2d(moveToDeliveryTag.end().getX()+ 4.5, moveToDeliveryTag.end().getY()),
+                            SampleMecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                            SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL)
+                    )
+                    .build();
         }
 
-        backintoBoard = drive.trajectoryBuilder(moveToDeliveryTag.end())
-                .lineTo(
-                        new Vector2d(moveToDeliveryTag.end().getX()+ 4.5, moveToDeliveryTag.end().getY()),
-                        SampleMecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL)
-                )
-                .build();
-
-        delivery();
 
     }
+
+    /**** Delete after testing
     public void deliverFront() {
         telemetry.addData("CentertagID", vision.CENTER_TAG_ID);
         telemetry.addData("TargetTagID", vision.TARGET_TAG_ID);
@@ -422,6 +446,8 @@ public class OdometryCommon extends LinearOpMode{
         delivery();
 
     }
+        ***/
+    
     public void park() {
         if (!IS_AUTO_FRONT) {
             park = drive.trajectoryBuilder(backintoBoard.end())
@@ -438,14 +464,16 @@ public class OdometryCommon extends LinearOpMode{
     }
 
     public void delivery() {
-        robot.arm.gotoAutoPosition();
-        sleep(2000);
+
         robot.gate.close();
-        sleep(300);
+        robot.arm.gotoAutoPosition();
+        sleep(150);
         robot.wrist.gotoAutoPosition();
+
         sleep(1000);
         drive.followTrajectory(backintoBoard);
         sleep(1100);
+
         robot.gate.open();
         sleep(550);
         robot.wrist.gotoPickupPosition();
