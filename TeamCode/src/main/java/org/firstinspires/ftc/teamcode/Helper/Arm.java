@@ -35,6 +35,7 @@ public class Arm {
     public void gotoPosition(int targetPosition) {
         ElapsedTime runtime = new ElapsedTime();
         timeout_ms = 3000;
+
         currentPosition = motor.getCurrentPosition();
         motor.setTargetPosition(targetPosition);
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -66,6 +67,7 @@ public class Arm {
         this.gotoPosition(ARM_DELIVERY_POSITION_HIGH);
     }
     public void gotoAutoPosition(){
+        this.gotoPosition(ARM_PICKUP_POSITION);
         this.gotoPosition(ARM_DELIVERY_POSITION_AUTO);
     }
 

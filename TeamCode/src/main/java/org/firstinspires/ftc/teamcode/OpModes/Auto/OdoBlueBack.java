@@ -25,13 +25,13 @@ public class OdoBlueBack extends OdometryCommon{
 
         comeBackPose = new Vector2d(37,40);
 
-        backboardPose = new Vector2d(45, 42).plus(robotLocalOffset);
+        backboardPose = new Vector2d(45, 46).plus(robotLocalOffset);
 
         //edge park
 //        parkPose = new Vector2d(50, 72).plus(robotLocalOffset);
 
         //center park
-        parkPose = new Vector2d(50, 24).plus(robotLocalOffset);
+        parkPose = new Vector2d(50, 27).plus(robotLocalOffset);
 
     }
 }

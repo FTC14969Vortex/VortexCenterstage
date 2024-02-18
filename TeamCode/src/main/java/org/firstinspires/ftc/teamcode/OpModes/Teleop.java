@@ -79,11 +79,11 @@ public class Teleop extends LinearOpMode {
         while (opModeIsActive()) {
 
              {
-                double move_y_axis = gamepad1.left_stick_y;
-                //double move_x_axis = -gamepad1.left_stick_x
-                // double(gamepad1.dpad_right)-double(gamepad1.dpad_left)
-                double move_x_axis = 0;
-                double pivot_turn = -gamepad1.right_stick_x;
+                 // Controller to motor powers.
+                 double move_y_axis = gamepad1.left_stick_y;
+                 double move_x_axis = -gamepad1.left_stick_x;
+                 double pivot_turn = -gamepad1.right_stick_x;
+
 
                 //Sets the target power
                 double target_fl_power = move_y_axis + move_x_axis + pivot_turn;
@@ -121,23 +121,8 @@ public class Teleop extends LinearOpMode {
                 DRIVETRAIN_SPEED = 1;
             }
 
-            // Controller to motor powers.
-            double move_y_axis = gamepad1.left_stick_y;
-            double move_x_axis = -gamepad1.left_stick_x;
-            double pivot_turn = -gamepad1.right_stick_x;
 
 
-            //Sets the target power
-            double target_fl_power = move_y_axis + move_x_axis + pivot_turn;
-            double target_bl_power = move_y_axis - move_x_axis + pivot_turn;
-            double target_fr_power = move_y_axis - move_x_axis - pivot_turn;
-            double target_br_power = move_y_axis + move_x_axis - pivot_turn;
-
-            //Adds how far you are from target power, times acceleration to the current power.
-            fl_power += ACCELERATION * (target_fl_power - fl_power);
-            bl_power += ACCELERATION * (target_bl_power - bl_power);
-            fr_power += ACCELERATION * (target_fr_power - fr_power);
-            br_power += ACCELERATION * (target_br_power - br_power);
 
 
             //Intake
@@ -226,17 +211,11 @@ public class Teleop extends LinearOpMode {
 
             if(gamepad2.dpad_right) {
                 robot.gate.close();
-                sleep(300);
                 robot.arm.gotoAutoPosition();
-                sleep(2000);
-                robot.wrist.gotoAutoPosition();
-                sleep(1000);
-                robot.gate.open();
-                sleep(700);
-                robot.wrist.gotoPickupPosition();
-                sleep(500);
-                robot.arm.gotoPickupPosition();
-                sleep(500);
+                telemetry.addData("Encoder Val", robot.arm.motor.getCurrentPosition());
+                telemetry.update();
+                sleep(150);
+               robot.wrist.gotoAutoPosition();
 
             }
 

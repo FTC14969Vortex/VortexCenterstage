@@ -36,7 +36,7 @@ public class OdometryCommon extends LinearOpMode{
     SampleMecanumDrive drive;
 
 
-    enum AutoStages {DETECT_TE, OUTTAKE, GOTOOUTTAKE, GO_TO_BACKBOARD, DELIVER_BACKBOARD, INTAKE_STACK, RETURN_BACKBOARD, PARK, END_AUTO}
+    enum AutoStages {DETECT_TE, OUTTAKE, DELIVER_BACKBOARD, INTAKE_STACK, RETURN_BACKBOARD, PARK, END_AUTO}
     AutoStages currentStage = AutoStages.DETECT_TE;
 
     /*
@@ -467,6 +467,8 @@ public class OdometryCommon extends LinearOpMode{
 
         robot.gate.close();
         robot.arm.gotoAutoPosition();
+        telemetry.addData("Encoder Val", robot.arm.motor.getCurrentPosition());
+        telemetry.update();
         sleep(150);
         robot.wrist.gotoAutoPosition();
 
