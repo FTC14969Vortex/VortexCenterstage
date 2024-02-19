@@ -31,7 +31,7 @@ public class OdoBlueBack extends OdometryCommon{
 //        parkPose = new Vector2d(50, 72).plus(robotLocalOffset);
 
         //center park
-        parkPose = new Vector2d(50, 27).plus(robotLocalOffset);
+        parkPose = new Vector2d(53, 27).plus(robotLocalOffset);
 
     }
 }
