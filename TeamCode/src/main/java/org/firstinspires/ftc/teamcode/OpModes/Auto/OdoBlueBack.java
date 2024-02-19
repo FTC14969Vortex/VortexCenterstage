@@ -19,19 +19,21 @@ public class OdoBlueBack extends OdometryCommon{
         startPose = new Pose2d(12, 62, Math.toRadians(90));
 
         //Outake Coordinates for Autos
-        outtake16Pose = new Vector2d(37, 40).plus(robotLocalOffset);
-        outtake25Pose = new Vector2d(12, 20).plus(robotLocalOffset);
-        outtake34Pose = new Vector2d(12,45).plus(robotLocalOffset);
+        outtake16Pose = new Vector2d(37, 40).plus(robotLocalOffsetVector);
+        outtake25Pose = new Vector2d(12, 20).plus(robotLocalOffsetVector);
+        outtake34Pose = new Pose2d(12,45,Math.toRadians(180)).plus(robotLocalOffsetPose);
 
-        comeBackPose = new Vector2d(37,40);
+        comeBackPose = new Pose2d(37, 40, Math.toRadians(180)).plus(robotLocalOffsetPose);
 
-        backboardPose = new Vector2d(45, 46).plus(robotLocalOffset);
+        backboardPose = new Vector2d(45, 46).plus(robotLocalOffsetVector);
+
+        backUpDistance = 4;
 
         //edge park
 //        parkPose = new Vector2d(50, 72).plus(robotLocalOffset);
 
         //center park
-        parkPose = new Vector2d(53, 27).plus(robotLocalOffset);
+        parkPose = new Vector2d(53, 27).plus(robotLocalOffsetVector);
 
     }
 }
