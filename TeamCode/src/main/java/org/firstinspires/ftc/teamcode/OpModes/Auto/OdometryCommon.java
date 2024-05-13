@@ -56,6 +56,8 @@ public class OdometryCommon extends LinearOpMode{
     Trajectory backintoBoard;
     Trajectory park;
     Trajectory moveToDeliveryTag;
+    Trajectory driveStacks;
+    Trajectory runStacks;
 
     int backUpDistance;
 
@@ -68,6 +70,7 @@ public class OdometryCommon extends LinearOpMode{
     Vector2d startBackboardPose;
     Vector2d cyclePoint;
     Vector2d backboardPose;
+    Vector2d stacksPose;
     Vector2d parkPose;
     Pose2d robotLocalOffsetPose = new Pose2d(0,-6.5,Math.toRadians(0));
     Vector2d robotLocalOffsetVector = new Vector2d(0,-6.5);
@@ -89,6 +92,7 @@ public class OdometryCommon extends LinearOpMode{
         cyclePoint = new Vector2d(0,0);
         backboardPose = new Vector2d(45, 48);
         backUpDistance = 5;
+        stacksPose = new Vector2d(20, 36);
         parkPose = new Vector2d(48, 72);
     }
 
@@ -164,6 +168,9 @@ public class OdometryCommon extends LinearOpMode{
                     park();
                     currentStage = AutoStages.END_AUTO;
                     break;
+                case INTAKE_STACK:
+                    goToStacks();
+                    currentStage = AutoStages.END_AUTO;
                 case END_AUTO:
                     // End Auto keeps printing debug information via telemetry.
                     telemetry.update();
@@ -402,7 +409,15 @@ public class OdometryCommon extends LinearOpMode{
 
     }
 
+    public void goToStacks() {
+        if (!IS_AUTO_FRONT) {
+            driveStacks = drive.trajectoryBuilder(moveToDeliveryTag.end())
+                    .lineTo(cyclePoint)
+                    .build();
+            drive.followTrajectory(driveStacks);
+        }
 
+    }
     public void park() {
         if (!IS_AUTO_FRONT) {
             park = drive.trajectoryBuilder(backintoBoard.end())
@@ -427,14 +442,14 @@ public class OdometryCommon extends LinearOpMode{
         sleep(150);
         robot.wrist.gotoAutoPosition();
 
-        sleep(1000);
+        sleep(1500);
         drive.followTrajectory(backintoBoard);
         sleep(1100);
 
         robot.gate.open();
         sleep(550);
         robot.wrist.gotoPickupPosition();
-        sleep(1500);
+        sleep(2000);
         robot.arm.gotoPickupPosition();
         sleep(500);
     }

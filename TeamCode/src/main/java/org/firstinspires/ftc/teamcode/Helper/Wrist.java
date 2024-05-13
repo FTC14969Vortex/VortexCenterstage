@@ -11,7 +11,7 @@ public class Wrist {
     public double WRIST_DELIVERY_POSITION_HIGH = 0.21;
     public double WRIST_DELIVERY_POSITION_LOW = 0.22;
     public double WRIST_DELIVERY_POSITION_AUTO = 0.233;
-    public double WRIST_PICKUP_POSITION = 0.305;
+    public double WRIST_PICKUP_POSITION = 0.31;
 
 
 
