@@ -161,7 +161,7 @@ public class OdometryCommon extends LinearOpMode{
                     gotoBackBoard();
                     centerOnTarget();
                     delivery();
-                    currentStage = AutoStages.PARK;
+                    currentStage = AutoStages.INTAKE_STACK;
                     break;
 
                 case PARK:
@@ -411,7 +411,7 @@ public class OdometryCommon extends LinearOpMode{
 
     public void goToStacks() {
         if (!IS_AUTO_FRONT) {
-            driveStacks = drive.trajectoryBuilder(moveToDeliveryTag.end())
+            driveStacks = drive.trajectoryBuilder(backintoBoard.end())
                     .lineTo(cyclePoint)
                     .build();
             drive.followTrajectory(driveStacks);
