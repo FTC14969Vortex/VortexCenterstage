@@ -92,7 +92,7 @@ public class OdometryCommon extends LinearOpMode{
         cyclePoint = new Vector2d(0,0);
         backboardPose = new Vector2d(45, 48);
         backUpDistance = 5;
-        stacksPose = new Vector2d(20, 36);
+        stacksPose = new Vector2d(-45, 12);
         parkPose = new Vector2d(48, 72);
     }
 
@@ -415,6 +415,10 @@ public class OdometryCommon extends LinearOpMode{
                     .lineTo(cyclePoint)
                     .build();
             drive.followTrajectory(driveStacks);
+            runStacks = drive.trajectoryBuilder(driveStacks.end())
+                    .lineTo(stacksPose)
+                    .build();
+            drive.followTrajectory(runStacks);
         }
 
     }

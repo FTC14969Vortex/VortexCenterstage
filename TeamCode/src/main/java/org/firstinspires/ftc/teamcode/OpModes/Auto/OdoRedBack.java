@@ -22,13 +22,16 @@ public class OdoRedBack extends OdometryCommon{
         //Outake Coordinates for Autos
         outtake16Pose = new Vector2d(38, -41).minus(robotLocalOffsetVector);
         outtake25Pose = new Vector2d(26, -29.5).minus(robotLocalOffsetVector);
-        outtake34Pose = new Pose2d(12,-45,Math.toRadians(90)).minus(robotLocalOffsetPose);
+        outtake34Pose = new Pose2d(12,-45, Math.toRadians(90)).minus(robotLocalOffsetPose);
 
         comeBackPose = new Pose2d(37, -40, Math.toRadians(180)).minus(robotLocalOffsetPose);
 
-        backboardPose = new Vector2d(45, -42).minus(robotLocalOffsetVector);
+        backboardPose = new Vector2d(45, -60).minus(robotLocalOffsetVector);
 
         backUpDistance = 4;
+
+        cyclePoint = new Vector2d(0,-3);
+        stacksPose = new Vector2d(-35,-14);
 
         //edge park
         parkPose = new Vector2d(50, -72).minus(robotLocalOffsetVector);

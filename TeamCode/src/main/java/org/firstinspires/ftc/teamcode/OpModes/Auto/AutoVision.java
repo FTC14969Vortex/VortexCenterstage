@@ -147,7 +147,7 @@ public class AutoVision extends LinearOpMode {
 
             //Garage Exposure
 
-            setManualExposure(45, 250);
+            setManualExposure(250, 250);
 
         } else {
             myVisionPortal = new VisionPortal.Builder()
