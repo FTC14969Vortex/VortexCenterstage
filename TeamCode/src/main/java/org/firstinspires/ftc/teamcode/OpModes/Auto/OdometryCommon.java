@@ -348,14 +348,19 @@ public class OdometryCommon extends LinearOpMode{
 
                 drive.followTrajectory(moveToDeliveryTag);
             }
-            else{
-                if (rangeError != 0){
-                    moveToDeliveryTag = drive.trajectoryBuilder(BackSideBackboard.end())
-                            .lineTo(new Vector2d(adjustedRangeX, (BackSideBackboard.end().getY())))
-                            .build();
+            else if (rangeError != 0){
+                moveToDeliveryTag = drive.trajectoryBuilder(BackSideBackboard.end())
+                        .lineTo(new Vector2d(adjustedRangeX, (BackSideBackboard.end().getY())))
+                        .build();
 
-                    drive.followTrajectory(moveToDeliveryTag);
-                }
+                drive.followTrajectory(moveToDeliveryTag);
+            } else {
+                //Failsafe if Camera doesn't detect anything
+                moveToDeliveryTag = drive.trajectoryBuilder(BackSideBackboard.end())
+                        .lineTo(new Vector2d(BackSideBackboard.end().getX()-0.1, (BackSideBackboard.end().getY()-0.1)))
+                        .build();
+
+                drive.followTrajectory(moveToDeliveryTag);
             }
             backintoBoard = drive.trajectoryBuilder(moveToDeliveryTag.end())
                     .lineTo(
