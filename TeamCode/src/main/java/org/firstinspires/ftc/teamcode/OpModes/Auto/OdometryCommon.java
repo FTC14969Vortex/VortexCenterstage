@@ -55,6 +55,7 @@ public class OdometryCommon extends LinearOpMode{
     Trajectory BackSideBackboard;
     Trajectory backintoBoard;
     Trajectory park;
+    Trajectory returnPark;
     Trajectory moveToDeliveryTag;
     Trajectory driveStacks;
     Trajectory runStacks;
@@ -164,13 +165,13 @@ public class OdometryCommon extends LinearOpMode{
                     currentStage = AutoStages.INTAKE_STACK;
                     break;
 
+                case INTAKE_STACK:
+                    goToStacks();
+                    currentStage = AutoStages.PARK;
                 case PARK:
                     park();
                     currentStage = AutoStages.END_AUTO;
                     break;
-                case INTAKE_STACK:
-                    goToStacks();
-                    currentStage = AutoStages.END_AUTO;
                 case END_AUTO:
                     // End Auto keeps printing debug information via telemetry.
                     telemetry.update();
@@ -429,9 +430,13 @@ public class OdometryCommon extends LinearOpMode{
     }
     public void park() {
         if (!IS_AUTO_FRONT) {
-            park = drive.trajectoryBuilder(backintoBoard.end())
+            returnPark = drive.trajectoryBuilder(runStacks.end())
+                    .lineTo(cyclePoint)
+                    .build();
+            park = drive.trajectoryBuilder(returnPark.end())
                     .lineTo(parkPose)
                     .build();
+            drive.followTrajectory(returnPark);
             drive.followTrajectory(park);
         } else {
             park = drive.trajectoryBuilder(backintoBoard.end())
