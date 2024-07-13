@@ -59,7 +59,8 @@ public class OdometryCommon extends LinearOpMode{
     Trajectory FrontSideBackboard;
     Trajectory BackSideBackboard;
     Trajectory backintoBoard;
-    Trajectory park;
+    Trajectory parkFirst;
+    Trajectory parkSecond;
     Trajectory moveToDeliveryTag;
     Trajectory driveStacks;
     Trajectory runStacks;
@@ -76,11 +77,15 @@ public class OdometryCommon extends LinearOpMode{
     Pose2d comeBack34;
     Vector2d startBackboardPose;
     Vector2d cyclePoint;
-    Vector2d backboardPose;
+    Vector2d backboardPose16;
+    Vector2d backboardPose25;
+    Vector2d backboardPose34;
     Vector2d stacksPose;
-    Vector2d parkPose;
+    Vector2d parkFirstPose;
+    Vector2d parkSecondPose;
     Pose2d robotLocalOffsetPose = new Pose2d(0,0);
     Vector2d robotLocalOffsetVector = new Vector2d(0,0);
+    public int whichOuttake = 25;
 
     public void setUniqueParameters() {
         IS_AUTO_FRONT = false;
@@ -99,10 +104,14 @@ public class OdometryCommon extends LinearOpMode{
         comeBack34 = new Pose2d(-50, -7, 180).plus(robotLocalOffsetPose);
         startBackboardPose = new Vector2d(-12,12);
         cyclePoint = new Vector2d(0,0);
-        backboardPose = new Vector2d(45, 48);
+        backboardPose16 = new Vector2d(45, 48);
+        backboardPose25 = new Vector2d(45, 48);
+        backboardPose34 = new Vector2d(45, 48);
         backUpDistance = 5;
         stacksPose = new Vector2d(-45, 12);
-        parkPose = new Vector2d(48, 72);
+        parkFirstPose = new Vector2d(48, 72);
+        parkSecondPose = new Vector2d(48, 72);
+
     }
 
     @Override
@@ -167,7 +176,14 @@ public class OdometryCommon extends LinearOpMode{
 
 
                 case DELIVER_BACKBOARD:
-                    gotoBackBoard();
+                    if (whichOuttake ==16) {
+                        gotoBackBoard16();
+                    } else if (whichOuttake == 34) {
+                        gotoBackBoard34();
+                    } else {
+                        gotoBackBoard25();
+                    }
+
                     centerOnTarget();
                     delivery();
                     currentStage = AutoStages.PARK;
@@ -207,8 +223,8 @@ public class OdometryCommon extends LinearOpMode{
 
             drive.followTrajectory(outtake_1_6);
             outtake();
-            sleep(2000);
-//            drive.followTrajectory(comeBack);
+            drive.followTrajectory(comeBack);
+            whichOuttake = 16;
         }
     }
     public void outtake_2_5() {
@@ -227,8 +243,8 @@ public class OdometryCommon extends LinearOpMode{
             //Outtake at spike mark
             outtake();
             //Return to Outtake common position
-            sleep(2000);
-//            drive.followTrajectory(comeBack);
+            drive.followTrajectory(comeBack);
+            whichOuttake = 25;
 
         } else {
             outtake_2_5 = drive.trajectoryBuilder(startPose)
@@ -244,6 +260,8 @@ public class OdometryCommon extends LinearOpMode{
             outtake();
             //Return to Outtake common position
             drive.followTrajectory(comeBack);
+            whichOuttake = 25;
+
         }
 
 
@@ -263,9 +281,10 @@ public class OdometryCommon extends LinearOpMode{
 
             //Outtake at spike mark
             outtake();
-            sleep(2000);
             //Return to Outtake common position
             drive.followTrajectory(comeBack);
+            whichOuttake = 34;
+
         } else {
             outtake_3_4 = drive.trajectoryBuilder(startPose)
                     .lineToLinearHeading(outtake34Pose)
@@ -282,13 +301,15 @@ public class OdometryCommon extends LinearOpMode{
 
             //Return to Outtake common position
             drive.followTrajectory(comeBack);
+            whichOuttake = 34;
+
         }
     }
-    public void gotoBackBoard() {
+    public void gotoBackBoard16() {
 
         if (!IS_AUTO_FRONT) {
             BackSideBackboard = drive.trajectoryBuilder(comeBack.end())
-                    .lineTo(backboardPose)
+                    .lineTo(backboardPose16)
                     .build();
             drive.followTrajectory(BackSideBackboard);
         } else {
@@ -299,7 +320,51 @@ public class OdometryCommon extends LinearOpMode{
                     .lineTo(cyclePoint)
                     .build();
             FrontSideBackboard = drive.trajectoryBuilder(extendToBackboard.end())
-                    .lineToLinearHeading(new Pose2d(backboardPose.getX(), backboardPose.getY(), Math.toRadians(180)))
+                    .lineToLinearHeading(new Pose2d(backboardPose16.getX(), backboardPose16.getY(), Math.toRadians(180)))
+                    .build();
+            drive.followTrajectory(startBackboard);
+            drive.followTrajectory(extendToBackboard);
+            drive.followTrajectory(FrontSideBackboard);
+        }
+    }
+    public void gotoBackBoard25() {
+
+        if (!IS_AUTO_FRONT) {
+            BackSideBackboard = drive.trajectoryBuilder(comeBack.end())
+                    .lineTo(backboardPose25)
+                    .build();
+            drive.followTrajectory(BackSideBackboard);
+        } else {
+            startBackboard = drive.trajectoryBuilder(comeBack.end())
+                    .lineTo(startBackboardPose)
+                    .build();
+            extendToBackboard = drive.trajectoryBuilder(startBackboard.end())
+                    .lineTo(cyclePoint)
+                    .build();
+            FrontSideBackboard = drive.trajectoryBuilder(extendToBackboard.end())
+                    .lineToLinearHeading(new Pose2d(backboardPose25.getX(), backboardPose25.getY(), Math.toRadians(180)))
+                    .build();
+            drive.followTrajectory(startBackboard);
+            drive.followTrajectory(extendToBackboard);
+            drive.followTrajectory(FrontSideBackboard);
+        }
+    }
+    public void gotoBackBoard34() {
+
+        if (!IS_AUTO_FRONT) {
+            BackSideBackboard = drive.trajectoryBuilder(comeBack.end())
+                    .lineTo(backboardPose34)
+                    .build();
+            drive.followTrajectory(BackSideBackboard);
+        } else {
+            startBackboard = drive.trajectoryBuilder(comeBack.end())
+                    .lineTo(startBackboardPose)
+                    .build();
+            extendToBackboard = drive.trajectoryBuilder(startBackboard.end())
+                    .lineTo(cyclePoint)
+                    .build();
+            FrontSideBackboard = drive.trajectoryBuilder(extendToBackboard.end())
+                    .lineToLinearHeading(new Pose2d(backboardPose34.getX(), backboardPose34.getY(), Math.toRadians(180)))
                     .build();
             drive.followTrajectory(startBackboard);
             drive.followTrajectory(extendToBackboard);
@@ -422,15 +487,22 @@ public class OdometryCommon extends LinearOpMode{
     }
     public void park() {
         if (!IS_AUTO_FRONT) {
-            park = drive.trajectoryBuilder(backintoBoard.end())
-                    .lineTo(parkPose)
+            parkFirst = drive.trajectoryBuilder(backintoBoard.end())
+                    .lineTo(parkFirstPose)
                     .build();
-            drive.followTrajectory(park);
+
+            parkSecond = drive.trajectoryBuilder(parkFirst.end())
+                    .lineTo(parkSecondPose)
+                    .build();
+
+            drive.followTrajectory(parkFirst);
+            drive.followTrajectory(parkSecond);
+
         } else {
-            park = drive.trajectoryBuilder(backintoBoard.end())
-                    .lineTo(parkPose)
+            parkFirst = drive.trajectoryBuilder(backintoBoard.end())
+                    .lineTo(parkFirstPose)
                     .build();
-            drive.followTrajectory(park);
+            drive.followTrajectory(parkFirst);
         }
 
     }

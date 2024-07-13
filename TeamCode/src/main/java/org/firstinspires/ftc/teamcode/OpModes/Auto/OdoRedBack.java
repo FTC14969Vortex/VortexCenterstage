@@ -26,16 +26,17 @@ public class OdoRedBack extends OdometryCommon{
 
 
         //Outake Coordinates for Autos
-        outtake16Pose = new Vector2d(36, -41).minus(robotLocalOffsetVector);
-        outtake25Pose = new Vector2d(12, -20.5).minus(robotLocalOffsetVector);
-        outtake34Pose = new Pose2d(10,-41, Math.toRadians(180)).minus(robotLocalOffsetPose);
+        outtake16Pose = new Vector2d(37, -26).minus(robotLocalOffsetVector);
+        outtake25Pose = new Vector2d(12, -12).minus(robotLocalOffsetVector);
+        outtake34Pose = new Pose2d(9,-20, Math.toRadians(210)).minus(robotLocalOffsetPose);
 
-        comeBack16 = new Pose2d(43, -50, Math.toRadians(180)).minus(robotLocalOffsetPose);
-        comeBack25 = new Pose2d(43, -50, Math.toRadians(180)).minus(robotLocalOffsetPose);
-        comeBack34 = new Pose2d(43, -50, Math.toRadians(180)).minus(robotLocalOffsetPose);
+        comeBack16 = new Pose2d(43, -23, Math.toRadians(180)).minus(robotLocalOffsetPose);
+        comeBack25 = new Pose2d(50, -55, Math.toRadians(180)).minus(robotLocalOffsetPose);
+        comeBack34 = new Pose2d(35, -34, Math.toRadians(180)).minus(robotLocalOffsetPose);
 
-
-        backboardPose = new Vector2d(45, -50).minus(robotLocalOffsetVector);
+        backboardPose16 = new Vector2d(40, -34.5).minus(robotLocalOffsetVector);
+        backboardPose25 = new Vector2d(42, -45).minus(robotLocalOffsetVector);
+        backboardPose34 = new Vector2d(25, -31).minus(robotLocalOffsetVector);
 
         backUpDistance = 4;
 
@@ -43,7 +44,9 @@ public class OdoRedBack extends OdometryCommon{
         stacksPose = new Vector2d(-35,-14);
 
         //edge park
-        parkPose = new Vector2d(65, -80).minus(robotLocalOffsetVector);
+        parkFirstPose = new Vector2d(40, -80).minus(robotLocalOffsetVector);
+        parkSecondPose = new Vector2d(65, -80).minus(robotLocalOffsetVector);
+
 
         //center park
 //        parkPose = new Vector2d(50, -14).minus(robotLocalOffset);

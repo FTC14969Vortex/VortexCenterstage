@@ -29,7 +29,9 @@ public class OdoBlueFront extends OdometryCommon{
         startBackboardPose = new Vector2d(-40,20).plus(robotLocalOffsetVector);
         cyclePoint = new Vector2d(40,20);
 
-        backboardPose = new Vector2d(40, 55).plus(robotLocalOffsetVector);
+        backboardPose16 = new Vector2d(45, -50).minus(robotLocalOffsetVector);
+        backboardPose25 = new Vector2d(45, -50).minus(robotLocalOffsetVector);
+        backboardPose34 = new Vector2d(45, -50).minus(robotLocalOffsetVector);
 
         backUpDistance = 4;
 
@@ -37,6 +39,6 @@ public class OdoBlueFront extends OdometryCommon{
 //        parkPose = new Vector2d(50, 72).plus(robotLocalOffset);
 
         //center park
-        parkPose = new Vector2d(50, 24).plus(robotLocalOffsetVector);
-    }
+        parkFirstPose = new Vector2d(65, -80).minus(robotLocalOffsetVector);
+        parkSecondPose = new Vector2d(40, -80).minus(robotLocalOffsetVector);    }
 }

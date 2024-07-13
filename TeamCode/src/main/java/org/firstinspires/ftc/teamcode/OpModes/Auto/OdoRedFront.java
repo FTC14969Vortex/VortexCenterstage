@@ -32,10 +32,12 @@ public class OdoRedFront extends OdometryCommon{
 
         backUpDistance = 3;
 
-        backboardPose = new Vector2d(38, -48).minus(robotLocalOffsetVector);
+        backboardPose16 = new Vector2d(45, -50).minus(robotLocalOffsetVector);
+        backboardPose25 = new Vector2d(45, -50).minus(robotLocalOffsetVector);
+        backboardPose34 = new Vector2d(40, -45).minus(robotLocalOffsetVector);
 
-        parkPose = new Vector2d(50, -72).minus(robotLocalOffsetVector);
-
+        parkFirstPose = new Vector2d(65, -80).minus(robotLocalOffsetVector);
+        parkSecondPose = new Vector2d(40, -80).minus(robotLocalOffsetVector);
 
 
     }
