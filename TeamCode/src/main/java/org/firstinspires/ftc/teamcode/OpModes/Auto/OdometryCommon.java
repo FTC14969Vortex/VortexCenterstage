@@ -1,5 +1,10 @@
 package org.firstinspires.ftc.teamcode.OpModes.Auto;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.util.Angle;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
@@ -36,7 +41,7 @@ public class OdometryCommon extends LinearOpMode{
     SampleMecanumDrive drive;
 
 
-    enum AutoStages {DETECT_TE, OUTTAKE, DELIVER_BACKBOARD, INTAKE_STACK, RETURN_BACKBOARD, PARK, END_AUTO}
+    enum AutoStages {DETECT_TE, OUTTAKE, DELIVER_BACKBOARD, INTAKE_STACK, PARK, END_AUTO}
     AutoStages currentStage = AutoStages.DETECT_TE;
 
     /*
@@ -72,8 +77,8 @@ public class OdometryCommon extends LinearOpMode{
     Vector2d backboardPose;
     Vector2d stacksPose;
     Vector2d parkPose;
-    Pose2d robotLocalOffsetPose = new Pose2d(0,-6.5,Math.toRadians(0));
-    Vector2d robotLocalOffsetVector = new Vector2d(0,-6.5);
+    Pose2d robotLocalOffsetPose = new Pose2d(0,0);
+    Vector2d robotLocalOffsetVector = new Vector2d(0,0);
 
     public void setUniqueParameters() {
         IS_AUTO_FRONT = false;
@@ -152,7 +157,7 @@ public class OdometryCommon extends LinearOpMode{
                             telemetry.addLine("Case 3");
                             break;
                     }
-//                    sleep(2000);
+                    sleep(2000);
                     currentStage = AutoStages.DELIVER_BACKBOARD;
                     break;
 
@@ -161,7 +166,7 @@ public class OdometryCommon extends LinearOpMode{
                     gotoBackBoard();
                     centerOnTarget();
                     delivery();
-                    currentStage = AutoStages.INTAKE_STACK;
+                    currentStage = AutoStages.PARK;
                     break;
 
                 case PARK:
@@ -189,9 +194,7 @@ public class OdometryCommon extends LinearOpMode{
         if (!IS_AUTO_FRONT) {
             drive.setPoseEstimate(startPose);
             outtake_1_6 = drive.trajectoryBuilder(startPose)
-                    .lineToLinearHeading(
-                            new Pose2d(outtake16Pose.getX(),outtake16Pose.getY(),Math.toRadians(180))
-                    )
+                    .lineToLinearHeading(new Pose2d(outtake16Pose.getX(),outtake16Pose.getY(),Math.toRadians(180)))
                     .build();
 
             comeBack = drive.trajectoryBuilder(outtake_1_6.end())
@@ -199,24 +202,9 @@ public class OdometryCommon extends LinearOpMode{
                     .build();
 
             drive.followTrajectory(outtake_1_6);
-            //Outtake at spike mark
             outtake();
-
-            drive.followTrajectory(comeBack);
-        } else {
-            drive.setPoseEstimate(startPose);
-            outtake_1_6 = drive.trajectoryBuilder(startPose)
-                    .lineToLinearHeading(
-                            new Pose2d(outtake16Pose.getX(),outtake16Pose.getY(),Math.toRadians(0))
-                    )
-                    .build();
-            comeBack = drive.trajectoryBuilder(outtake_1_6.end())
-                    .lineToLinearHeading(comeBackPose)
-                    .build();
-
-            drive.followTrajectory(outtake_1_6);
-            outtake();
-            drive.followTrajectory(comeBack);
+            sleep(2000);
+//            drive.followTrajectory(comeBack);
         }
     }
     public void outtake_2_5() {
@@ -227,7 +215,7 @@ public class OdometryCommon extends LinearOpMode{
                     .build();
 
             comeBack = drive.trajectoryBuilder(outtake_2_5.end())
-                    .lineToLinearHeading(new Pose2d(outtake16Pose.getX(),outtake16Pose.getY(),Math.toRadians(180)))
+                    .lineToLinearHeading(comeBackPose)
                     .build();
 
             drive.followTrajectory(outtake_2_5);
@@ -235,7 +223,8 @@ public class OdometryCommon extends LinearOpMode{
             //Outtake at spike mark
             outtake();
             //Return to Outtake common position
-            drive.followTrajectory(comeBack);
+            sleep(2000);
+//            drive.followTrajectory(comeBack);
 
         } else {
             outtake_2_5 = drive.trajectoryBuilder(startPose)
@@ -270,7 +259,7 @@ public class OdometryCommon extends LinearOpMode{
 
             //Outtake at spike mark
             outtake();
-
+            sleep(2000);
             //Return to Outtake common position
             drive.followTrajectory(comeBack);
         } else {

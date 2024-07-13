@@ -29,6 +29,11 @@
 
 package org.firstinspires.ftc.teamcode.OpModes.Auto;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.util.Angle;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -61,6 +66,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Autonomous(name = "AutoVision", group = "Auto")
 @Disabled
+@Config
 public class AutoVision extends LinearOpMode {
     //------------------------------------------------------------------
     /**
@@ -147,7 +153,7 @@ public class AutoVision extends LinearOpMode {
 
             //Garage Exposure
 
-            setManualExposure(250, 250);
+            setManualExposure(15, 250);
 
         } else {
             myVisionPortal = new VisionPortal.Builder()

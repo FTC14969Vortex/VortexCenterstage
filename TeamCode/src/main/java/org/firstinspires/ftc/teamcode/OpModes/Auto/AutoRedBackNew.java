@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.OpModes.Auto;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-@Disabled
 @Autonomous(name = "AutoRedBackNew", group = "Auto")
 public class AutoRedBackNew extends AutoCommon{
 
