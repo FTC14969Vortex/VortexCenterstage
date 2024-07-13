@@ -22,7 +22,9 @@ public class OdoBlueFront extends OdometryCommon{
         outtake25Pose = new Vector2d(-40, 26).plus(robotLocalOffsetVector);
         outtake34Pose = new Pose2d(-48,34,Math.toRadians(90)).plus(robotLocalOffsetPose);
 
-        comeBackPose = new Pose2d(-50, 25, Math.toRadians(180)).plus(robotLocalOffsetPose);
+        comeBack16 = new Pose2d(43, -50, Math.toRadians(180)).minus(robotLocalOffsetPose);
+        comeBack25 = new Pose2d(43, -50, Math.toRadians(180)).minus(robotLocalOffsetPose);
+        comeBack34 = new Pose2d(43, -50, Math.toRadians(180)).minus(robotLocalOffsetPose);
 
         startBackboardPose = new Vector2d(-40,20).plus(robotLocalOffsetVector);
         cyclePoint = new Vector2d(40,20);

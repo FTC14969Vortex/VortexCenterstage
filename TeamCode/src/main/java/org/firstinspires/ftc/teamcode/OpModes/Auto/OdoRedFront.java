@@ -23,7 +23,9 @@ public class OdoRedFront extends OdometryCommon{
         outtake25Pose = new Vector2d(-36, -19).minus(robotLocalOffsetVector);
         outtake34Pose = new Pose2d(-47,-18, Math.toRadians(270)).minus(robotLocalOffsetPose);
 
-        comeBackPose = new Pose2d(-50, -8, Math.toRadians(180)).minus(robotLocalOffsetPose);
+        comeBack16 = new Pose2d(43, -50, Math.toRadians(180)).minus(robotLocalOffsetPose);
+        comeBack25 = new Pose2d(43, -50, Math.toRadians(180)).minus(robotLocalOffsetPose);
+        comeBack34 = new Pose2d(43, -50, Math.toRadians(180)).minus(robotLocalOffsetPose);
 
         startBackboardPose = new Vector2d(-40,-10).minus(robotLocalOffsetVector);
         cyclePoint = new Vector2d(40,-10).minus(robotLocalOffsetVector);

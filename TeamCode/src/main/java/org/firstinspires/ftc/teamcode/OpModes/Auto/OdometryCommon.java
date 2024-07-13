@@ -71,7 +71,9 @@ public class OdometryCommon extends LinearOpMode{
     Vector2d outtake16Pose;
     Vector2d outtake25Pose;
     Pose2d outtake34Pose;
-    Pose2d comeBackPose;
+    Pose2d comeBack16;
+    Pose2d comeBack25;
+    Pose2d comeBack34;
     Vector2d startBackboardPose;
     Vector2d cyclePoint;
     Vector2d backboardPose;
@@ -92,7 +94,9 @@ public class OdometryCommon extends LinearOpMode{
         outtake16Pose = new Vector2d(37, 45);
         outtake25Pose = new Vector2d(20, 36);
         outtake34Pose = new Pose2d(12,45,Math.toRadians(270));
-        comeBackPose = new Pose2d(-50, -7, 180).plus(robotLocalOffsetPose);
+        comeBack16 = new Pose2d(-50, -7, 180).plus(robotLocalOffsetPose);
+        comeBack25 = new Pose2d(-50, -7, 180).plus(robotLocalOffsetPose);
+        comeBack34 = new Pose2d(-50, -7, 180).plus(robotLocalOffsetPose);
         startBackboardPose = new Vector2d(-12,12);
         cyclePoint = new Vector2d(0,0);
         backboardPose = new Vector2d(45, 48);
@@ -198,7 +202,7 @@ public class OdometryCommon extends LinearOpMode{
                     .build();
 
             comeBack = drive.trajectoryBuilder(outtake_1_6.end())
-                    .lineToLinearHeading(comeBackPose)
+                    .lineToLinearHeading(comeBack16)
                     .build();
 
             drive.followTrajectory(outtake_1_6);
@@ -215,7 +219,7 @@ public class OdometryCommon extends LinearOpMode{
                     .build();
 
             comeBack = drive.trajectoryBuilder(outtake_2_5.end())
-                    .lineToLinearHeading(comeBackPose)
+                    .lineToLinearHeading(comeBack25)
                     .build();
 
             drive.followTrajectory(outtake_2_5);
@@ -231,7 +235,7 @@ public class OdometryCommon extends LinearOpMode{
                     .lineTo(outtake25Pose)
                     .build();
             comeBack = drive.trajectoryBuilder(outtake_2_5.end())
-                    .lineToLinearHeading(new Pose2d(comeBackPose.getX(),comeBackPose.getY(),Math.toRadians(180)))
+                    .lineToLinearHeading(new Pose2d(comeBack25.getX(),comeBack25.getY(),Math.toRadians(180)))
                     .build();
 
             drive.followTrajectory(outtake_2_5);
@@ -252,7 +256,7 @@ public class OdometryCommon extends LinearOpMode{
                     .build();
 
             comeBack = drive.trajectoryBuilder(outtake_3_4.end())
-                    .lineToLinearHeading(comeBackPose)
+                    .lineToLinearHeading(comeBack34)
                     .build();
 
             drive.followTrajectory(outtake_3_4);
@@ -268,7 +272,7 @@ public class OdometryCommon extends LinearOpMode{
                     .build();
 
             comeBack = drive.trajectoryBuilder(outtake_3_4.end())
-                    .lineToLinearHeading(comeBackPose)
+                    .lineToLinearHeading(comeBack34)
                     .build();
 
             drive.followTrajectory(outtake_3_4);

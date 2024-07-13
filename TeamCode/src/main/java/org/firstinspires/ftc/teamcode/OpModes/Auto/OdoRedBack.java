@@ -30,7 +30,10 @@ public class OdoRedBack extends OdometryCommon{
         outtake25Pose = new Vector2d(12, -20.5).minus(robotLocalOffsetVector);
         outtake34Pose = new Pose2d(10,-41, Math.toRadians(180)).minus(robotLocalOffsetPose);
 
-        comeBackPose = new Pose2d(43, -50, Math.toRadians(180)).minus(robotLocalOffsetPose);
+        comeBack16 = new Pose2d(43, -50, Math.toRadians(180)).minus(robotLocalOffsetPose);
+        comeBack25 = new Pose2d(43, -50, Math.toRadians(180)).minus(robotLocalOffsetPose);
+        comeBack34 = new Pose2d(43, -50, Math.toRadians(180)).minus(robotLocalOffsetPose);
+
 
         backboardPose = new Vector2d(45, -50).minus(robotLocalOffsetVector);
 
