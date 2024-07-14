@@ -20,7 +20,9 @@ public class OdoBlueFront extends OdometryCommon{
         //Outake Coordinates for Autos
         outtake16Pose = new Vector2d(-38, 43).plus(robotLocalOffsetVector);
         outtake25Pose = new Vector2d(-40, 26).plus(robotLocalOffsetVector);
+        outtake25Pose = new Vector2d(12, -12).plus(robotLocalOffsetVector);
         outtake34Pose = new Pose2d(-48,34,Math.toRadians(90)).plus(robotLocalOffsetPose);
+        outtake342Pose = new Pose2d(9,-21, Math.toRadians(180)).minus(robotLocalOffsetPose);
 
         comeBack16 = new Pose2d(43, -50, Math.toRadians(180)).minus(robotLocalOffsetPose);
         comeBack25 = new Pose2d(43, -50, Math.toRadians(180)).minus(robotLocalOffsetPose);

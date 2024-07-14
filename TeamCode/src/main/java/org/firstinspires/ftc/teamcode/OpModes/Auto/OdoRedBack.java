@@ -27,16 +27,19 @@ public class OdoRedBack extends OdometryCommon{
 
         //Outake Coordinates for Autos
         outtake16Pose = new Vector2d(37, -26).minus(robotLocalOffsetVector);
-        outtake25Pose = new Vector2d(12, -12).minus(robotLocalOffsetVector);
-        outtake34Pose = new Pose2d(9,-20, Math.toRadians(210)).minus(robotLocalOffsetPose);
+        outtake25Pose = new Vector2d(12, -15).minus(robotLocalOffsetVector);
+        outtake252Pose = new Vector2d(38, -12).minus(robotLocalOffsetVector);
+        outtake34Pose = new Pose2d(9,-36, Math.toRadians(270)).minus(robotLocalOffsetPose);
+        outtake342Pose = new Pose2d(9,-37, Math.toRadians(180)).minus(robotLocalOffsetPose);
 
-        comeBack16 = new Pose2d(43, -23, Math.toRadians(180)).minus(robotLocalOffsetPose);
-        comeBack25 = new Pose2d(50, -55, Math.toRadians(180)).minus(robotLocalOffsetPose);
-        comeBack34 = new Pose2d(35, -34, Math.toRadians(180)).minus(robotLocalOffsetPose);
 
-        backboardPose16 = new Vector2d(40, -34.5).minus(robotLocalOffsetVector);
-        backboardPose25 = new Vector2d(42, -45).minus(robotLocalOffsetVector);
-        backboardPose34 = new Vector2d(25, -31).minus(robotLocalOffsetVector);
+        comeBack16 = new Pose2d(43, -40, Math.toRadians(180)).minus(robotLocalOffsetPose);
+        comeBack25 = new Pose2d(43, -40, Math.toRadians(180)).minus(robotLocalOffsetPose);
+        comeBack34 = new Pose2d(43, -40, Math.toRadians(180)).minus(robotLocalOffsetPose);
+
+        backboardPose16 = new Vector2d(40, -43).minus(robotLocalOffsetVector);
+        backboardPose25 = new Vector2d(40, -43).minus(robotLocalOffsetVector);
+        backboardPose34 = new Vector2d(40, -43).minus(robotLocalOffsetVector);
 
         backUpDistance = 4;
 
@@ -44,8 +47,8 @@ public class OdoRedBack extends OdometryCommon{
         stacksPose = new Vector2d(-35,-14);
 
         //edge park
-        parkFirstPose = new Vector2d(40, -80).minus(robotLocalOffsetVector);
-        parkSecondPose = new Vector2d(65, -80).minus(robotLocalOffsetVector);
+        parkFirstPose = new Vector2d(40, -72).minus(robotLocalOffsetVector);
+        parkSecondPose = new Vector2d(65, -72).minus(robotLocalOffsetVector);
 
 
         //center park

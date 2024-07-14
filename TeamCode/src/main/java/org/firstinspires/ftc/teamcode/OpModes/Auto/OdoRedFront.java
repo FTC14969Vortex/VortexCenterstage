@@ -21,7 +21,9 @@ public class OdoRedFront extends OdometryCommon{
         //Outake Coordinates for Autos
         outtake16Pose = new Vector2d(-38, -23 ).minus(robotLocalOffsetVector);
         outtake25Pose = new Vector2d(-36, -19).minus(robotLocalOffsetVector);
+        outtake25Pose = new Vector2d(12, -12).minus(robotLocalOffsetVector);
         outtake34Pose = new Pose2d(-47,-18, Math.toRadians(270)).minus(robotLocalOffsetPose);
+        outtake342Pose = new Pose2d(9,-21, Math.toRadians(180)).minus(robotLocalOffsetPose);
 
         comeBack16 = new Pose2d(43, -50, Math.toRadians(180)).minus(robotLocalOffsetPose);
         comeBack25 = new Pose2d(43, -50, Math.toRadians(180)).minus(robotLocalOffsetPose);
